@@ -113,11 +113,11 @@ sBegin	Data
 
 	externW x_cell			;x_cell of last drawn cursor
 	externW y_cell			;y_cell of last drawn cursor
-	externA INIT_CURSOR_X		;initial x position
-	externA INIT_CURSOR_Y		;initial y position
 
-real_x	dw	INIT_CURSOR_X		;Real x location of cursor
-real_y	dw	INIT_CURSOR_Y		;Real x location of cursor
+real_x	dw	0		;Real x location of cursor
+real_y	dw	0		;Real x location of cursor
+public real_x
+public real_y
 
 
 

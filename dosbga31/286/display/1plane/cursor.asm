@@ -174,8 +174,6 @@ sBegin	Data
 	public	CUR_HEIGHT
 	public	CUR_ROUND_LEFT
 	public	CUR_ROUND_RIGHT
-	public	INIT_CURSOR_X
-	public	INIT_CURSOR_Y
 
 
 

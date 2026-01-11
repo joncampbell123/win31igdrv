@@ -41,10 +41,5 @@ X_RATE		equ	1			;X mickeys/pixel rate
 Y_RATE		equ	2			;Y mickeys/pixel rate
 
 
-INIT_CURSOR_X	equ	SCREEN_WIDTH/2		;Initial cursor x
-INIT_CURSOR_Y	equ	SCREEN_HEIGHT/2 	;Initial cursor x
-
-
 CUR_ROUND_LEFT	equ	0FFF0h			;Round down to a word
 CUR_ROUND_RIGHT equ	0000Fh			;Round up   to a word
-

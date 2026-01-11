@@ -297,6 +297,8 @@ page
 createSeg _INIT,InitSeg,word,public,CODE
 sBegin	InitSeg
 assumes cs,InitSeg
+assumes ds,Data
+assumes es,nothing
 
 public dosbox_ig_detect
 dosbox_ig_detect	proc near
@@ -574,10 +576,6 @@ msg_starting_video_shutdown db 'Display driver shutdown beginning',10,0
 ; {
 ; }
 ;-----------------------------------------------------------------------;
-
-
-	assumes ds,Data
-	assumes es,nothing
 
 DBIG_INIT_CTL	equ	DBID_REG_VGAIG_CTL_OVERRIDE + \
 			DBID_REG_VGAIG_CTL_VGAREG_LOCKOUT + \
