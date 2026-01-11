@@ -60,7 +60,6 @@ COLOR_BLT	equ	01000000b	; the screen is a color device
 ;----------------------------------------------------------------------------;
 
 	externA	SCREEN_WIDTH		; width of screen in pels
-	externA	SCREEN_HEIGHT		; height of screen in scans
 	externA	SCREEN_W_BYTES		; width of screen in bytes
 	externA	ScreenSelector		; video segment address
         externA COLOR_FORMAT            ; own color format

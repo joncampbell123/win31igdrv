@@ -202,6 +202,7 @@ globalW ScratchSel,0			;have a scratch selector
 globalW ssb_mask,0FFFFh 		;Mask for save screen bitmap bit
 globalB enabled_flag,0			;Display is enabled if non-zero
 globalW	is_protected,WinFlags		;LSB set in protected mode
+globalW SCREEN_HEIGHT,480		;Screen height in pixels
 
 sEnd	Data
 page

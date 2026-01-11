@@ -33,6 +33,7 @@ incDevice = 1				;allow assembly of needed constants
 	externA		ScreenSelector	; the selector for display memory
 	externFP      	AllocCSToDSAlias; get a data seg alias for CS
 	externFP	FreeSelector	; free a selector
+	externW		SCREEN_HEIGHT
 	externW		real_x
 	externW		real_y
 
@@ -103,7 +104,8 @@ cBegin
 	mov	ax,SCREEN_WIDTH/2
 	mov	real_x,ax
 
-	mov	ax,SCREEN_HEIGHT/2
+	mov	ax,SCREEN_HEIGHT
+	shr	ax,1
 	mov	real_y,ax
 
 	mov	ax,SCREEN_WIDTH

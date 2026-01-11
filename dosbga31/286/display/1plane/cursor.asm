@@ -135,6 +135,7 @@
 
 
 	externA ScreenSelector		;Segment of screen
+	externW SCREEN_HEIGHT
 
 	public	move_cursors
 	public	draw_cursor

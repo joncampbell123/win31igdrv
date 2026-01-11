@@ -42,7 +42,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 	externA ScreenSelector		;Selector to the screen
 	externA SCREEN_WIDTH		;Screen width in pixels
 	externA SCREEN_W_BYTES		;Screen width in bytes
-	externA SCREEN_HEIGHT		;Screen height in scans
+	externW SCREEN_HEIGHT		;Screen height in scans
 
 
 ifdef	EXCLUSION

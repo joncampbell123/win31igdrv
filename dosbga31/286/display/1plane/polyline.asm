@@ -238,7 +238,7 @@ incOutput	= 1			;Include GDI Output definitions
 	externA SCREEN_W_BYTES
 	externA ScreenSelector
 	externA	SCREEN_WIDTH
-	externA	SCREEN_HEIGHT
+	externW	SCREEN_HEIGHT
 
 	externFP LineSeg_check_stack
 
@@ -491,7 +491,8 @@ do_no_clipping:
 ifdef	EXCLUSION
 	xor	cx,cx			; assume entire screen
 	mov	dx,cx
-	mov	di,SCREEN_HEIGHT-1
+	mov	di,SCREEN_HEIGHT	; SCREEN_HEIGHT-1
+	dec	di
 	mov	si,SCREEN_WIDTH-1
 
 	test	ClipFlag,CLIP_TOBE_DONE ; non zero clipping rectangle ?
