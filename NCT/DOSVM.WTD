@@ -1,0 +1,921 @@
+GLOBAL DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc' 
+'$INCLUDE: 'netinfo.inc' 
+'$INCLUDE: 'drvconn.inc' 
+'$INCLUDE: 'drvdconn.inc' 
+'$INCLUDE: 'clock.inc' 
+
+ViewPort OFF
+HctTestBegin 0, "DOS Multi-VM Test"
+GetWinplayVars
+ClearLog "dosvm.log"
+'*************************************************************************
+' Microsoft Multiple DOS VM Test Script (Enhanced Mode Version)
+'
+' Script:       DOSVM.WTD
+' Author:       GOA & DLS & converted by jl
+' Date:         12-Jun-1991
+'
+'*************************************************************************
+' Description:
+'*************************************************************************
+' Script used with WinPlay to test network IO operations with multiple
+' VMs.
+'
+' The script connects the three network drives to test.  Then it uses
+'   NotePad to create the VM batch files.  
+'
+' Variables used in this script:
+'       AutoDelay               NCTPath                 NetDrive1
+'       NetPath1                NetDir1                 NetDrive2               
+'       NetPath2                NetDir2                 NCTDriveLtr
+'       NCTFlopLtr
+'*************************************************************************
+' Modifications:
+' NAME          DATE            DESCRIPTION
+'
+'************************************************************************
+'  Test Controls dialog
+'************************************************************************
+x%=usecontrols("Multi-VM Test") 
+'*************************************************************************
+' WRITE HEADER TO MAIN LOG FILE
+'**************************************************************************
+
+lf$ = "dosvm.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for DOS MULTI-VM Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'*************************************************************************
+' CONNECT TO NETWORK DRIVES & VERIFY CONNECTION
+'**************************************************************************
+'
+drvconn               'connect drives - defined in drvconn.inc
+
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drive Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+
+wlog lf$, " "
+wlog lf$, " "
+
+'*************************************************************************
+' Decide whether to make the batch files...or to run existing ones....
+'*************************************************************************
+
+IF NOT ((MakeBatchFile$ = "y") OR (MakeBatchFile$ = "Y")) THEN
+  ret%  = Exists (NCTDriveLtr+":"+NCTPath+"\DOSVM1.BAT")    'does this file exists?
+  ret2% = Exists(NCTDriveLtr+":"+NCTPath+"\DOSVM2.BAT")         'does this file exists?
+  ret3% = Exists(NCTDriveLtr+":"+NCTPath+"\DOSVM3.BAT")         'does this file exists?  
+  ret4% = Exists(NCTDriveLtr+":"+NCTPath+"\DOSVM1.PIF")         'does this file exists?
+  ret5% = Exists(NCTDriveLtr+":"+NCTPath+"\DOSVM2.PIF")         'does this file exists?
+  ret6% = Exists(NCTDriveLtr+":"+NCTPath+"\DOSVM3.PIF")         'does this file exists?  
+  
+  IF ((ret% = -1) AND (ret2% = -1) AND (ret3% = -1) AND (ret4% = -1) AND (ret5% = -1) AND (ret6% = -1)) THEN
+    goto SKIPBATCH                                               'only if ALL exists
+  END IF
+END IF
+
+
+'************************************************************************
+' LOAD NOTEPAD AND CREATE BATCH FILES FOR VMs
+'************************************************************************
+
+retcode%=WinExec("Notepad",1)
+'
+
+'(((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
+'*************************************************************************
+' CREATE FIRST BATCH FILE:  DOSVM1.BAT - DOS UTILITIES
+'*************************************************************************
+'(((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))
+
+WPlayKeys("%FN")                 ' notepad - open new file
+
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("Rem *** Batch File Name:   DOSVM1.bat{Enter}")
+WPlayKeys("Rem *** Created by Script: DOSVM.WTD{Enter}")
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+'
+WPlayKeys("@echo off{Enter}{Enter}")
+
+
+WPlayKeys("Echo ****************************************** > "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo *****DOS UTILS BATCH FILE BEGINNING******* >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ******** BATCH FILE: DOSVM1.BAT ********** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG del "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG{ENTER}")
+
+' change to working directories (out of Windows dir)
+
+WPlayKeys(":Loop{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto end{ENTER}")
+WPlayKeys("{Enter}")
+'
+'
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("Rem *** Change to working directories{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+
+'PlayKeys("if exist "%NCTDriveLtr%":"%NctPath%"\DOSVM.FLG goto clean{ENTER}")
+
+WPlayKeys("{Enter}")
+'
+'************************************************************************
+' MAKE FILE ON FLOPPY DRIVE - COPY TO NCT DIRECTORY
+'************************************************************************
+
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY *****{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir > "+NCTFlopLtr+":\VMTEST.FIL{ENTER}") 'make test file
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NCT DIR COPY FAILED @ LINE 37! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NCT DIR COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' COPY FILE FROM FLOPPY DRIVE TO NETWORK DRIVE
+'*************************************************************************
+
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NET COPY FAILED @ LINE 53! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' DEL FILE FROM NETWORK DRIVE & COPY FILE FROM NCT DIR TO NETWORK DRIVE
+'*************************************************************************
+
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("del "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NCT DIR TO NET COPY FAILED @ LINE 70! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NCT DIR TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' DIR > TO SORT.FIL ON NETWORK, THEN REDIRECT TO SORT COMMAND
+'***************************************************************************
+
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT *****{ENTER}")
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("sort < "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NETWORK FILE SORT FAILED @ LINE 86! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NETWORK FILE SORT PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' ATTRIB FILE READ-ONLY; ATTEMPT TO DELETE FILE
+'***************************************************************************
+
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST *****{ENTER}")
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\NDIR1.fil{ENTER}")
+WPlayKeys("attrib {+}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB {+}R NET FILE FAILED @ LINE 101! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB {+}R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys("del "+NETDRIVE1+":"+NETDIR1+"\*.FIL{ENTER}")
+
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo COULDN'T DELETE READ-ONLY NET FILE! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error DELETED READ-ONLY NET FILE @ 221! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' RENAME A NETWORK FILE
+'***************************************************************************
+
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME *****{ENTER}")
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+WPlayKeys("attrib {-}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB -R NET FILE FAILED @ LINE 118! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB -R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys("ren "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL VM2.FIL{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo RENAME NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error RENAME NET FILE FAILED @ LINE 121! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' XCOPY TEST - LOCAL TO NET & NET TO NET
+'***************************************************************************
+
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST *****{ENTER}")
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\*.boo{ENTER}")      'SETTING UP TREE STRUCTURE
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\*.boo{ENTER}")
+WPlayKeys("{Enter}")                  
+WPlayKeys("md "+NetDrive1+":"+NetDir1+"\1{Enter}")      'md dir on netdrive1
+
+WPlayKeys("xcopy "+NCTDriveLtr+":"+NctPath+"\1 "+NeTDrive1+":"+NeTDir1+"\1 /s/v{ENTER}")     'local to net xcopy
+
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NCT DIR TO NET FAILED @ LINE 148! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NCT DIR TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto clean{ENTER}")
+
+WPlayKeys("{Enter}")
+
+WPlayKeys("md "+NetDrive2+":"+NetDir2+"\1{Enter}")
+WPlayKeys("xcopy "+NeTDrive1+":"+NeTDir1+"\1 "+NeTDrive2+":"+NeTDir2+"\1 /s/v{ENTER}")
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NET TO NET DRIVE FAILED @ LINE 154! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NET TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' CLEAN UP FILES
+'***************************************************************************
+WPlayKeys(":Clean{Enter}")
+
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS *****{ENTER}")
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS ***** >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys( NetDrive2+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\APPLET.BOO goto nctdrv{ENTER}")
+
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("cd "+NeTDrive2+":"+NetDir2+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.FIL{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NetDrive2+":"+Netdir2+"\1\APPLET.boo goto nctdrv{ENTER}")
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+
+WPlayKeys(":nctdrv{Enter}")
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.boo goto net1{ENTER}")
+
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.boo goto net1{ENTER}")
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys(":net1{Enter}")
+
+WPlayKeys( NetDrive1+":{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\*.fil{Enter}")
+
+WPlayKeys("if NOT exist "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\APPLET.boo goto cont{ENTER}")
+
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("cd "+NeTDrive1+":"+NetDir1+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.fil{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("if exist "+NetDrive1+":"+Netdir1+"\1\APPLET.boo goto cont{ENTER}")
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+
+
+WPlayKeys(":cont{enter}")
+
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\DOSVM.FLG goto end{ENTER}")
+
+WPlayKeys("goto loop{Enter}")
+
+'*************************************************************************
+' ENDING SECTION FOR DOSVM1.BAT
+'**************************************************************************
+
+WPlayKeys(":end{ENTER}")
+
+WPlayKeys("type "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log >> "+NCTDriveLtr+":"+NctPath+"\dosvm.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\DOSVM1.log{ENTER}")
+
+WPlayKeys("exit{ENTER}")
+
+WPlayKeys("%FA")                                           ' save the file as DOSVM1.bat
+WPlayKeys( NCTDriveLtr+":"+NctPath+"\DOSVM1.BAT{Enter}%Y")
+
+'(((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))))))
+'*************************************************************************
+' CREATE SECOND BATCH FILE:  DOSVM2.BAT - NETBIOS TEST
+'*************************************************************************
+'(((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("%FN")         'NOTEPAD FILE_NEW
+
+WPlayKeys("REM  ***************************************{enter}")
+WPlayKeys("REM  ***** DOSVM2.BAT - NETBIOS TEST  ******{ENTER}")
+WPlayKeys("REM  ****** SCRIPT FILE:  DOSVM.WTD  *******{ENTER}")
+WPlayKeys("REM  ***************************************{enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("@echo off{ENTER}{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG del "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG{ENTER}")
+
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo ***** DOSVM2.BAT - NETBIOS TEST  ******{ENTER}")
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("echo ***************************************> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo *****  DOSVM2.BAT - NETBIOS TEST  *****>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo *********     NET BIOS TEST  **********{ENTER}")
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo *********     NET BIOS TEST   *********>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+WPlayKeys("{ENTER}")    
+
+WPlayKeys(":loop{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG goto end{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+WPlayKeys("{ENTER}")    
+
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\dnetbios /lfail /fdosvmnet.log netbios2.nct{ENTER}") 
+WPlayKeys("if Errorlevel 3 echo NETBIOS TEST EXECUTED! >> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("if Errorlevel 3 goto nextlabel{ENTER}")
+
+WPlayKeys("if Errorlevel 2 echo Error NETBIOS TEST FAILED @ LINE 32! >> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("if Errorlevel 2 goto nextlabel{ENTER}")
+
+WPlayKeys("if Errorlevel 0 echo Error NETBIOS NOT PRESENT!! >> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("cls{Enter}")
+WPlayKeys("{ENTER}")    
+
+WPlayKeys(":nextlabel{ENTER}")
+WPlayKeys("{ENTER}")    
+
+WPlayKeys("type "+NCTDriveLtr+":"+NCTPath+"\dosvmnet.log >> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}") 
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\dosvmnet.log{ENTER}")
+
+WPlayKeys("{ENTER}")    
+WPlayKeys("delay.exe{Enter}{Enter}")
+WPlayKeys("goto loop{Enter}")
+WPlayKeys("{ENTER}")    
+
+WPlayKeys(":end{ENTER}")    
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo ********* END OF NETBIOS TEST *********>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+
+WPlayKeys("type "+NCTDriveLtr+":"+NCTPath+"\dosvm2.log >> "+NCTDriveLtr+":"+NCTPath+"\dosvm.log{ENTER}") 
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\DOSVM2.log{ENTER}")
+
+'*************************************************************************
+' ENDING SECTION FOR DOSVM2.BAT
+'**************************************************************************
+
+WPlayKeys("exit{ENTER}")
+
+WPlayKeys("%FA")                 ' save the file
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\DOSVM2.BAT{Enter}%Y")
+
+
+'(((((((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))
+'*************************************************************************
+' CREATE THIRD BATCH FILE:  DOSVM3.BAT - SMALL FILE I/O
+'*************************************************************************
+'(((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("%FN")         'NOTEPAD FILE_NEW
+
+WPlayKeys("REM  ***************************************{enter}")
+WPlayKeys("REM  ***** DOSVM3.BAT - SMALL FILE I/O *****{ENTER}")
+WPlayKeys("REM  ****** SCRIPT FILE:  DOSVM.WTD  *******{ENTER}")
+WPlayKeys("REM  ***************************************{enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("@echo off{ENTER}{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG del "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG{ENTER}")
+
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo ***** DOSVM3.BAT - SMALL FILE I/O *****{ENTER}")
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("echo ***************************************> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+WPlayKeys("echo *****  DOSVM3.BAT - SMALL FILE I/O ****>> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM3.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\DOSVM3.log{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG goto end{ENTER}")
+
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo *       SMALL FILE I/O TEST           *{ENTER}")
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("{enter}")
+
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+WPlayKeys("echo *       SMALL FILE I/O TEST           *>> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\dosvm3.log{ENTER}")
+
+WPlayKeys("{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("Rem *** Change to working directories{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("md "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")       'cd to 1st net drive
+WPlayKeys("md "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")       'cd to 2nd net drive
+WPlayKeys("md "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")       'cd to 3rd net drive
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"{Enter}")     'cd to NCT dir
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")       'cd to 1st net drive
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")       'cd to 2nd net drive
+WPlayKeys("cd "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")       'cd to 3rd net drive
+WPlayKeys("{Enter}")
+
+'*********************************************************************
+' WRITE OUT DRIVE SMALL FILE I/O TEST LOOP
+'*********************************************************************
+WPlayKeys("{Enter}")
+
+'************************
+'header info for log file
+'************************
+
+WPlayKeys("{Enter}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo **** SMALL FILE I/O TEST BEGINNING ****{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Rem **************************************{Enter}")    'header info for batch file
+WPlayKeys("Rem ** BEGINNING OF SMALL FILE I/O TEST **{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("{Enter}")
+
+'****************************************************************************
+' MAIN DRVSTRES.EXE SECTION
+'****************************************************************************
+
+WPlayKeys("drvstres 65 4500 256 "+RemIOLoc+" "+NetDrive1+" "+NetDrive2+" "+NetDrive3+" /t /l{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error EXECUTING DRVSTRS.EXE! >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo PASS FILE I/O COMPLETED! >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ************************************{ENTER}")
+WPlayKeys("Echo **** SMALL FILE I/O TEST ENDING ****{ENTER}")
+WPlayKeys("Echo ************************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' COPY SOME BOZO FILES & THEN DELETE ALL THE TEMP FILES CREATED/COPIED
+'***************************************************************************
+
+WPlayKeys("{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("Rem *** Delete all the temp data files ***{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")  'copy some bogus files to netdrive1
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")  'copy some bogus files to netdrive2
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")  'copy some bogus files to netdrive3
+
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\nctbozo1.111\*.pif{ENTER}")       'del bogus files on netdrive1
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\nctbozo2.222\*.pif{ENTER}")       'del bogus files on netdrive2
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\nctbozo3.333\*.pif{ENTER}")       'del bogus files on netdrive3
+
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\drvstres.dat{ENTER}")    'del drvstres data files on local drive
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\nctbozo1.111\drvstres.dat{ENTER}")      'del drvstres data files on netdrive1
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\nctbozo2.222\drvstres.dat{ENTER}")      'del drvstres data files on netdrive2
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\nctbozo3.333\drvstres.dat{ENTER}")      'del drvstres data files on netdrive3
+
+
+'***************************************************************************
+' ENDING SECTION - DOSVM3.BAT
+'***************************************************************************
+
+WPlayKeys("Echo ************************************ >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("Echo **** SMALL FILE I/O TEST ENDING **** >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("Echo ************************************ >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+
+
+WPlayKeys(":end{Enter}")         'end section - write out log file & terminate
+
+WPlayKeys("cd "+NetDrive1+":\{Enter}")       'cd to 1st net drive \
+WPlayKeys("cd "+NetDrive2+":\{Enter}")       'cd to 2nd net drive \
+WPlayKeys("cd "+NetDrive3+":\{Enter}")       'cd to 3rd net drive \
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' LOG THE OUTPUT FROM TEMP LOG FILE TO MAIN LOG FILE-DELETE TEMP LOG FILE
+' ALSO NOTEPAD FILE_SAVEAS
+'***************************************************************************
+
+WPlayKeys("type "+NCTDriveLtr+":"+NctPath+"\dosvm3.log >> "+NCTDriveLtr+":"+NctPath+"\dosvm.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\dosvm3.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\test.log{ENTER}")
+
+WPlayKeys("exit{ENTER}")
+
+WPlayKeys("%FA")                 ' save the file
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\DOSVM3.BAT{Enter}%Y")
+WPlayKeys("%{F4}")               ' close Notepad
+
+'************************************************************************
+' MAKE A PIF FILE FOR DOSVM1
+'************************************************************************
+'
+retcode%=WinExec ("PIFEdit",1)                           'exec pifeditor
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("DOSVM1.BAT")                         'batch
+WPlayKeys ("%TNCT VM1 - DOS UTILITY TEST")       'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'startup dir
+WPlayKeys ("%W")                                 'Set to Windowed PIF
+WPlayKeys ("%B")                                 'background
+WPlayKeys ("%r")                                 'required
+WPlayKeys ("32")                                 '32K ram
+WPlayKeys ("%FA")                                'file save_as
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\DOSVM1.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+'***********************************************************************
+' MAKE A PIF FILE FOR DOSVM2
+'***********************************************************************
+'
+WPlayKeys("%FN")                                 'file_new
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("DOSVM2.BAT")                         'batch file
+WPlayKeys ("%TNCT VM2 - NETBIOS TEST")           'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'startup dir
+WPlayKeys ("%W")                                 'Set to Windowed PIF
+WPlayKeys ("%B")                                 'background
+WPlayKeys ("%r")                                 'required
+WPlayKeys ("32")                                 '32K ram
+WPlayKeys ("%FA")                                'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\DOSVM2.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+'**********************************************************************
+' MAKE A PIF FILE FOR DOSVM3
+'**********************************************************************
+'
+WPlayKeys("%FN")                                 'file_new
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("DOSVM3.BAT")                         'batch file
+WPlayKeys ("%TNCT VM3 - SM FILE I/O")            'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)         'startup directory
+WPlayKeys ("%W")                                 'Set to Windowed PIF
+WPlayKeys ("%B")                                 'background
+WPlayKeys ("%r")                                 'required
+WPlayKeys ("32")                                 '32K ram
+WPlayKeys ("%FA")                                'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\DOSVM3.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+WPlayKeys ("%{F4}")                              'Close PifEditor
+
+
+SKIPBATCH:      'come here if decide not to make batch & pif files
+
+'***********************************************************************
+' START AN INSTANCE OF CLOCK  - DIGITAL MODE - NORMAL SIZE
+'***********************************************************************
+'
+clock                'start minimized clock - defined in clock.inc
+
+retcode%=WinExec("Clock",1)              'restore clock back to normal size
+ret%=SleepDelay(2)                   '
+
+
+'***********************************************************************
+' RUN THE PIF BATCH FILES
+'***********************************************************************
+'
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify DOS VM's have started"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\DOSVM1.PIF",1)
+ret%=SleepDelay(10)
+
+IF ButtonExists("OK") <> 0 THEN 
+  ClickButton "OK"
+  wlog lf$,"Unable to start DOSVM #1 - may be due to insufficient memory!"
+  wlog lf$, "Please verify....................."
+  wlog lf$, " "
+ELSE
+  wlog lf$,"DOSVM #1 - started successfully!"
+END IF
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\DOSVM2.PIF",1)
+ret%=SleepDelay(13)
+
+IF ButtonExists("OK") <> 0 THEN 
+  ClickButton "OK"
+  wlog lf$,"Unable to start DOSVM #2 - may be due to insufficient memory!"
+  wlog lf$, "Please verify....................."
+  wlog lf$, " "
+ELSE
+  wlog lf$,"DOSVM #2 - started successfully!"
+END IF
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\DOSVM3.PIF",1)
+ret%=SleepDelay(15)
+
+IF ButtonExists("OK") <> 0 THEN 
+  ClickButton "OK"
+  wlog lf$,"Unable to start DOSVM #3 - may be due to insufficient memory!"
+  wlog lf$, "Please verify....................."
+  wlog lf$, " "
+ELSE
+  wlog lf$,"DOSVM #3 - started successfully!"
+END IF
+wlog lf$, " "
+wlog lf$, " "
+
+'*************************************************************************
+' WAIT x MINUTES TO ALLOW THE VM'S TO RUN IN THE BACKGROUND
+'**************************************************************************
+for i% = 1 to 4                 'increase this loop for longer test times!
+ret%=SleepDelay(59)             'wait 1 minute i times
+next
+
+'*************************************************************************
+' WRITE OUT STOP FLAG FOR OTHER VM'S
+'**************************************************************************
+
+retcode%=WinExec("wverify.exe 1 "+NCTDriveLtr+":"+NCTPath+"\DOSVM.FLG",1)  ' Create stop file
+ret%=SleepDelay(10)
+
+'***************************************************************************
+'wait until VM's have closed
+'***************************************************************************
+ret%=SleepDelay(59)
+
+ii% = 1
+loop% = 0
+
+While ii > 0  
+
+  IF WindowExists ("NCT VM") <> 0 THEN          'if exists then wait
+     Ret%=SleepDelay(20)                          'wait 10 seconds
+     Loop = loop + 1                              'increment loop counter
+  ELSE
+     ii = -1                                      'since gone - quit while loop
+  END IF
+  
+  IF loop > 36 THEN                               'check if past 12 mins
+     ii =  -1                                     'if past 12 min then quit
+  END IF
+
+WEND   
+
+IF loop > 36 THEN
+  wlog lf$, "Error: @ least one VM not closed!!"
+  goto ending                                     'do not disconnect  
+END IF
+
+
+
+'*************************************************************************
+' CLOSE THE CLOCK
+'**************************************************************************
+
+retcode%=WinExec("Clock",1)
+ret%=SleepDelay(2)
+
+WPlayKeys("%{f4}")                        'close
+ret%=SleepDelay(2)
+
+
+'*************************************************************************
+' DISCONNECT NETWORK DRIVES & VERIFY DISCONNECTION
+'**************************************************************************
+
+drvdconn                'disconnect the drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Drive Disconnections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NCTPath+"\dosvm.log",1) 'verify connection
+
+'*************************************************************************
+' QUIT
+'**************************************************************************
+ending:
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Log File for DOS MULTI-VM Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+
+result%=HctCopyErrorsFromLogFile ("dosvm.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

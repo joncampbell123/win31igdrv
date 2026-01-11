@@ -1,0 +1,211 @@
+Global DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+'$INCLUDE: 'netinfo.inc'
+'$INCLUDE: 'drvconn.inc'
+'$INCLUDE: 'drvdconn.inc'
+
+
+ViewPort OFF
+HctTestBegin 0, "STD Net Sm File Test"
+GetWinplayVars
+ClearLog "sremio.log"
+
+
+'*************************************************************************
+' Microsoft Remote IO Test Script (Standard Mode Version)
+'
+' Script:       SREMIO.WTD
+' Author:       GOA (modified by jl)
+' Date:         29-May-1991
+'
+'*************************************************************************
+' Description:
+'*************************************************************************
+' Script used with WATTDRV to test network drive IO operations within
+' various networking environments.
+
+' The script connects the three network drives.  Then it uses
+'   NotePad to create the SREMIO.BAT file.  This file sets the current
+'   directory on all the drives to the test directory, then it executes
+'   DRVSTRES.EXE with the settings given in the WINPLAY.INI file.
+'   After the test is run, the test data files are deleted and the
+'   test directories are removed.
+'
+' Variables used in this script:
+'       AutoDelay               NCTPath                 NetDrive1
+'       NetPath1                NetDir1                 NetDrive2               
+'       NetPath2                NetDir2                 NetDrive3               
+'       NetPath3                NetDir3                 RemIOLoc
+'       NCTDriveLtr
+'*************************************************************************
+' Modifications:
+' NAME          DATE            DESCRIPTION
+'
+'*************************************************************************
+'
+'
+'*************************************************************************
+'  Test Controls dialog
+'*************************************************************************
+
+x%=usecontrols("Std Sm File IO")
+
+'*************************************************************************
+' LOG OUT HEADER INFORMATION TO LOG FILE
+'*************************************************************************
+
+lf$ = "sremio.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for STD Lg File I/O Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'*************************************************************************
+' CONNECT THE NETWORK DRIVES & VERIFY CONNECTIONS
+'*************************************************************************
+
+drvconn                  'connect the drives - defined in drvconn.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drive Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+
+'*************************************************************************
+' Decide whether to make the batch files...or to run existing ones....
+'*************************************************************************
+
+IF NOT ((MakeBatchFile$ = "y") OR (MakeBatchFile$ = "Y")) THEN
+  ret% = Exists (NCTDriveLtr+":"+NCTPath+"\SREMIO.BAT")         'does this file exists?
+  ret2% = Exists(NCTDriveLtr+":"+NCTPath+"\SREMIO.PIF")         'does this file exists?
+  IF ((ret% = -1) and (ret2% = -1)) THEN
+    goto SKIPBATCH                                      'only if both exists
+  END IF
+END IF
+
+
+'*************************************************************************
+' LOAD NOTEPAD AND CREATE BATCH FILE
+'*************************************************************************
+
+retcode%=WinExec("Notepad",1)
+
+'
+WPlayKeys("@echo off{Enter}{Enter}")
+
+'****************************************************
+' change to working directories (out of Windows dir)
+'*****************************************************
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NCTPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+WPlayKeys("cd "+NetDrive3+":"+NetDir3+"{Enter}")
+
+WPlayKeys("drvstres 65 15240 64 "+RemIOLoc+" "+NetDrive1+" "+NetDrive2+" "+NetDrive3+" /t /l{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error DRIVE STRESS FAILED! >> "+NctDriveLtr+":"+NctPath+"\sremio.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo DRIVE STRESS PASSED! >> "+NctDriveLtr+":"+NctPath+"\sremio.log{ENTER}")
+
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\drvstres.dat{ENTER}")
+'
+WPlayKeys("cd "+NetDrive1+":\{ENTER}")       'make net drives @ root
+WPlayKeys("cd "+NetDrive2+":\{ENTER}")
+WPlayKeys("cd "+NetDrive3+":\{ENTER}")
+'
+WPlayKeys("{ENTER}")
+WPlayKeys("type test.log >> sremio.log")        'put test info into log file
+WPlayKeys("{ENTER}")
+WPlayKeys("{ENTER}")
+WPlayKeys("del test.log{ENTER}")
+WPlayKeys("exit{Enter}")
+
+WPlayKeys("%FA")                 ' save the file
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\SREMIO.BAT{Enter}%Y")
+WPlayKeys("%{F4}")               ' close Notepad
+
+'***********************************************************************
+' MAKE A PIF FILE FOR SREMIO.BAT
+'***********************************************************************
+
+retcode%=WinExec ("PIFEdit",1)                                  'exec pif editor
+WPlayKeys ("%P")                                                'program
+WPlayKeys ("SREMIO.BAT")                                        'batch file
+WPlayKeys ("%TNCT IO Stress Test")                              'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)                        'startup directory
+WPlayKeys ("%FA")                                               'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\SREMIO.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+WPlayKeys ("%{F4}")                              'Close the Editor
+
+
+
+SKIPBATCH:       'come here if decided to skip making batch & pif files
+
+'***********************************************************************
+' RUN THE PIF FILE
+'***********************************************************************
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "STD I/O Test Results Posted Here:"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\SREMIO.PIF",1)
+
+ret%=SleepDelay(10)                  'put in a little delay
+
+'*************************************************************************
+' ONCE SREMIO.BAT IS COMPLETED, DISCONNECT THE NETWORK DRIVES
+'*************************************************************************
+
+drvdconn                  'disconnect the drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drive Disconnections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /l"+NctDriveLtr+":"+NctPath+"\sremio.log",3) 'verify connection
+
+'*************************************************************************
+' Log out test end information to log file 
+'*************************************************************************
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Std Sm File I/O Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+
+result%=HctCopyErrorsFromLogFile (NctDriveLtr+":"+NctPath+"\sremio.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

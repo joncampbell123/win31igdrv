@@ -1,0 +1,285 @@
+Global DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+'$INCLUDE: 'netinfo.inc'
+'$INCLUDE: 'drvconn.inc'
+'$INCLUDE: 'drvdconn.inc'
+'$INCLUDE: 'clock.inc'
+
+ViewPort OFF
+HctTestBegin 0, "ENH Net Lg File Test"
+GetWinplayVars
+ClearLog "eremiolg.log"
+lf$ = "eremiolg.log"
+
+'*************************************************************************
+' Microsoft Remote IO Test Script (Enhanced Mode Version - Large File Size)
+'
+' Script:       EREMIOLG.WTD
+' Author:       ga & jl
+' Date:         Aug 14, 1991
+'
+'
+' Version:  3.1
+'
+'*************************************************************************
+' Description:
+'*************************************************************************
+' Script used with WATTDRV to test network drive IO operations within
+' various networking environments.
+
+' The script connects the three network drives.  Then it uses
+'   NotePad to create the EREMIOLG.BAT file.  This file sets the current
+'   directory on all the drives to the test directory, then it executes
+'   DRVSTRES.EXE with the settings given in the WINPLAY.INI file.
+'   After the test is run, the test data files are deleted and the
+'   test directories are removed.
+'
+' Variables used in this script:
+'       AutoDelay               NCTPath                 NetDrive1
+'       NetPath1                NetDir1                 NetDrive2               
+'       NetPath2                NetDir2                 NetDrive3               
+'       NetPath3                NetDir3                 RemIOLoc
+'       NCTDriveLtr
+'*************************************************************************
+' Modifications:
+' NAME          DATE            DESCRIPTION
+'
+'*************************************************************************
+'
+'
+'
+'*************************************************************************
+' Test Controls dialog
+'*************************************************************************
+'
+x%=usecontrols("Enh Lg File IO")
+'
+'*************************************************************************
+' LOG OUT HEADER INFORMATION TO LOG FILE
+'*************************************************************************
+
+lf$ = "eremiolg.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for Enh Lg File I/O Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+
+'*************************************************************************
+' CONNECT THE NETWORK DRIVES & VERIFY CONNECTIONS
+'*************************************************************************
+
+drvconn          'connect the drives - defined in drvconn.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+
+
+'*************************************************************************
+' Decide whether to make the batch files...or to run existing ones....
+'*************************************************************************
+
+IF NOT ((MakeBatchFile$ = "y") OR (MakeBatchFile$ = "Y")) THEN
+  ret% = Exists (NCTDriveLtr+":"+NCTPath+"\EREMIOLG.BAT")         'does this file exists?
+  ret2% = Exists(NCTDriveLtr+":"+NCTPath+"\EREMIOLG.PIF")         'does this file exists?
+  IF ((ret% = -1) and (ret2% = -1)) THEN
+    goto SKIPBATCH                                      'only if both exists
+  END IF
+END IF
+
+
+'*************************************************************************
+' LOAD NOTEPAD AND CREATE BATCH FILES
+'*************************************************************************
+'
+retcode%=WinExec("Notepad",1)            'exec notepad
+
+WPlayKeys("@echo off{Enter}{Enter}")     'first line of eremiolg.bat batch file
+
+WPlayKeys("{enter}")
+
+'***************************************************
+' change to working directories (out of Windows dir)
+'***************************************************
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NCTPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+WPlayKeys("cd "+NetDrive3+":"+NetDir3+"{Enter}")
+WPlayKeys("{enter}")
+
+WPlayKeys(":Loop{enter}")
+WPlayKeys("{enter}")
+
+WPlayKeys("{Enter}")
+'
+
+'*****************************
+'main section of EREMIOLG.WTD
+'*****************************
+
+WPlayKeys("drvstres 100000 500000 10000 "+RemIOLoc+" "+NetDrive1+" "+NetDrive2+" "+NetDrive3+" /t /l{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error DRIVE STRESS FAILED! >> "+NctDriveLtr+":"+NctPath+"\eremiolg.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo DRIVE STRESS PASSED! >> "+NctDriveLtr+":"+NctPath+"\eremiolg.log{ENTER}")
+
+'*************************************************************************
+' DELETE TEMP *.DAT FILES CREATED
+'*************************************************************************
+
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\drvstres.dat{ENTER}")
+
+WPlayKeys("{enter}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' ENDING SECTION FOR EREMIOLG.BAT
+'*************************************************************************
+
+WPlayKeys(":end{enter}{enter}")
+
+WPlayKeys("cd "+NetDrive1+":\{ENTER}")           'put netdrives back @ root
+WPlayKeys("cd "+NetDrive2+":\{ENTER}")
+WPlayKeys("cd "+NetDrive3+":\{ENTER}")
+'
+WPlayKeys("{ENTER}")
+WPlayKeys("type test.log >> eremiolg.log")      'put test results into log file
+WPlayKeys("{ENTER}")
+WPlayKeys("{ENTER}")
+WPlayKeys("del test.log{ENTER}")                'del test temp log file
+
+WPlayKeys("exit{Enter}")
+
+WPlayKeys("%FA")                 ' save the file
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\EREMIOLG.BAT{Enter}%Y")
+
+WPlayKeys("%{F4}")               ' close Notepad
+
+
+'********************************************************************
+' MAKE A PIF FILE FOR EREMIOLG.BAT
+'********************************************************************
+'
+retcode%=WinExec ("PIFEdit",1)                                  'pif editor
+WPlayKeys ("%P")                                                'program
+WPlayKeys ("EREMIOLG.BAT")                                      'batch file         
+WPlayKeys ("%TENH Net Lg File Test")                            'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)                        'startup dir
+WPlayKeys ("%W")                                                'Set to Windowed PIF
+WPlayKeys ("%B")                                                'background
+WPlayKeys ("%FA")                                               'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\EREMIOLG.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+WPlayKeys ("%{F4}")                              'Close the Editor
+
+
+SKIPBATCH:      'come here if we decided to skip making the batch & pif files 
+
+'************************************************************************
+' START AN INSTANCE OF CLOCK - DIGITAL MODE - NORMAL SIZE
+'************************************************************************
+'
+Clock                 'start a minimized clock - DEFINED IN CLOCK.INC
+
+SelectWindow "Clock"              'restore back to normal size
+RestoreWindow
+PositionWindow 3,3                'position clock in upper right hand corner
+
+'*********************************************************************
+' RUN THE PIF FOR EREMIOLG
+'*********************************************************************
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Begin ENH File I/O - Results Logged Here!"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\EREMIOLG.PIF",1)
+ret%=SleepDelay(2)
+PositionWindow 150,200
+
+
+'***********************************************************************
+' LOOP UNTIL THE VM IS DONE -   
+'***********************************************************************
+
+WHILE WindowExists("enh net lg") <> 0     'Check - does vm exists?
+   ret%=SleepDelay(15)                    '   yes - wait 15 seconds
+WEND                                      'loop again
+
+
+'************************************************************************
+' CLOSE THE CLOCK
+'************************************************************************
+
+retcode%=WinExec("Clock",1)
+ret%=SleepDelay(3)
+
+WPlayKeys("%{F4}")               'close Clock 
+ret%=SleepDelay(2)
+
+'***********************************************************************
+' DISCONNECT THE DRIVES & VERIFY DISCONNECTIONS
+'***********************************************************************
+
+drvdconn              'disconnect the drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Disconnections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /l"+NctDriveLtr+":"+NctPath+"\eremiolg.log",3) 'verify connection
+ret%=SleepDelay(3)
+
+'***********************************************************************
+' Log out test end information to log file
+'***********************************************************************
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Log File for Enh Lg File I/O Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+
+result%=HctCopyErrorsFromLogFile (NctDriveLtr+":"+NctPath+"\eremiolg.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

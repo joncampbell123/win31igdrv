@@ -1,0 +1,720 @@
+Global DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+'$INCLUDE: 'netinfo.inc'
+'$INCLUDE: 'drvconn.inc'
+'$INCLUDE: 'drvdconn.inc'
+'$INCLUDE: 'printerc.inc'
+'$INCLUDE: 'printerd.inc'       
+'$INCLUDE: 'vprinter.inc'       
+
+Viewport OFF
+HctTestBegin 0, "Task Swapper Test"
+GetWinplayVars
+ClearLog "stdos.log"
+
+'*************************************************************************
+' Microsoft Multiple DOS Prompt Test Script (Standard Mode Version)
+'
+' Script:       STDOS.WTD 
+' Author:       GOA & DLS & JL
+' Date:         12-Jun-1991
+'
+'*************************************************************************
+' Description:
+'*************************************************************************
+' Script used with WinPlay to test network IO operations with multiple
+' Prompts.
+' The script connects the two network drives to test.  Then it uses
+'   NotePad to create the batch files.  
+'   Once the files are created, they are executed.  
+'
+'
+' Variables used in this script:
+'       AutoDelay               NCTPath                 NetDrive1
+'       NetPath1                NetDir1                 NetDrive2               
+'       NetPath2                NetDir2                 NCTDriveLtr
+
+'       NCTFlopLtr
+'*************************************************************************
+' Modifications:
+' NAME          DATE            DESCRIPTION
+
+'
+'
+'***************************************************************************
+' Test Controls dialog
+'***************************************************************************
+x%=usecontrols("Task Swapper")
+'               
+'*************************************************************************
+' LOG HEADER INFORMATION INTO LOG FILE
+'*************************************************************************
+
+lf$ = "stdos.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for Standard Mode Task Swapper Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'*************************************************************************
+' NETWORK DRIVE CONNECTIONS & PRINTER CONNECTIONS 
+'*************************************************************************
+
+drvconn                       'connect the drives - defined in drvconn.inc
+printerc                      'connect the printers - defined in printerc.inc
+vprinter(lf$)                 'verify network printer connections - def in vprinter.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drive Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+
+wlog lf$, " "
+wlog lf$, " "
+'*************************************************************************
+' Decide whether to make the batch files...or to run existing ones....
+'*************************************************************************
+
+IF NOT ((MakeBatchFile$ = "y") OR (MakeBatchFile$ = "Y")) THEN
+  ret%  = Exists (NCTDriveLtr+":"+NCTPath+"\stdos1.BAT")    'does this file exists?
+  ret2% = Exists(NCTDriveLtr+":"+NCTPath+"\stdos2.BAT")         'does this file exists?
+  ret3% = Exists (NCTDriveLtr+":"+NCTPath+"\stdos1.PIF")        'does this file exists?
+  ret4% = Exists(NCTDriveLtr+":"+NCTPath+"\stdos2.PIF")         'does this file exists?
+  
+  IF ((ret% = -1) AND (ret2% = -1) AND (ret3% = -1) AND (ret4% = -1)) THEN
+    goto SKIPBATCH                                               'only if ALL exists
+  END IF
+END IF
+
+
+'************************************************************************
+' LOAD NOTEPAD AND CREATE BATCH FILES FOR VMs
+'************************************************************************
+
+retcode%=WinExec("Notepad",1)                   'exec notepad
+
+'((((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))))))))))))
+'*************************************************************************
+' CREATE FIRST BATCH FILE:  STDOS1.BAT - DOS UTILITIES
+'*************************************************************************
+'(((((((((((((((((((((((((((((((((((()))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("%FN")                 ' notepad - open new file
+
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("Rem *** Batch File Name:   STDOS1.BAT  {Enter}")
+WPlayKeys("Rem *** Created by Script: STDOS.WTD   {Enter}")
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+'
+WPlayKeys("@echo off{Enter}{Enter}")
+
+WPlayKeys("cls{Enter}")
+WPlayKeys("echo This is the DOS batch file #1.{ENTER}")
+WPlayKeys("echo Press a key to start DOS batch file #1, and then{ENTER}")
+WPlayKeys("echo use ALT{+}TAB to Task Swap back to Windows so that{Enter}")
+WPlayKeys("echo DOS batch file #2 can start.{ENTER}")
+WPlayKeys("Pause{Enter}")
+
+WPlayKeys("Echo ****************************************** > "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo *****DOS UTILS BATCH FILE BEGINNING******* >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ******** BATCH FILE: STDOS1.BAT ********** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys("{Enter}")
+
+
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("Rem *** Change to working directories{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+WPlayKeys("{Enter}")
+'
+'************************************************************************
+' MAKE FILE ON FLOPPY DRIVE - COPY TO NCT DIRECTORY
+'************************************************************************
+
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY *****{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir > "+NCTFlopLtr+":\VMTEST.FIL{ENTER}") 'make test file
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NCT DIR COPY FAILED @ LINE 40! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NCT DIR COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' COPY FILE FROM FLOPPY DRIVE TO NETWORK DRIVE
+'*************************************************************************
+
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NET COPY FAILED @ LINE 55! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' DEL FILE FROM NETWORK DRIVE & COPY FILE FROM NCT DIR TO NETWORK DRIVE
+'*************************************************************************
+
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("del "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\vmtest.fil echo Error DEL NET FILE FAILED LINE 69! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\vmtest.fil echo DELETED NET FILE - PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NCT DIR TO NET COPY FAILED @ LINE 76! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NCT DIR TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+'*************************************************************************
+' COPY A FILE TO LPT1: WHICH SHOULD REROUTE PRINT JOB TO NETWORK PRINTER
+'*************************************************************************
+
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("Echo *****    COPY FILE TO PRINTER PORT   *****{ENTER}")
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo *****    COPY FILE TO PRINTER PORT   ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL lpt1:{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error COPY TO LPT1: FAILED @ LINE 90! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo COPY TO LPT1: PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+'***************************************************************************
+' DIR > TO SORT.FIL ON NETWORK, THEN REDIRECT TO SORT COMMAND
+'***************************************************************************
+
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT *****{ENTER}")
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("sort < "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NET FILE SORT FAILED @ LINE 105! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NET FILE SORT PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' ATTRIB FILE READ-ONLY; ATTEMPT TO DELETE FILE
+'***************************************************************************
+
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST *****{ENTER}")
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\NDIR1.fil{ENTER}")
+WPlayKeys("attrib {+}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB {+}R NET FILE FAILED @ LINE 120! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB {+}R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys("del "+NETDRIVE1+":"+NETDIR1+"\*.FIL{ENTER}")
+
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo COULDN'T DEL READ-ONLY NET FILE - PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error DELETED READ-ONLY NET FILE @ 241! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' RENAME A NETWORK FILE
+'***************************************************************************
+
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME *****{ENTER}")
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+WPlayKeys("attrib {-}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB -R NET FILE FAILED @ LINE 137! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB -R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys("ren "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL VM2.FIL{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo RENAME NET FILE - PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error RENAME NET FILE FAILED @ LINE 141! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' XCOPY TEST - LOCAL TO NET & NET TO NET
+'***************************************************************************
+
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST *****{ENTER}")
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\*.boo{ENTER}")      'SETTING UP TREE STRUCTURE
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\*.boo{ENTER}")
+WPlayKeys("{Enter}")                  
+WPlayKeys("md "+NetDrive1+":"+NetDir1+"\1{Enter}")      'md dir on netdrive1
+
+WPlayKeys("xcopy "+NCTDriveLtr+":"+NctPath+"\1 "+NeTDrive1+":"+NeTDir1+"\1 /s/v{ENTER}")     'local to net xcopy
+
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NCT DIR TO NET FAILED @ LINE 167! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NCT DIR TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys("{Enter}")
+
+WPlayKeys("md "+NetDrive2+":"+NetDir2+"\1{Enter}")
+WPlayKeys("xcopy "+NeTDrive1+":"+NeTDir1+"\1 "+NeTDrive2+":"+NeTDir2+"\1 /s/v{ENTER}")
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NET TO NET DRIVE FAILED @ LINE 172! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NET TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+'***************************************************************************
+' CLEAN UP FILES
+'***************************************************************************
+
+WPlayKeys(":Clean{Enter}")
+
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS *****{ENTER}")
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS ***** >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys( NetDrive2+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\APPLET.boo goto nctdrv{ENTER}")
+
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("cd "+NeTDrive2+":"+NetDir2+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.FIL{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NetDrive2+":"+Netdir2+"\1\APPLET.boo goto nctdrv{ENTER}")
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+
+
+WPlayKeys(":nctdrv{Enter}")
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.boo goto net1{ENTER}")
+
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.boo goto net1{ENTER}")
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+
+
+WPlayKeys(":net1{Enter}")
+
+WPlayKeys( NetDrive1+":{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\*.fil{Enter}")
+
+WPlayKeys("if NOT exist "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\APPLET.boo goto cont{ENTER}")
+
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("cd "+NeTDrive1+":"+NetDir1+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.fil{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("if exist "+NetDrive1+":"+Netdir1+"\1\APPLET.boo goto cont{ENTER}")
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+
+WPlayKeys(":cont{enter}")
+
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+
+WPlayKeys(":end{ENTER}")
+
+'(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((
+'SAVE THE STDOS1 LOG FILE TO STDOS.LOG
+'DELETE THE STDOS1.LOG FILE
+'))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("type "+NCTDriveLtr+":"+NctPath+"\stdos1.log >> "+NCTDriveLtr+":"+NctPath+"\stdos.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\stdos1.log{ENTER}")
+
+WPlayKeys("cls{Enter}")
+WPlayKeys("echo DOS BATCH FILE #1 HAS COMPLETED!{ENTER}")
+WPlayKeys("echo Press a key to end this DOS session.{ENTER}")
+WPlayKeys("echo .{Enter}")
+WPlayKeys("Pause{Enter}")
+
+
+WPlayKeys("exit{ENTER}")
+
+WPlayKeys("%FA")                                           ' save the file as stdos1.bat
+WPlayKeys( NCTDriveLtr+":"+NctPath+"\stdos1.BAT{Enter}%Y")
+
+
+'((((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))))))))))
+'*************************************************************************
+' CREATE SECOND BATCH FILE:  STDOS2.BAT - BACKUP & NETBIOS
+'*************************************************************************
+'((((((((((((((((((((((((((((((((((())))))))))))))))))))))))))))))))))))
+
+WPlayKeys("%FN")         ' notepad file_new
+
+
+WPlayKeys("@echo off{ENTER}{ENTER}")
+
+
+WPlayKeys("Echo ****************************************** > "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo *****DRIVE STRESS BATCH FILE BEGIN******** >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo ******** BATCH FILE: STDOS2.BAT ********** >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+
+
+
+'****************************************************
+' change to working directories (out of Windows dir)
+'*****************************************************
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NCTPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+WPlayKeys("cd "+NetDrive3+":"+NetDir3+"{Enter}")
+
+WPlayKeys("drvstres 65 7540 128 "+RemIOLoc+" "+NetDrive1+" "+NetDrive2+" "+NetDrive3+" /t /l{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error DRIVE STRESS FAILED! >> "+NctDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo DRIVE STRESS PASSED! >> "+NctDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\drvstres.dat{ENTER}")
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\drvstres.dat{ENTER}")
+'
+WPlayKeys("cd "+NetDrive1+":\{ENTER}")       'make net drives @ root
+WPlayKeys("cd "+NetDrive2+":\{ENTER}")
+WPlayKeys("cd "+NetDrive3+":\{ENTER}")
+'
+WPlayKeys("{ENTER}")
+WPlayKeys("type test.log >> stdos2.log")        'put test info into log file
+WPlayKeys("{ENTER}")
+WPlayKeys("{ENTER}")
+WPlayKeys("del test.log{ENTER}")                'del temp test results
+WPlayKeys("{ENTER}")
+WPlayKeys("{ENTER}")
+
+
+'(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((
+'  NETBIOS PORTION OF STDOS2.BAT
+'))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("cls{Enter}")
+WPlayKeys("echo A NetBIOS test will begin when you hit any key.{Enter}")
+WPlayKeys("echo .{enter}")
+WPlayKeys("echo This test should prevent you from using ALT{+}TAB{ENTER}")
+WPlayKeys("echo to Task Swap back to Windows.  As the NetBios test runs, confirm{ENTER}")
+WPlayKeys("echo that ALT{+}TAB is disabled.  The test will run for a few{ENTER}")
+WPlayKeys("echo minutes to allow you time to try ALT{+}TAB several times.{ENTER}")
+WPlayKeys("Pause{Enter}")
+WPlayKeys("cls{Enter}")
+
+WPlayKeys("echo off{ENTER}")
+
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("echo *             NETBIOS TEST            *{ENTER}")
+WPlayKeys("echo ***************************************{enter}")
+WPlayKeys("Echo .{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("echo *             NETBIOS TEST            *>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+
+
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\dnetbios /lfail /fstdosnet.log netbios2.nct{ENTER}") 
+WPlayKeys("if Errorlevel 3 echo NETBIOS TEST EXECUTED! >> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("if Errorlevel 3 goto nextlabel{ENTER}")
+
+WPlayKeys("if Errorlevel 2 echo Error NETBIOS TEST FAILED @ LINE 48! >> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("if Errorlevel 2 goto nextlabel{ENTER}")
+
+WPlayKeys("if Errorlevel 0 echo Error NETBIOS NOT PRESENT!! >> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("cls{Enter}")
+
+
+WPlayKeys(":nextlabel{ENTER}")
+WPlayKeys("{ENTER}")
+
+WPlayKeys("type "+NCTDriveLtr+":"+NCTPath+"\stdosnet.log >> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}") 
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\stdosnet.log{ENTER}")
+
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("echo *          END NETBIOS TEST           *>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("echo ***************************************>> "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stdos2.log{ENTER}")
+
+'(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((
+'SAVE THE STDOS2 LOG FILE TO STDOS.LOG
+'DELETE THE STDOS2.LOG FILE
+'))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+
+WPlayKeys("type "+NCTDriveLtr+":"+NCTPath+"\stdos2.log >> "+NCTDriveLtr+":"+NCTPath+"\stdos.log{ENTER}") 
+WPlayKeys("del "+NCTDriveLtr+":"+NCTPath+"\stdos2.log{ENTER}")
+
+
+WPlayKeys("cls{Enter}")
+WPlayKeys("echo DOS BATCH FILE #2 HAS COMPLETED!{ENTER}")
+WPlayKeys("echo Press a key to end this DOS session.{ENTER}")
+WPlayKeys("echo .{Enter}")
+WPlayKeys("Pause{Enter}")
+
+WPlayKeys("exit{ENTER}")                          'exit batch file
+
+
+WPlayKeys("%FA")                                             ' save the file
+WPlayKeys( NCTDriveLtr+":"+NCTPath+"\STDOS2.BAT{Enter}%Y")
+
+
+WPlayKeys("%{F4}")               ' close Notepad
+
+'************************************************************************
+'   Pif file creation & save
+'************************************************************************
+
+'************************************************************************
+' MAKE A PIF FILE FOR STDOS1.BAT
+'************************************************************************
+'
+retcode%=WinExec ("PIFEdit",1)                           'exec pifeditor
+WPlayKeys ("%P")                                 'program           
+WPlayKeys ("STDOS1.BAT")                         'batch file
+WPlayKeys ("%TDOS BATCH FILE #1")                'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'start up directory
+WPlayKeys ("%FA")                                'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\STDOS1.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+'***********************************************************************
+' MAKE A PIF FILE FOR STDOS2
+'***********************************************************************
+'
+WPlayKeys("%FN")                                 'file_new
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("STDOS2.BAT")                         'batch file
+WPlayKeys ("%TDOS BATCH FILE #2")                'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'startup dir
+WPlayKeys ("%FA")                                'file_saveas
+WPlayKeys ("%N"+NCTDriveLtr+":"+NCTPath+"\STDOS2.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+
+WPlayKeys ("%{F4}")                              'Close the Editor
+
+
+SKIPBATCH:       'come here if decide not to make batch & pif files
+'******************************************************************
+' RUN THE PIF BATCH FILES
+'******************************************************************
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\STDOS1.PIF",1)
+ret%=SleepDelay(1)
+pause "Click the OK button to start DOS Batch File #2"
+
+retcode%=WinExec( NCTDriveLtr+":"+NCTPath+"\STDOS2.PIF",1)
+ret%=SleepDelay( AutoDelay )
+pause "Use Alt-Tab to swap between Batch files #1 & #2 until both have completed. Press OK when done!" 
+pause "Remember, press OK only after both batch files have completed!"
+
+'**************************************************************************
+'  NETWORK DRIVE DISCONNECT & NETWORK PRINTER DISCONNECTION
+'**************************************************************************
+
+printerd                      'disconnect printer - defined in printerd.inc
+drvdconn                      'disconnect drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drives are Disconnected"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 3 /l"+NCTDriveLtr+":"+NCTPath+"\stdos.log",3)                      'put in footer
+
+'**************************************************************************
+' QUIT!
+'**************************************************************************
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Log File for Standard Mode Task Swapper Test"
+wlog lf$, "***********************************************************"
+
+result%=HctCopyErrorsFromLogFile (NctDriveLtr+":"+NctPath+"\stdos.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

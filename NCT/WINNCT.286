@@ -1,0 +1,94 @@
+[Modes]
+Standard=
+Enhanced=
+
+[Standard]
+FM Test - Drive A=
+FM Test - Drive C=
+FM Test - Network=
+Applet Network Test=
+STD Net Sm File Test=
+STD Net Lg File Test=
+Win NetBIOS Test=
+NetBIOS VM Test=
+WinNet API Test=
+WinNet Prt API Test=
+XMS Test=
+Int 13 Test=
+DMA Test=
+Task Swapper Test=
+
+[Enhanced]
+FM Test - Drive A=
+
+
+[DMA Test]
+cmdline=/c2
+ExeName=dmatest.pif
+
+[XMS Test]
+cmdline=
+ExeName=xmstest.pif
+
+[Int 13 Test]
+cmdline=
+ExeName=int13tst.pif
+
+[NetBIOS VM Test]
+ExeName=dnetbios.exe
+CmdLine=/lfail netbios.nct
+
+[Win NetBIOS Test]
+ExeName=netosct.exe
+CmdLine=/lfail /n netbios.nct
+
+[WinNet API Test]
+ExeName=wattdrvr.exe
+CmdLine=/run winnet.wtd
+
+[WinNet Prt API Test]
+ExeName=wattdrvr.exe
+CmdLine=/run wnetprt.wtd
+
+[FM Test - Drive A]
+cmdline=/run fm_a.wtd
+ExeName=wattdrvr.exe
+
+[FM Test - Drive C]
+cmdline=/run fm_c.wtd
+ExeName=wattdrvr.exe
+
+[FM Test - Network]
+ExeName=wattdrvr.exe
+CmdLine=/run fm_net.wtd
+
+[Applet Network Test]
+ExeName=wattdrvr.exe
+CmdLine=/run applet.wtd
+
+[STD Net Sm File Test]
+ExeName=wattdrvr.exe
+CmdLine=/run sremio.wtd
+
+[STD Net Lg File Test]
+ExeName=wattdrvr.exe
+CmdLine=/run sremiolg.wtd
+
+[Task Swapper Test]
+ExeName=wattdrvr.exe
+CmdLine=/run stdos.wtd
+
+
+
+;important this [config] should be the very last one, with no homedir key
+; this is to make batch file installation possible
+
+[config]
+; Important! When specifying a directory, be sure NOT to end with "\".
+; Windows 3.1 Network Compatibility Test
+title=Windows 3.1 NCT
+wrapupcmds=/c %ctdir%wnetprt.log /c %ctdir%winnet.log /c %ctdir%applet.log /c %ctdir%shelltst.log /c %ctdir%eremio.log /c %ctdir%sremio.log /c %ctdir%dosvm.log /c %ctdir%stress.log /c %ctdir%stdos.log /c %ctdir%eremiolg.log /c %ctdir%sremiolg.log
+wrapuptext=When the Wrap Up is finished, please send the floppy disk to Microsoft.
+log=nct.log
+; homedir will be appended after this line
+

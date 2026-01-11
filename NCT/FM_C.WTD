@@ -1,0 +1,461 @@
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+
+ViewPort OFF
+HctTestBegin 0, "FM Test - Drive C"
+GetWinplayVars
+
+'
+' Script Name:   FM_C.WTD
+' Log file Name: FM_C.LOG
+' 
+' Project: nct 
+' Author: JL
+'
+' Date Created: 8/27/91
+'
+'
+'  Description:
+'    This script is designed to test the File Manager compatibility
+'    with local drive C.
+'
+'
+' Start:
+'
+'************************************************************************
+' test controls dialog
+'************************************************************************
+
+x%=usecontrols("FM Test - C")
+
+'************************************************************************
+' Log out Header information to log file
+'************************************************************************
+
+lf$ = "fm_c.log"
+openlog (lf$)                               'clear log file lf$
+
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for File Manager Test - Drive C"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+
+
+'***********************************************************************
+'start the test
+'***********************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "File Manager - Drive C Test begins here:"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+
+
+retcode%=WinExec("winfile.exe",3)    ' Runs File Manager in maximized mode
+ret%=SleepDelay(8)
+
+WPlayKeys("^c")                      ' Read drive c
+ret%=SleepDelay(10)
+
+
+SelectMenuItem "View"                                    'check view status
+
+IF IsMenuItemChecked ("Tree and Directory") = 0 THEN     'if not checked...
+   SelectMenuItem "Tree and Directory"                   'ensure it's checked
+END IF
+ret%=SleepDelay(5)
+
+
+SelectMenuItem "View"                 'mfdll way to not set show hid/sys files
+ret%=SleepDelay(1)
+SelectMenuItem "By File Type"
+SetButtonState "show hidden/system files", 0     'not checked....!
+ret%=SleepDelay(1)
+ClickButton "OK"
+ret%=SleepDelay(5)
+
+WPlayKeys("%o")                         'options menu item
+ret%=SleepDelay(1)
+
+WPlayKeys("c")                          'confirmation menu item
+ret%=SleepDelay(1)
+
+SetButtonState "file delete",0          'do not check file delete
+SetButtonState "directory delete",0     'do not check directory delete
+ClickButton "OK"
+
+SelectMenuItem "File"
+ret%=SleepDelay(1) 
+SelectMenuItem "Delete"
+    
+WPlayKeys("c:\ncttest.1")               'delete old ncttest.1 dir
+ClickButton "OK"
+ret%=SleepDelay(3) 
+    
+IF WindowExists ("error deleting file") <> 0 THEN   'windows exists=no dir...
+   ClickButton "OK"
+ELSE
+   While WindowExists ("delete") <> 0               'still in delete op
+      IF WindowExists ("confirm file delete") <> 0 THEN
+	 ClickButton "yes"
+      END IF
+      ret%=SleepDelay(1)
+   WEND
+END IF
+
+ret%=SleepDelay(5)
+
+
+WPlayKeys("%o")                         'options menu item
+ret%=SleepDelay(1)
+
+WPlayKeys("c")                          'confirmation menu item
+ret%=SleepDelay(1)
+
+SetButtonState "file delete",1          'check file delete
+SetButtonState "directory delete",1     'check directory delete
+ClickButton "OK"
+ret%=SleepDelay(4)
+
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1{ENTER}") ' Name
+ret%=SleepDelay(4)
+WPlayKeys(" \") ' Move to root directory
+ret%=SleepDelay(1)
+
+FMClickDir "NCTtest.1"                    'use MFDLL function to set focus
+
+
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1 /lfm_c.log",3)     ' Verify Directory Exists
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 1 c:\nctfile1.tst /lfm_c.log",3)  ' Create Temp File
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 11 c:\nctfile1.tst /lfm_c.log",3) ' Verify File Was Made
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1\ncttest.01{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.01 /lfm_c.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1\ncttest.02{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.02 /lfm_c.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1\ncttest.03{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.03 /lfm_c.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1\ncttest.01\ncttest.001{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.01\ncttest.001 /lfm_c.log",3) ' Verify Directory Exists
+ret%=SleepDelay(5)
+WPlayKeys("%fd")                           ' Remove one of the subdirectories
+WPlayKeys("\ncttest.1\ncttest.03{ENTER}")  '
+WPlayKeys("y")                             '
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1\ncttest.03 /lfm_c.log",3)'
+ret%=SleepDelay(5)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\ncttest.1\ncttest.01\ncttest.002{ENTER}") ' Name
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.01\ncttest.002 /lfm_c.log",3) ' Verify Directory Exists
+ret%=SleepDelay(5)
+'
+'
+'Directory Structure Should now be as follows
+'  
+'  c:----->nctTEST.1--------------->nctTEST.01-------->nctTEST.001
+'          :nctFILE1.TST       |                |
+'                              |                |
+'                              |                |
+'                              |                |----->nctTEST.002
+'                              |
+'                              |--->nctTEST.02
+'
+WPlayKeys("%fc")                                  ' Copy file one dir. down
+WPlayKeys("%fc:\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\nctfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\nctfile1.tst c:\ncttest.1\nctfile1.tst /lfm_c.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%fc")                               ' Copy file another dir. down
+WPlayKeys("%fc:\ncttest.1\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.01\nctfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\nctfile1.tst c:\ncttest.1\ncttest.01\nctfile1.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fc")                               ' Copy file 2 dir. down
+WPlayKeys("%fc:\ncttest.1\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.001\nctfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\nctfile1.tst c:\ncttest.1\ncttest.01\ncttest.001\nctfile1.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fc")                               ' Copy file same directory
+WPlayKeys("%fc:\ncttest.1\ncttest.01\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.01\nctfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\ncttest.01\nctfile1.tst c:\ncttest.1\ncttest.01\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fm")                               ' Move file down a directory
+WPlayKeys("%fc:\ncttest.1\ncttest.01\nctfile2.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.002\nctfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 c:\ncttest.1\ncttest.01\nctfile2.tst c:\ncttest.1\ncttest.01\ncttest.002\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fm")                               ' Move To Sibling
+WPlayKeys("%fc:\ncttest.1\ncttest.01\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.02\nctfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 c:\ncttest.1\ncttest.01\nctfile1.tst c:\ncttest.1\ncttest.02\nctfile1.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+
+'Directory Structure Should now be as follows
+'  
+'  c:----->nctTEST.1--------------->nctTEST.01-------->nctTEST.001
+'          :nctFILE1.TST       |                 |     :nctFILE1.TST
+'                              |                 |
+'                              |                 |
+'                              |                 |---->nctTEST.002
+'                              |                       :nctFILE2.TST
+'                              |--->nctTEST.02
+'                                   :nctFILE1.TST
+
+
+WPlayKeys("%fm")                               ' Move file up a directory
+WPlayKeys("%fc:\ncttest.1\ncttest.01\ncttest.002\nctfile2.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.02\nctfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 c:\ncttest.1\ncttest.01\ncttest.002\nctfile2.tst c:\ncttest.1\ncttest.02\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+
+WPlayKeys("%fc")                               ' Copy with wildcard char
+WPlayKeys("%fc:\ncttest.1\ncttest.02\*.tst{TAB}")
+WPlayKeys("c:\ncttest.1\ncttest.01\*.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\ncttest.02\nctfile1.tst c:\ncttest.1\ncttest.01\nctfile1.tst /lfm_c.log",3)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\ncttest.02\nctfile2.tst c:\ncttest.1\ncttest.01\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+'Directory Structure Should now be as follows
+'  
+'  c:----->nctTEST.1--------------->nctTEST.01-------->nctTEST.001
+'          :nctFILE1.TST       |    :nctFILE1.TST|     :nctFILE1.TST
+'                              |    :nctFILE2.TST|
+'                              |                 |
+'                              |                 |---->nctTEST.002
+'                              |
+'                              |--->nctTEST.02
+'                                   :nctFILE1.TST
+'                                   :nctFILE2.TST
+' We will now copy ncttest.1\nctfile1.tst  to nctfile2.tst, then change
+'  the attributes of these files and test that the change occurred.
+' We will assume no bits are currently set for either file.
+
+WPlayKeys("%fc")                               ' Copy file same directory
+WPlayKeys("%fc:\ncttest.1\nctfile1.tst{TAB}")
+WPlayKeys("c:\ncttest.1\nctfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 c:\ncttest.1\nctfile1.tst c:\ncttest.1\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%vt")'   'This will set up the viewer so that it will
+			   ' show hidden/system files
+			   ' Note: Next section won't work if
+			   ' it was set to view them before executing script.
+
+ret%=SleepDelay(1)
+WPlayKeys("%(s)")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB} ")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB}{DOWN}{DOWN}")
+WPlayKeys("%ft")                    ' Setting attributes of first file to :
+WPlayKeys("%(rsi)")               ' +R+H+S+A
+WPlayKeys("{ENTER}") 
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 10 c:\ncttest.1\nctfile1.tst RHSA /lfm_c.log",3)
+ret%=SleepDelay(6)
+WPlayKeys("%ft")
+WPlayKeys("%(rasi)")               ' change it back to normal
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 10 c:\ncttest.1\nctfile1.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+'  PlayKeys("%fd%lc:\ncttest.1\nctfile1.tst{ENTER}")     ; Try to delete file
+'  SleepDelay(1)
+'  PlayKeys("y")
+'  WinExec("wverify.exe 9 c:\ncttest.1\nctfile1.tst /lfm_c.log",1)   ; should be deleted
+'  SleepDelay(6)
+
+
+WPlayKeys("{DOWN}%ft")                    ' Make Second File Read Only
+ret%=SleepDelay(1)
+WPlayKeys("%(r){ENTER}")
+retcode%=WinExec("wverify.exe 10 c:\ncttest.1\nctfile2.tst R /lfm_c.log",3)
+ret%=SleepDelay(6)
+WPlayKeys("%fd%lc:\ncttest.1\nctfile2.tst{ENTER}")      ' Try to delete file
+ret%=SleepDelay(1)
+WPlayKeys("n")
+retcode%=WinExec("wverify.exe 11 c:\ncttest.1\nctfile2.tst /lfm_c.log",3)  ' Should still exist
+ret%=SleepDelay(6)
+WPlayKeys("%ft")
+WPlayKeys("%(r){ENTER}")
+retcode%=WinExec("wverify.exe 10 c:\ncttest.1\nctfile2.tst /lfm_c.log",3)
+ret%=SleepDelay(6)
+WPlayKeys("%fd%lc:\ncttest.1\nctfile2.tst{ENTER}")     ' Try to delete file
+ret%=SleepDelay(1)
+WPlayKeys("y")
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\nctfile2.tst /lfm_c.log",3)   ' should be deleted
+ret%=SleepDelay(6)
+WPlayKeys("+({TAB}){UP}")
+WPlayKeys("%vt")   'This will reset up the viewer so that it will
+ret%=SleepDelay(1)
+WPlayKeys("%(s)")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB} ")
+ret%=SleepDelay(1)
+			   ' not show hidden/system files
+
+
+
+'  Now we begin cleaning up, some operations will fail on purpose
+'  such as trying to delete a directory that has something in it.
+'
+'
+WPlayKeys("%fd%l")      'Delete Directory, should succeed.
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.002{ENTER}")
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1\ncttest.01\ncttest.002 /lfm_c.log",3) ' should be deleted
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.001{ENTER}") ' should fail
+ret%=SleepDelay(1)
+WPlayKeys("n")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 c:\ncttest.1\ncttest.01\ncttest.001 /lfm_c.log",3) ' should be still there
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.001\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\ncttest.01\ncttest.001\nctfile1.tst /lfm_c.log",3) '
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.01\ncttest.001{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1\ncttest.01\ncttest.001 /lfm_c.log",3) ' should be gone
+ret%=SleepDelay(6)
+
+'Directory Structure Should now be as follows
+'  
+'  c:----->nctTEST.1--------------->nctTEST.01
+'          :nctFILE1.TST       |    :nctFILE1.TST
+'                              |    :nctFILE2.TST
+'                              |                 
+'                              |                 
+'                              |
+'                              |--->nctTEST.02
+'                                   :nctFILE1.TST
+'                                   :nctFILE2.TST
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.01\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\ncttest.01\nctfile1.tst /lfm_c.log",3) '
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\ncttest.01\nctfile2.tst /lfm_c.log",3) '
+ret%=SleepDelay(3)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.02\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\ncttest.02\nctfile1.tst /lfm_c.log",3) '
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\ncttest.02\nctfile2.tst /lfm_c.log",3) '
+ret%=SleepDelay(3)
+
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.02{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1\ncttest.02 /lfm_c.log",3) ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\ncttest.01{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1\ncttest.01 /lfm_c.log",3) ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1\nctfile1.tst{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 c:\ncttest.1\nctfile1.tst /lfm_c.log",3)    ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\ncttest.1{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 c:\ncttest.1 /lfm_c.log",3)    ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys("c:\nctfile1.tst{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+
+
+WPlayKeys("%fx")'     Exit filemanager
+ret%=SleepDelay(6)'
+
+'******************************************************************
+'Log test end to log file
+'*******************************************************************
+
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Log File for File Manager Test - Drive C"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+'***********************************************************************
+
+
+result%=HctCopyErrorsFromLogFile ("fm_c.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

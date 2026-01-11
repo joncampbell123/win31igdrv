@@ -1,0 +1,146 @@
+GLOBAL TestResult%
+
+
+'$INCLUDE: 'MFDLL.INC'     REM MAGIC FINGERS STUFF
+'$INCLUDE: 'WINNET.INC'
+'$INCLUDE: 'WTDUTIL.INC'
+'$INCLUDE: 'GETCAPS.INC'
+'$INCLUDE: 'INIVAR.INC'
+'$INCLUDE: 'LFN.INC'
+'$INCLUDE: 'PLAYER.INC'
+
+TestResult%=RS_PASSED
+
+
+HctTestBegin 0, "Win Net Printer Test"
+
+ret%=usecontrols("Printer API Test")
+
+Viewport ON
+SelectWindow "WATT Driver ViewPort"
+Viewport Clear
+
+MaximizeWindow 
+
+
+retcode%=GetWinplayVars (1)
+if retcode%=FALSE THEN
+    LOG "ERROR READING WINPLAY.INI, Aborting."
+    TestResult%=RS_FAILED
+    GOTO BOTTOM
+END IF
+
+
+REM FIND OUT WHAT WE CAN DO
+GetCaps
+
+
+
+REM *********************************************
+REM *                                           *
+REM * Test WNetOpenJob                          *
+REM *      WNetWriteJob                         *
+REM *      WNetCloseJob                         *
+REM *      WNetSetJobCopies                     *
+REM *                                           *
+REM *********************************************
+
+LOG " "
+LOG " "
+LOG "*******************************************************************"
+LOG " Testing WNetOpenJob, WNetWriteJob, WNetCloseJob & WNetSetJobCopies"
+LOG "*******************************************************************"
+LOG " "
+LOG " "
+
+IF (PrintingCaps% AND WNNC_PRT_OpenJob) <> 0 THEN
+
+    retcode%=WNetCancelConnection("LPT1", TRUE)
+    
+    LOG "1. Calling WNetAddConnection("""+NetPrt1$+""","""+NetPrtPwd1$+""",""LPT1"")"
+    retcode%=WNetAddConnection(NetPrt1$, NetPrtPwd1$, "LPT1")
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+    JobHandle%=0
+    LOG "2. Calling WNetOpenJob(""LPT1"",""Random Job"",1,<pointer to handle>)"    
+    retcode%=WNetOpenJob("LPT1","Random Job", 1, varptr(JobHandle%))
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    IF retcode <> WN_SUCCESS THEN
+	GOTO BOTTOM
+    END IF
+    LOG "JobHandle% = "+str$(JobHandle%)
+    LOG ""
+    
+    IF (PrintingCaps% AND WNNC_PRT_SetJobCopies) <> 0 THEN
+	LOG "3. Calling WNetSetJobCopies("""+NetPrt1$+""","+Str$(JobHandle%)+",3)"
+	retcode%=WNetSetJobCopies(NetPrt1$,JobHandle%,3)
+	result%=checkError(WN_SUCCESS, retcode%, TRUE)
+	LOG ""
+    ELSE
+	LOG "4. Calling WNetSetJobCopies("""+NetPrt1$+""","+Str$(JobHandle%)+",3)"
+	retcode%=WNetSetJobCopies(NetPrt1$,JobHandle%,3)
+	result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+	LOG ""
+    ENDIF
+	
+    ReopenBuff$="                                                                     "    
+    FileHandle%=OpenFile(NCTDriveLtr$+NCTPath+"\readme.txt", ReopenBuff$, OF_READ)
+    LOG " "
+    outstring$=NCTDriveLtr$+NCTPath+"\readme.txt"
+    LOG "Opening "+outstring$+" for printing!"
+    LOG " "
+
+    IF FileHandle%=-1 THEN
+	LOG "Error Opening Output File for printing"
+	Buff$="                            "
+	Dummy%=0
+	LOG "5. Calling WNetCloseJob("+str$(JobHandle%)+",<pointer to id variable>, <pointer to valid buffer>)"
+	retcode%=WNetCloseJob(JobHandle%, varptr(Dummy%), Buff$)
+	result%=checkError(WN_SUCCESS, retcode%, TRUE)
+	LOG ""
+	GOTO BOTTOM
+    END IF
+    LOG "FileHandle% ="+str$(FileHandle%)
+	  
+ WRITEBLOCK:
+    Buff$="                                                                         "
+    lenbuff%=len(Buff$)
+    NumBytes%=_lread(FileHandle% ,Buff$, len(Buff$))
+    retcode%=_lwrite(JobHandle%, Buff$, len(Buff$))
+    IF retcode% <> -1 AND NumBytes% = lenbuff% THEN
+	LOG "Wrote "+str$(retcode%)+" Bytes."
+	GOTO WRITEBLOCK
+    END IF
+    retcode%=_lclose(FileHandle%)
+    LOG "File close retcode%= "+str$(retcode%)
+    LOG ""
+
+    LOG "6. Calling WNetCloseJob("+str$(JobHandle%)+",<pointer to id variable>, <pointer to valid buffer>)"
+    Buff$="                                         "
+    Dummy%=0
+    retcode%=WNetCloseJob(JobHandle%, varptr(Dummy%), Buff$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG "pIDJob% = "+str$(Dummy%)
+    LOG "szQueue$= "+Buff$
+    LOG ""
+
+    LOG "7. Calling WNetCancelConnection(""LPT1"",TRUE)"
+    retcode%=WNetCancelConnection("LPT1", TRUE)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+
+ELSE
+    REM *** VERFIY UNSUPPORTED    
+    LOG "8. Calling WNetOpenJob("""+NetPrt1$+""","""",1,<pointer to handle>)"
+    retcode%=WNetOpenJob(NetPrt1$,"A Random Job Name", 1, varptr(JobHandle%))
+    result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+    LOG ""
+
+END IF
+
+BOTTOM:
+
+LOG "Test Result: "+str$(TestResult%)
+HctTestDone TestResult%
+

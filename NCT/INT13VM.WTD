@@ -1,0 +1,19 @@
+'Wattdrvr Script - int13vm Test 
+szTestName$ = "int13vm" 
+
+'$DEFINE USE_INSTRUCT
+'$include: 'hct.inc'
+
+'*** Tell HCT shell that we are starting
+HctScriptBegin (szTestName$)
+'$include: 'winplay.inc' 
+
+x=Instruct(1,"$int13vm.1")        ' Put up instructions, obtained from \windir\winplay.ini [instructions]
+
+x=WinExec(ctdir$+"int13_1.pif",SW_SHOW)
+x=WinExec(ctdir$+"int13_2.pif",SW_SHOW)
+x=WaitForNext()              ' wait for user to press next button
+k% = ChooseResult (szTestName$, 0)
+HctScriptEnd (k%)
+
+endit:

@@ -1,0 +1,503 @@
+Global DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+'$INCLUDE: 'netinfo.inc'
+'$INCLUDE: 'drvconn.inc'
+'$INCLUDE: 'drvdconn.inc'
+
+ViewPort OFF
+HctTestBegin 0, "FM Test - Network"
+GetWinplayVars
+ClearLog "fm_net.log"
+
+'
+' Script Name: FM_NET.WTD
+' 
+' Project: NCT 
+' Author: JOV - converted by JL to wattdrvr on 12/20/91
+' 
+' Date Created: 1/27/91
+'
+' 
+'
+'  Description:
+'    This script is designed to test the File Manager compatibility
+'    with networks.
+'
+'
+' Start:
+'
+'*************************************************************************
+'  Test controls dialog
+'*************************************************************************
+x%=usecontrols("FM Network Test")
+
+'**************************************************************************
+
+lf$ = "fm_net.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for File Manager Network Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+'***********************************************************************
+'  Establish Network Drive Connection & Verify Connections
+'***********************************************************************
+
+drvconn               'connect drives - sub call defined in drvconn.inc
+
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Drive Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /lfm_net.log",3)  'verify 1st drive connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /lfm_net.log",3)  'verify 2nd drive connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /lfm_net.log",3)  'verify 3rd drive connection
+
+'**********************************************************************
+'  The old way to connect the first Net drive specified in winplay.ini
+'**********************************************************************
+
+
+'WPlayKeys("^"+NCTDriveLtr)'         'read the drive
+'ret%=SleepDelay(30)
+'WPlayKeys("%DN")                    'Bring up Disk, Net Connection dialog
+'ret%=SleepDelay(3)'                 'delay next execution
+'WPlayKeys("%N"+netpath1)            'enter network path\share
+'WPlayKeys("%R"+netdrive1)           'enter drive letter for share
+'WPlayKeys("%W"+NetPwd1)             'enter network password if available
+'ret%=SleepDelay(3)                  'delay next execution
+'WPlayKeys("%C")                     'connect the drive
+'ret%=SleepDelay(3)                  'delay next execution
+'WPlayKeys("%L")                     'close network dialog
+	 
+'**********************************************************************
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "File Manager Network Test - begins here:"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+
+retcode%=WinExec("winfile.exe",3)    ' Runs File Manager in maximized mode
+ret%=SleepDelay(8)
+
+
+WPlayKeys("^"+netdrive1)            ' make %netdrive1% current drive.
+
+For ii = 1 to 25                'read the net drive loop
+    SelectMenuItem "disk"       'done when netconnections is not grayed
+ 
+    IF MenuItemExists ("Network Connections") THEN          'std & novell
+	IF IsMenuItemGrayed ("Network Connections") = 0 THEN    'finished reading drive?
+	   EXIT FOR
+	ELSE
+	   WPlayKeys("{ESC}{ESC}")        'get out of menu selection
+	   ret%=SleepDelay(10) 
+	END IF 
+    ELSE                                                    'lm21
+	IF IsMenuItemGrayed ("Disconnect Network Drive") = 0 THEN    'finished reading drive?
+	   EXIT FOR
+	ELSE
+	   WPlayKeys("{ESC}{ESC}")        'get out of menu selection
+	   ret%=SleepDelay(10) 
+	END IF 
+    END IF
+	  
+NEXT                        'for ii
+
+WPlayKeys("{ESC}{ESC}")
+
+SelectMenuItem "View"                                    'check view status
+
+IF IsMenuItemChecked ("Tree and Directory") = 0 THEN     'if not checked...
+   SelectMenuItem "Tree and Directory"                   'ensure it's checked
+END IF
+ret%=SleepDelay(5)
+
+SelectMenuItem "View"                 'mfdll way to not set show hid/sys files
+ret%=SleepDelay(1)
+SelectMenuItem "By File Type"
+SetButtonState "show hidden/system files", 0     'not checked....!
+ret%=SleepDelay(1)
+ClickButton "OK"
+
+ret%=SleepDelay(5)
+WPlayKeys(" \")                      ' Move to root directory
+ret%=SleepDelay(3)
+WPlayKeys("-")                       ' collapse the entire tree
+ret%=SleepDelay(5)
+WPlayKeys("{+}")                     ' expand the entire tree - only dir
+ret%=SleepDelay(5)
+
+'WPlayKeys("%fs")'                   ' this section was the old way to
+'ret%=SleepDelay(2)'                 ' ensure that the focus was on 
+'WPlayKeys("NCTtest.1{ENTER}")       ' ncttest.1
+'ret%=SleepDelay(1)'
+'WPlayKeys("{ESC}")
+'ret%=SleepDelay(1)'
+'WPlayKeys("{ENTER}")
+'ret%=SleepDelay(1)'
+'WPlayKeys("+({TAB})")                ' Now focus should be on NCTTEST.1
+'WPlayKeys("{ENTER}")
+
+
+netdir$ = mid$(netdir1$,2)          ' get netdir$ w/o leading \
+
+FMClickDir netdir                   ' Use MFDLL function to ensure
+				      ' focus is on netdir$
+
+
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+" /lfm_net.log",1)     ' Verify Directory Exists
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 1 "+netdrive1+":\NCTfile1.tst",1)  ' Create Temp File
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 11 "+netdrive1+":\NCTfile1.tst /lfm_net.log",1) ' Verify File Was Made
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\"+netdir$+"\NCTtest.01{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.01 /lfm_net.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\"+netdir$+"\NCTtest.02{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.02 /lfm_net.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\"+netdir$+"\NCTtest.03{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.03 /lfm_net.log",3) ' Verify Directory Exists
+ret%=SleepDelay(3)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\"+netdir$+"\NCTtest.01\NCTtest.001{ENTER}") ' Name
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001 /lfm_net.log",3) ' Verify Directory Exists
+ret%=SleepDelay(5)
+WPlayKeys("%fd")                           ' Remove one of the subdirectories
+WPlayKeys("\"+netdir$+"\NCTtest.03{ENTER}")  '
+WPlayKeys("y")                             '
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+"\NCTtest.03 /lfm_net.log",3)'
+ret%=SleepDelay(5)
+WPlayKeys("%fe")               ' Create Directory
+WPlayKeys("\"+netdir$+"\NCTtest.01\NCTtest.002{ENTER}") ' Name
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002 /lfm_net.log",3) ' Verify Directory Exists
+ret%=SleepDelay(5)
+'
+'
+'Directory Structure Should now be as follows
+'  
+'   :----->netdir$--------------->NCTTEST.01-------->NCTTEST.001
+'          :NCTFILE1.TST       |                |
+'                              |                |
+'                              |                |
+'                              |                |----->NCTTEST.002
+'                              |
+'                              |--->NCTTEST.02
+'
+WPlayKeys("%fc")                                  ' Copy file one dir. down
+WPlayKeys("%f"+netdrive1+":\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTfile1.tst /lfm_net.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%fc")                               ' Copy file another dir. down
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fc")                               ' Copy file 2 dir. down
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001\NCTfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001\NCTfile1.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fc")                               ' Copy file same directory
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fm")                               ' Move file down a directory
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002\NCTfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%fm")                               ' Move To Sibling
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile1.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile1.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+
+'Directory Structure Should now be as follows
+'  
+'   :----->netdir$--------------->NCTTEST.01-------->NCTTEST.001
+'          :NCTFILE1.TST       |                 |     :NCTFILE1.TST
+'                              |                 |
+'                              |                 |
+'                              |                 |---->NCTTEST.002
+'                              |                       :NCTFILE2.TST
+'                              |--->NCTTEST.02
+'                                   :NCTFILE1.TST
+
+
+WPlayKeys("%fm")                               ' Move file up a directory
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002\NCTfile2.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 8 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002\NCTfile2.tst "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+
+WPlayKeys("%fc")                               ' Copy with wildcard char
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTtest.02\*.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\*.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst /lfm_net.log",3)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile2.tst "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+'Directory Structure Should now be as follows
+'  
+'   :----->netdir$--------------->NCTTEST.01-------->NCTTEST.001
+'          :NCTFILE1.TST       |    :NCTFILE1.TST|     :NCTFILE1.TST
+'                              |    :NCTFILE2.TST|
+'                              |                 |
+'                              |                 |---->NCTTEST.002
+'                              |
+'                              |--->NCTTEST.02
+'                                   :NCTFILE1.TST
+'                                   :NCTFILE2.TST
+' We will now copy "+netdir$+"\NCTfile1.tst  to NCTfile2.tst, then change
+'  the attributes of these files and test that the change occurred.
+' We will assume no bits are currently set for either file.
+
+WPlayKeys("%fc")                               ' Copy file same directory
+WPlayKeys("%f"+netdrive1+":\"+netdir$+"\NCTfile1.tst{TAB}")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTfile2.tst{ENTER}")
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 7 "+netdrive1+":\"+netdir$+"\NCTfile1.tst "+netdrive1+":\"+netdir$+"\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+
+WPlayKeys("%vt")'   'This will set up the viewer so that it will
+			   ' show hidden/system files
+			   ' Note: Next section won't work if
+			   ' it was set to view them before executing script.
+ret%=SleepDelay(1)
+WPlayKeys("%(s)")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB} ")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB}{DOWN}{DOWN}")
+ret%=SleepDelay(6)
+WPlayKeys("%ft")                    ' Setting attributes of first file to :
+WPlayKeys("%(rsi)")               ' +R+H+S+A
+WPlayKeys("{ENTER}") 
+ret%=SleepDelay(6)
+retcode%=WinExec("wverify.exe 10 "+netdrive1+":\"+netdir$+"\NCTfile1.tst RHSA /lfm_net.log",3)
+ret%=SleepDelay(6)
+WPlayKeys("%ft")
+WPlayKeys("%(rasi)")               ' change it back to normal
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(6)
+retcode%=WinExec("wverify.exe 10 "+netdrive1+":\"+netdir$+"\NCTfile1.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+'  PlayKeys("%fd%l"%netdrive1%":\"+netdir$+"\NCTfile1.tst{ENTER}")     ; Try to delete file
+'  SleepDelay(1)
+'  PlayKeys("y")
+'  WinExec("wverify.exe 9 "%netdrive1%":\"+netdir$+"\NCTfile1.tst /lfm_net.log",1)   ; should be deleted
+'  SleepDelay(6)
+
+
+WPlayKeys("{DOWN}%ft")                    ' Make Second File Read Only
+ret%=SleepDelay(5)
+WPlayKeys("%(r){ENTER}")
+retcode%=WinExec("wverify.exe 10 "+netdrive1+":\"+netdir$+"\NCTfile2.tst R /lfm_net.log",3)
+ret%=SleepDelay(8)
+WPlayKeys("%fd%l"+netdrive1+":\"+netdir$+"\NCTfile2.tst{ENTER}")      ' Try to delete file
+ret%=SleepDelay(1)
+WPlayKeys("n")
+retcode%=WinExec("wverify.exe 11 "+netdrive1+":\"+netdir$+"\NCTfile2.tst /lfm_net.log",3)  ' Should still exist
+ret%=SleepDelay(6)
+WPlayKeys("%ft")
+WPlayKeys("%(r){ENTER}")
+retcode%=WinExec("wverify.exe 10 "+netdrive1+":\"+netdir$+"\NCTfile2.tst /lfm_net.log",3)
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l"+netdrive1+":\"+netdir$+"\NCTfile2.tst{ENTER}")     ' Try to delete file
+ret%=SleepDelay(1)
+WPlayKeys("y")
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTfile2.tst /lfm_net.log",3)   ' should be deleted
+ret%=SleepDelay(6)
+WPlayKeys("+({TAB}){UP}")
+WPlayKeys("%vt")   'This will reset up the viewer so that it will
+ret%=SleepDelay(1)
+WPlayKeys("%(s)")
+ret%=SleepDelay(1)
+WPlayKeys("{TAB} ")
+ret%=SleepDelay(1)
+			   ' not show hidden/system files
+
+
+
+'  Now we begin cleaning up, some operations will fail on purpose
+'  such as trying to delete a directory that has something in it.
+'
+'
+WPlayKeys("%fd%l")      'Delete Directory, should succeed.
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002{ENTER}")
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.002 /lfm_net.log",3) ' should be deleted
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001{ENTER}") ' should fail
+ret%=SleepDelay(1)
+WPlayKeys("n")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 5 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001 /lfm_net.log",3) ' should be still there
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001\NCTfile1.tst /lfm_net.log",3) '
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTtest.001 /lfm_net.log",3) ' should be gone
+ret%=SleepDelay(6)
+
+'Directory Structure Should now be as follows
+'  
+'   :----->netdir$--------------->NCTTEST.01
+'          :NCTFILE1.TST       |    :NCTFILE1.TST
+'                              |    :NCTFILE2.TST
+'                              |                 
+'                              |                 
+'                              |
+'                              |--->NCTTEST.02
+'                                   :NCTFILE1.TST
+'                                   :NCTFILE2.TST
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile1.tst /lfm_net.log",3) '
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTtest.01\NCTfile2.tst /lfm_net.log",3) '
+ret%=SleepDelay(3)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.02\*.*{ENTER}")    ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("a")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile1.tst /lfm_net.log",3) '
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTtest.02\NCTfile2.tst /lfm_net.log",3) '
+ret%=SleepDelay(3)
+
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.02{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+"\NCTtest.02 /lfm_net.log",3) ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTtest.01{ENTER}")  ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+"\NCTtest.01 /lfm_net.log",3) ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"\NCTfile1.tst{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\"+netdir$+"\NCTfile1.tst /lfm_net.log",3)    ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\"+netdir$+"{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 6 "+netdrive1+":\"+netdir$+" /lfm_net.log",3)    ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("%fd%l")
+WPlayKeys( netdrive1+":\NCTfile1.tst{ENTER}")     ' should succeed
+ret%=SleepDelay(1)
+WPlayKeys("{ENTER}")'
+ret%=SleepDelay(3)
+retcode%=WinExec("wverify.exe 9 "+netdrive1+":\NCTfile1.tst /lfm_net.log",3)    ' should be gone
+ret%=SleepDelay(6)
+WPlayKeys("^c")                      'Bring control back to drive c:
+ret%=SleepDelay(10)
+
+ret%=SleepDelay(6)
+WPlayKeys("%{F4}")                     'Exit filemanager
+ret%=SleepDelay(6)'
+
+'**************************************************************************
+'  DISCONNECT FROM NETWORK & VERIFY DISCONNECTION 
+'**************************************************************************
+
+drvdconn               'disconnect drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Drive Disconnections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /lfm_net.log",3)  'verify 1st drive connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /lfm_net.log",3)  'verify 2nd drive connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /lfm_net.log",3)  'verify 3rd drive connection
+
+'**************************************************************************
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End of Log File for File Manager NET Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+result%=HctCopyErrorsFromLogFile ("fm_net.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

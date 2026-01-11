@@ -1,0 +1,730 @@
+Global DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc'
+'$INCLUDE: 'netinfo.inc'
+'$INCLUDE: 'drvconn.inc'
+'$INCLUDE: 'drvdconn.inc'
+'$INCLUDE: 'printerc.inc'
+'$INCLUDE: 'printerd.inc'
+'$INCLUDE: 'clock.inc'
+'$INCLUDE: 'vprinter.inc'
+
+ViewPort OFF
+HctTestBegin 0, "Applet Network Test"
+GetWinplayVars
+ClearLog "applet.log"
+
+'*************************************************************************
+'script name:  applet.scr
+'written by:   jefflo
+'
+'rev 3.1
+'
+'initial date written: 06/05/91
+'
+'description:
+'
+'This script tests the following functional areas:
+'
+'       * loads applets
+'       * loads file from local drive
+'       * prints file to network printer
+'       * saves file to network drive
+'       * loads file from network drive
+'       * prints file to network printer
+
+'Applets tested:
+'       * Clock                 * Paint
+'       * Calculator            * Calendar
+'       * Write                 * Cardfile
+'       * Notepad
+
+'Variables Used (winplay.ini)
+'
+'for (x=1, x<=3, x++)
+'       * NetPrtx               : defines network printer (\\LMserver\printer)
+'       * NetPrtPwdx            : defines network printer passwords
+'       * ShortPrnDelay         : a short printer delay for small files
+'       * LongPrnDelay          : a long printer delay for big files
+'
+'       * NetDrivex             : defines what drive for network connection
+'       * NetPathx              : defines network share/volume name
+'       * NetPwdx               : defines network share password
+'       * NetDirx               : defines a network Dir for the given share/vol
+'
+'       * NctDriveLtr           : defines drive letter where NCT files are
+'       * NctPath               : defines directory where NCT file are
+'
+'
+'Supplemental Files needed in Nctdir:
+'
+'These are the supplemental files which are needed to run the tests.  The
+'files should be in the NCT directory which is defined by the 2 variables
+'NctDriveLtr and NctPath.
+'
+'       * Nctwrite.wri          :for write
+'       * Nctnote.txt           :for notepad
+'       * Nctpaint.bmp          :for paint
+'       * Nctcal.cal            :for calendar
+'       * Nctcard.crd           :for cardfile
+'
+'************************************************************************
+'Modification log:
+'
+'Name    Date           Modification:
+'
+
+'*************************************************************************
+' Test Controls dialog
+'*************************************************************************
+
+x%=usecontrols("Applet Test")
+
+'*************************************************************************
+' Log out header information to log file
+'*************************************************************************
+
+lf$ = "applet.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File for Applet Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'*************************************************************************
+'  network printer connection
+'*************************************************************************
+
+printerc             'printer connection script - defined in printerc.inc
+
+'*************************************************************************
+'  verify network printer connection
+'*************************************************************************
+
+vprinter(lf$)    'verify network printer connection script - defined in vprinter.inc
+
+'***********************************************************************
+'  Establish Network Drive Connection & Verify Connections
+'***********************************************************************
+
+drvconn               'connect drives - defined in drvconn.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /lapplet.log",3)  'verify 1st drive connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /lapplet.log",3)  'verify 2nd drive connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /lapplet.log",3)  'verify 3rd drive connection
+
+'************************************************************************
+'************************************************************************
+'                       Applet Test Section
+'************************************************************************
+'************************************************************************
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Applet Test Section Starts Here"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'************************************************************************
+' Clock 
+'************************************************************************
+
+Clock     'call the clock script - which will bring
+		      'up an instance of clock with title,
+		      'digital mode. - defined in clock.inc
+
+'*************************************************************************
+' Calculator 
+'*************************************************************************
+
+retcode%=WinExec("Calc",1)               'exec calculator
+ret%=SleepDelay(2)
+WPlayKeys("%VT")                 'view_standard calcalutor layout
+ret%=SleepDelay(1)
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+WPlayKeys("1111{+}")             'play 1111+
+WPlayKeys("2222{Enter}")'        'add 2222 = should display 3333
+ret%=SleepDelay(2)
+WPlayKeys("%EC")                 'copy 3333 into clipboard
+
+WPlayKeys("%VS")                 'scientific mode
+ret%=SleepDelay(2)
+WPlayKeys("%VT")                 'back to STD mode - number should be same
+
+WPlayKeys("{Delete}")              'delete 3333 from the display
+ret%=SleepDelay(2)                   '
+WPlayKeys("%EP")                 'Paste 3333 from clipboard
+				'should now display 3333
+
+
+ret%=SleepDelay(2)
+WPlayKeys("% N")                 'minimize the app
+ret%=SleepDelay(5)   
+
+'*************************************************************************
+' Write
+'*************************************************************************
+
+retcode%=WinExec("Write",1)              'exec write...
+ret%=SleepDelay(1)
+WPlayKeys("% X")                 'maximize the app
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+WPlayKeys("%FO")                 'File.Open from NCT directory
+WPlayKeys("%N"+NctDriveLtr+":"+NctPath+"\nctwrite.wri{Enter}")
+ret%=SleepDelay(20)
+
+'***********************
+'*** edit features *****
+'***********************
+
+WPlayKeys("^{Home}")             'go to beginning of Doc
+ret%=SleepDelay(5)
+WPlayKeys("^{End}")              'go to end of doc
+ret%=SleepDelay(10)
+WPlayKeys("^{Home}")             'goto to beginning of Doc
+
+
+WPlayKeys("%nf")                 'enable the Find feature
+WPlayKeys("%n")                  'Find
+WPlayKeys("write.")              'put this string into the Find box
+ret%=SleepDelay(5)
+WPlayKeys("{enter}")             'find the string
+ret%=SleepDelay(2)
+WPlayKeys("%{F4}")               'close the find dialog box
+ret%=SleepDelay(5)
+WPlayKeys("^b")                  'Bold the WRITE. string (ctrl+B)
+ret%=SleepDelay(5)
+
+WPlayKeys("%nf")                 'enable the Find feature
+WPlayKeys("%n")                  'Find
+WPlayKeys(" the beginning of")   'put this string into the Find box
+ret%=SleepDelay(5)
+WPlayKeys("{enter}")                  'find the string
+ret%=SleepDelay(2)
+WPlayKeys("%{F4}")               'close the find dialog box
+ret%=SleepDelay(5)
+WPlayKeys("{delete}")            'delete the string from the doc...
+WPlayKeys("{home}")              'goto to beginning of doc
+
+
+WPlayKeys("%FA")                 'save the changed file on the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctwrite.wri{Enter}%Y")
+ret%=SleepDelay(10)
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(1)
+WPlayKeys("% N")                 'minimize the app
+
+
+'*************************************************************************
+' Notepad 
+'*************************************************************************
+
+retcode%=WinExec("Notepad",1)            'exec notepad
+ret%=SleepDelay(1)
+WPlayKeys("% X")                 'maximize the app
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+WPlayKeys("%FO")                 'File.open from NCT directory
+WPlayKeys("%N"+NctDriveLtr+":"+NctPath+"\nctnote.txt{Enter}")
+ret%=SleepDelay(7)
+
+WPlayKeys("%FA")                 'save file to network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctnote.txt{Enter}%Y")
+ret%=SleepDelay(10)
+
+WPlayKeys("% R")                 'restore app to normal window
+ret%=SleepDelay(1)
+WPlayKeys("% N")                 'minimize app
+
+
+'*************************************************************************
+' Paintbrush
+'*************************************************************************
+
+retcode%=WinExec("PBrush",1)             'exec Paintbrush
+ret%=SleepDelay(2)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+WPlayKeys("%FO")                 'File.open from NCT directory
+WPlayKeys("%N"+NctDriveLtr+":"+NctPath+"\nctpaint.bmp{Enter}")
+ret%=SleepDelay(5)
+'
+WPlayKeys("%FA")                 'save file to network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctpaint.bmp{Enter}%Y")
+ret%=SleepDelay(10)
+
+'
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(1)
+WPlayKeys("% N")                 'minimize app
+'
+
+'*************************************************************************
+'  Calendar
+'*************************************************************************
+
+retcode%=WinExec("Calendar",1)           'exec Calendar
+ret%=SleepDelay(1)
+WPlayKeys("% X")                 'maximize the app
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+WPlayKeys("%FO")                 'file.open from NCT directory
+WPlayKeys("%N"+NctDriveLtr+":"+NctPath+"\Nctcal.cal{Enter}")
+ret%=SleepDelay(5)
+WPlayKeys("%SD")
+WPlayKeys("%S")
+WPlayKeys("01-06-92{Enter}")     'display calendar for this date
+ret%=SleepDelay(5)
+'
+WPlayKeys("%FA")                 'save file to the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcal.cal{Enter}%Y")
+ret%=SleepDelay(10)
+
+'
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(1)
+WPlayKeys("% N")                 'minimize the app
+'
+
+'***********************************************************************
+' Cardfile 
+'***********************************************************************
+'
+retcode%=WinExec("Cardfile",1)           'exec cardfile
+ret%=SleepDelay(1)
+WPlayKeys("% X")
+
+WPlayKeys("%HA")                 'display help_about
+ret%=SleepDelay(2)
+WPlayKeys("{Enter}")             'close help_about
+
+
+WPlayKeys("%FO")                 'file.open from NCT directory
+WPlayKeys("%N"+NctDriveLtr+":"+NctPath+"\nctcard.crd{Enter}")
+ret%=SleepDelay(5)
+'
+WPlayKeys("%FA")                 'save file on the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcard.crd{Enter}%Y")
+ret%=SleepDelay(10)
+
+'
+WPlayKeys("% R")                 'restore app to normal window
+ret%=SleepDelay(1)
+WPlayKeys("% N")                 'minimize the app
+'
+
+'**************************************************************************
+' Restore each App & then Close them. 
+'**************************************************************************
+'                                         
+ret%=SleepDelay(5)
+SelectWindow "Write - nctwrite.wri"
+ret%=SleepDelay(3)
+WPlayKeys("% R")                 're-activate Write and restore window
+ret%=SleepDelay(5)
+
+SelectWindow "Notepad - nctnote.txt"
+ret%=SleepDelay(3)
+WPlayKeys("% R")                 're-activate Notepad and restore window
+ret%=SleepDelay(5)
+
+SelectWindow "Paintbrush - nctpaint.bmp"
+ret%=SleepDelay(3)
+WPlayKeys("% R")                 're-activate Paint and restore window
+ret%=SleepDelay(5)
+
+SelectWindow   "Calendar - nctcal.cal"
+ret%=SleepDelay(3)
+WPlayKeys("% R")                 're-activate Calendar and restore window
+ret%=SleepDelay(5)
+
+SelectWindow "Cardfile - Nctcard.crd"
+ret%=SleepDelay(3)
+WPlayKeys("% R")                 're-activate Cardfile and restore window
+ret%=SleepDelay(5)
+
+WPlayKeys("%{F4}")               'close Cardfile 
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Calendar 
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Paintbrush
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Notepad
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Write 
+ret%=SleepDelay(9)                                 
+
+'
+'*******************************************************************
+'verify file saved to network as nctcard.crd....           CARDFILE
+'cannot compare to original file....verify existance - slow machine bug
+'*******************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "verify CARDFILE file on network drive"
+wlog lf$, "***********************************************************"
+
+retcode%=WinExec("wverify.exe 11 "+NetDrive1+":"+NetDir1+"\nctcard.crd /lapplet.log",3)
+ret%=SleepDelay(7)
+
+
+'*******************************************************************
+'verify file saved onto the network as nctcal.cal....       CALENDAR
+'cannot compare to original file....verify existance
+'*******************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "verify CALENDAR file on network drive"
+wlog lf$, "***********************************************************"
+
+retcode%=WinExec("wverify.exe 11 "+NetDrive1+":"+NetDir1+"\nctcal.cal /lapplet.log",3)
+ret%=SleepDelay(7)
+
+
+
+'*******************************************************************
+'verify file saved onto the network as nctpaint.bmp....     PAINTBRUSH
+'cannot compare to original file....verify existance
+'*******************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "verify PAINTBRUSH file on network drive"
+wlog lf$, "***********************************************************"
+
+retcode%=WinExec("wverify.exe 11 "+NetDrive1+":"+NetDir1+"\nctpaint.bmp /lapplet.log",3)
+ret%=SleepDelay(7)
+				 
+
+'*******************************************************************
+'verify file saved to network & compare it to original....  NOTEPAD
+'*******************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "verify NOTEPAD file on network drive"
+wlog lf$, "***********************************************************"
+
+retcode%=WinExec("wverify.exe 7 "+NctDriveLtr+":"+NctPath+"\nctnote.txt "+NetDrive1+":"+NetDir1+"\nctnote.txt /lapplet.log",3)
+ret%=SleepDelay(7)
+
+
+'*******************************************************************
+'verify file saved onto the network as nctwrite.wri....     WRITE
+'cannot compare to original file....verify existance
+'*******************************************************************
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "verify WRITE file on network drive"
+wlog lf$, "***********************************************************"
+
+retcode%=WinExec("wverify.exe 11 "+NetDrive1+":"+NetDir1+"\nctwrite.wri /lapplet.log",3)
+ret%=SleepDelay(7)
+
+
+
+'************************************************************************
+'************************************************************************                                 
+'OPEN EACH APPLET AGAIN & LOAD FILES FROM THE NETWORK & PRINT EACH FILE
+'************************************************************************
+'************************************************************************
+
+'*************************************************************************
+' Write 
+'*************************************************************************
+
+retcode%=WinExec("Write",1)                      'exec write
+ret%=SleepDelay(5)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%FO")                 'file.open from the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctwrite.wri{Enter}")
+ret%=SleepDelay(20)
+
+WPlayKeys("%FP")                 'print the contents of the document
+ret%=SleepDelay(5)
+WPlayKeys("{Enter}")             'enter to clear the print dialog box
+ret%=SleepDelay( LongPrnDelay )      'delay n seconds while printing
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(3)
+WPlayKeys("% N")                 'minimize the app
+
+'*************************************************************************
+' Notepad 
+'*************************************************************************
+
+retcode%=WinExec("Notepad",1)            'exec notepad
+ret%=SleepDelay(3)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%FO")                 'file.open from the net
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctnote.txt{Enter}")
+ret%=SleepDelay(10)
+
+WPlayKeys("%FP")                 'print the contents of the document
+ret%=SleepDelay( LongPrnDelay )      'delay n seconds while printing
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(3)
+WPlayKeys("% N")                 'minimize app
+
+'*************************************************************************
+' Paintbrush 
+'*************************************************************************
+
+retcode%=WinExec("PBrush",1)             'exec paintbrush
+ret%=SleepDelay(3)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%FO")                 'file.open from the net
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctpaint.bmp{Enter}")
+ret%=SleepDelay(12)
+
+WPlayKeys("%FP")                 'print the contents of the document
+ret%=SleepDelay(5)
+WPlayKeys("{Enter}")             'enter to clear the print dialog box
+ret%=SleepDelay( LongPrnDelay )      'delay n seconds while printing
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(3)
+WPlayKeys("% N")                 'minimize the app
+'
+
+'*************************************************************************
+'  Calendar  
+'*************************************************************************
+
+retcode%=WinExec("Calendar",1)           'exec calendar
+ret%=SleepDelay(3)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%FO")                 'file.open from the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcal.cal{Enter}")
+WPlayKeys("%SD")
+WPlayKeys("%S")
+WPlayKeys("01-06-92{Enter}")     'display calendar for this date..
+ret%=SleepDelay(5)
+'
+WPlayKeys("%FP")                 'print the contents of the document
+ret%=SleepDelay(5)
+WPlayKeys("{Enter}")             'enter to clear the print dialog box
+ret%=SleepDelay( ShortPrnDelay )     'delay n seconds while printing
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(3)
+WPlayKeys("% N")                 'minimize the app
+'
+
+'***********************************************************************
+' Cardfile
+'***********************************************************************
+
+retcode%=WinExec("Cardfile",1)           'exec cardfile
+ret%=SleepDelay(3)
+WPlayKeys("% X")                 'maximize the app 
+
+WPlayKeys("%FO")                 'file.open from the network
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcard.crd{Enter}")
+ret%=SleepDelay(5)
+'
+WPlayKeys("%FP")                 'print the contents of the document
+ret%=SleepDelay( ShortPrnDelay )     'delay n seconds while printing
+
+WPlayKeys("% R")                 'restore the app to normal window
+ret%=SleepDelay(3)
+WPlayKeys("% N")                 'minimize the app
+'
+
+'**************************************************************************
+'**************************************************************************
+'  RESTORE EACH APPLET - & CLOSE EACH OF THEM
+'**************************************************************************
+'**************************************************************************                                         
+
+ret%=SleepDelay(3)
+SelectWindow "Write - nctwrite.wri"
+WPlayKeys("% R")                 're-activate Write and restore window
+ret%=SleepDelay(3)
+
+SelectWindow "Notepad - nctnote.txt"
+WPlayKeys("% R")                 're-activate Notepad and restore window
+ret%=SleepDelay(3)
+
+SelectWindow "Paintbrush - nctpaint.bmp"
+WPlayKeys("% R")                 're-activate Paint and restore window
+ret%=SleepDelay(3)
+
+SelectWindow "Calendar - nctcal.cal"
+WPlayKeys("% R")                 're-activate Calendar and restore window
+ret%=SleepDelay(3)
+
+SelectWindow "Cardfile - Nctcard.crd"
+WPlayKeys("% R")                 're-activate Cardfile and restore window
+ret%=SleepDelay(3)
+
+SelectWindow "Calculator"
+WPlayKeys("% R")                 're-activate Calculator and restore window
+ret%=SleepDelay(3)
+
+retcode%=WinExec("Clock",1)              're-activate Clock with winexec
+WPlayKeys("% R")                 'only way to do so with date in title
+ret%=SleepDelay(3)
+
+WPlayKeys("%{F4}")               'close Clock 
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Calculator 
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Cardfile
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Calendar
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Paintbrush
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Notepad
+ret%=SleepDelay(7)
+WPlayKeys("%{F4}")               'close Write
+ret%=SleepDelay(7)                                 
+
+
+'*************************************************************************
+'  PRINTER DISCONNECTION
+'*************************************************************************
+
+printerd              'printer disconnection script - defined in printerd.inc
+
+
+'**************************************************************************
+'  DELETE NETWORK FILES 
+'**************************************************************************
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Applet File deletions....."
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("WinFile",1)            'bring up FM
+ret%=SleepDelay(4)
+WPlayKeys("^"+NctDriveLtr)      'focus & read Nctdrive....
+
+WPlayKeys("%FD%L")                 'file.delete
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctwrite.wri{Enter}")   'delete write file
+ret%=SleepDelay(1)
+WPlayKeys("%Y")                  'yes
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 9 "+NetDrive1+":"+NetDir1+"\nctwrite.wri /lapplet.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%FD%L")                 'file.delete
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctpaint.bmp{Enter}")   'delete paint file
+ret%=SleepDelay(1)
+WPlayKeys("%Y")                  'yes
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 9 "+NetDrive1+":"+NetDir1+"\nctpaint.bmp /lapplet.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%FD%L")                 'file.delete
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctnote.txt{Enter}")    'delete notepad file
+ret%=SleepDelay(1)
+WPlayKeys("%Y")                  'yes
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 9 "+NetDrive1+":"+NetDir1+"\nctnote.txt /lapplet.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%FD%L")                 'file.delete
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcal.cal{Enter}")     'delete calendar file
+ret%=SleepDelay(1)
+WPlayKeys("%Y")                  'yes
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 9 "+NetDrive1+":"+NetDir1+"\nctcal.cal /lapplet.log",3)
+ret%=SleepDelay(5)
+
+WPlayKeys("%FD%L")                 'file.delete
+WPlayKeys( NetDrive1+":"+NetDir1+"\nctcard.crd{Enter}")    'delete cardfile file
+ret%=SleepDelay(1)
+WPlayKeys("%Y")                  'yes
+ret%=SleepDelay(5)
+retcode%=WinExec("wverify.exe 9 "+NetDrive1+":"+NetDir1+"\nctcard.crd /lapplet.log",3)
+ret%=SleepDelay(5)
+
+
+'**************************************************************************
+'  DISCONNECT FROM NETWORK & VERIFY DISCONNECTION 
+'**************************************************************************
+
+drvdconn                'defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Disconnections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /lapplet.log",3)  'verify 1st drive connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /lapplet.log",3)  'verify 2nd drive connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /lapplet.log",3)  'verify 3rd drive connection
+
+'retcode%=WinExec("wverify.exe 3 /lapplet.log",3)      'log footer to file
+
+
+'*************************************************************************
+' Log end of test to log file
+'*************************************************************************
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "END of Log File for Applet Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+wlog lf$, " "
+
+'**************************************************************************
+' The End...applet.wtd
+'**************************************************************************
+
+result%=HctCopyErrorsFromLogFile("applet.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%

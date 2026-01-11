@@ -1,0 +1,821 @@
+REM ******************************************************************
+REM *
+REM *
+REM *  Microsoft WINNET API Testing Script
+REM *
+REM *
+REM *
+REM *
+
+GLOBAL TestResult%
+
+'$INCLUDE: 'MFDLL.INC'     REM MAGIC FINGERS STUFF
+'$INCLUDE: 'WINNET.INC'
+'$INCLUDE: 'WTDUTIL.INC'
+'$INCLUDE: 'GETCAPS.INC'
+'$INCLUDE: 'INIVAR.INC'
+'$INCLUDE: 'LFN.INC'
+'$INCLUDE: 'PLAYER.INC'
+
+TestResult%=RS_PASSED
+
+HctTestBegin 0, "Win Net Test"
+
+ret%=usecontrols("WinNet API Test")
+
+Viewport ON
+SelectWindow "WATT Driver ViewPort"
+Viewport Clear
+MaximizeWindow
+
+
+retcode%=GetWinplayVars (0)
+if retcode%=FALSE THEN
+    LOG "ERROR READING WINPLAY.INI, Aborting."
+    TestResult%=RS_FAILED
+    GOTO BOTTOM
+END IF
+
+
+REM FIND OUT WHAT WE CAN DO
+GetCaps
+
+LOG ""
+REM *********************************************
+REM *                                           *
+REM * Test WNetGetUser                          *
+REM *                                           *
+REM *********************************************
+
+
+IF (UserCaps% AND WNNC_USR_GetUser) <> 0 THEN
+
+    REM VERIFY SUCCESS
+    LOG "10. Calling WNetGetUser(<valid buffer>,<valid length pointer>)"
+    Buff$="                                                 "
+    length%=LEN(Buff$)
+    retcode%=WNetGetUser(Buff$, VARPTR(length%))
+    result%=checkError(WN_SUCCESS, recode%, FALSE)
+    IF result% = SUCCESS THEN
+	IF (CASESENSITIVE <> TRUE) THEN
+	    print "Making upper case"
+	    temp1$=UCASE$(UserName$)
+	    temp2$=UCASE$(Buff$)
+	ELSE
+	    temp1$=UserName$
+	    temp2$=Buff$
+	END IF
+    
+	Compare1$=RTRIM$(temp1$)
+	for i=1 to len(temp2$)
+	   IF asc(mid$(temp2$,i,1)) = 32 OR asc(mid$(temp2$,i,1)) = 0 THEN
+	       Compare2$=mid$(temp2$,1,i-1)
+	       GOTO donetrim
+	   END IF
+	next i
+	
+donetrim:
+	IF Compare1$=Compare2$ THEN            
+	    LOG "Expected Returned Value: "+WERROR(val(Compare1$))     'Log to winnet.log
+	    LOG "Actual Received Value: "+WERROR(val(Compare2$))
+	    LOG "Variation Succeeded!"
+	ELSE
+	    TestResult%=RS_FAILED
+	    LOG "FAIL: Expected User, /"+Compare1$+"/ Received, /"+Compare2$+"/"
+	END IF
+    ELSEIF result% <> COMMON THEN
+	 SELECT CASE retcode%
+	    CASE WN_BAD_USER
+		LOG "FAILURE: Return Code: WN_BAD_USER"
+		LOG "Procedure: Make sure the workstation is logged into the network"
+		LOG "and rerun the test. If the error occurs again, report as a bug."
+		TestResult%=RS_FAILED
+	    CASE WN_MORE_DATA
+		LOG "FAILURE: Return Code: WN_MORE_DATA"
+		LOG "Procedure: Report as a bug. The buffer passed to this function"
+		LOG "should be more than adequate to hold a user name."
+		TestResult%=RS_FAILED
+	    CASE ELSE
+		LOG "FAILURE: Unexpected return code: "+str$(retcode%)+" (decimal)"
+		TestResult%=RS_FAILED
+	END SELECT            
+    ENDIF
+    LOG ""
+    REM *** EXPECTED FAILURE VARIATIONS
+    REM RETURN CODE WN_MORE_DATE
+    LOG "11. Calling WNetGetUser(<valid buffer>,<Pointer to zero>)"
+    Buff$="                                                 "
+    length%=0
+    retcode%=WNetGetUser(Buff$, VARPTR(length%))
+    result%=checkError(WN_MORE_DATA, retcode%, TRUE)
+    LOG ""
+	
+    LOG "12. Calling WNetGetUser(<valid buffer>,<Pointer to one>)"
+    Buff$="                                                 "
+    length%=1
+    retcode%=WNetGetUser(Buff$, VARPTR(length%))
+    result%=checkError(WN_MORE_DATA, retcode%,TRUE)
+    LOG ""
+ELSE
+    REM *** VERIFY UNSUPPORTED
+    Buff$="                                                 "
+    length%=LEN(Buff$)
+    LOG "13. Calling WNetGetUser(<valid buffer>,<valid length pointer>)"
+    retcode%=WNetGetUser(Buff$, VARPTR(length))
+    result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+END IF    
+
+
+REM *********************************************
+REM *                                           *
+REM * Test WNetAddConnection                    *
+REM *                                           *
+REM *********************************************
+LOG "Cancelling all connections...."
+retcode%=WNetCancelConnection(NetDrive1$, TRUE)
+retcode%=WNetCancelConnection(NetDrive2$, TRUE)
+retcode%=WNetCancelConnection(NetDrive3$, TRUE)
+LOG "Complete!"
+LOG ""
+
+
+IF (ConnectCaps% AND WNNC_CON_AddConnection) <> 0 THEN
+    REM *** EXPECTED SUCCESS VARIATION
+    LOG "14. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, FALSE)
+    IF result%=SUCCESS THEN
+	Buff$="                                                 "
+	length%=LEN(Buff$)
+	retcode%=WNetGetConnection(NetDrive1$, Buff$, VARPTR(length%))
+	result%=checkError(WN_SUCCESS, retcode%, TRUE)
+	
+    ELSEIF result% <> COMMON THEN
+	    LOG "FAILURE: Unexpected return code: "+str$(retcode%)+" (decimal)"
+	    TestResult%=RS_FAILED
+    ENDIF
+    LOG ""
+    IF result% = SUCCESS THEN
+	LOG "15. Calling WNetCancelConnection("""+NetDrive1$+""",FALSE)"
+	retcode%=WNetCancelConnection(UCASE$(NetDrive1$), FALSE)
+	result%=checkError(WN_SUCCESS, retcode%, TRUE)
+	LOG ""
+    END IF
+
+    REM *** EXPECTED FAILURE VARIATIONS
+    REM RETURN CODE WN_BAD_NETNAME
+    LOG "16. Calling WNetAddConnection(""#@$#@$*(&@#(%^"", """+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection("#@$#@$*(&@#(%^", NetPwd1$, NetDrive1$)
+    result%=checkError(WN_BAD_NETNAME, retcode%, TRUE)
+    LOG ""
+    
+    REM RETURN CODE WN_BAD_LOCALNAME
+    LOG "17. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""",""$(*&%"")"
+    retcode%=WNetAddConnection(NetPath1$,NetPwd1$, "$(*&%")
+    result%=checkError(WN_BAD_LOCALNAME, retcode%, TRUE)
+    LOG ""
+    
+    REM RETURN CODE WN_BAD_PASSWORD
+    LOG "18. Calling WNetAddConnection("""+NetPath1$+""",""&(^&^*&"","""+NetDrive$+""")"
+    retcode%=WNetAddConnection(NetPath1$,NetPwd1$, "$(*&%")
+    result%=checkError(WN_BAD_PASSWORD, retcode%, TRUE)
+    LOG ""
+    
+    REM RETURN CODE WN_ALREADY_CONNECTED
+    LOG "19. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""    
+    
+    LOG "20. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_ALREADY_CONNECTED, retcode%, TRUE)
+    LOG ""    
+    
+    LOG "21. Calling WNetCancelConnection("""+NetDrive1$+""",FALSE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), FALSE)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+ELSE
+    REM *** VERFIY UNSUPPORTED    
+    LOG "22. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+    LOG ""
+END IF
+
+
+
+REM *********************************************
+REM *                                           *
+REM * Test WNetCancelConnection                 *
+REM *                                           *
+REM *********************************************
+
+IF (ConnectCaps% AND WNNC_CON_CancelConnection) <> 0 THEN
+    REM *** EXPECTED SUCCESS VARIATION
+    REM *** Tested in WNetAddConnection
+    
+
+    REM *** EXPECTED FAILURE VARIATIONS
+    REM RETURN CODE WN_NOT_CONNECTED
+    LOG "23. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+    LOG "24. Calling WNetCancelConnection("""+NetDrive1$+""",TRUE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), TRUE)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+    LOG "25. Calling WNetCancelConnection("""+NetDrive1$+""",TRUE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), TRUE)
+    result%=checkError(WN_NOT_CONNECTED, retcode%, TRUE)
+    LOG ""
+    
+
+    retcode%=SleepDelay(10)  
+    REM RETURN CODE WN_OPEN_FILES
+    LOG "26. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+
+    retcode%= CreateDir(NetDrive1$+NetDir1$)
+    Open(NetDrive1$+NetDir1$+"\test.txt") FOR OUTPUT AS #2
+    Print #2, "Testing WNetCancel with open file."
+    
+    LOG "27. Calling WNetCancelConnection("""+NetDrive1$+""",FALSE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), FALSE)
+    SaveRetcode%=retcode%
+    result%=checkError(WN_OPEN_FILES, retcode%, TRUE)    
+    LOG ""
+
+    LOG "28. Calling WNetCancelConnection("""+NetDrive1$+""",TRUE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$),TRUE)
+    IF SaveRetcode%=WN_SUCCESS THEN  'If #27 diconnected the netdrive, pass 28
+       result%=checkError(WN_NOT_CONNECTED, retcode%, TRUE)
+    ELSE
+       result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    END IF
+    LOG ""
+    Close #2
+    
+    retcode%=SleepDelay (10)
+    LOG "29. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+    retcode%=DeleteFile(NetDrive1$+NetDir1$+"\test.txt")
+    retcode%=RemoveDir(NetDrive1$+NetDir1$)
+    
+    LOG "" 
+    LOG "30. Calling WNetCancelConnection("""+NetDrive1$+""",TRUE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), TRUE)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+ELSE
+    REM *** VERFIY UNSUPPORTED    
+    LOG "31. Calling WNetCancelConnection("""+NetDrive1$+""",FALSE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), FALSE)
+    result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+    LOG ""
+END IF
+
+
+REM *********************************************
+REM *                                           *
+REM * Test WNetGetConnection                    *
+REM *                                           *
+REM *********************************************
+
+
+IF (ConnectCaps% AND WNNC_CON_GetConnections) <> 0 THEN
+    REM *** EXPECTED SUCCESS VARIATION
+    LOG "32. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    IF result%=SUCCESS THEN
+	Buff$="                                                 "
+	length%=LEN(Buff$)
+	LOG "33. Calling WNetGetConnection("""+NetDrive1$+""",<valid buffer>,<Pointer to valid length>)"
+	retcode%=WNetGetConnection(NetDrive1$, Buff$, VARPTR(length%))
+	result%=checkError(WN_SUCCESS, retcode%, FALSE)
+	retcode%=WnetGetCaps(WNNC_NET_TYPE)        'Get network type
+	IF retcode%=WNNC_NET_Vines THEN            'If Banyan
+	   NetPath1$=LCASE$(NetPath1$)             'LowerCase NetPath1
+	   FirstChar$=UCASE$(mid$(NetPath1$,1,1))  'UperCase the 1st letter
+	   TempNetPath1$=""
+	   TempNetPath1$=FirstChar$          
+	   for i=2 to len(NetPath1$) 'i=2 Skip the 1st char, because we need the Upercase one in FirstChar            
+	     TempNetPath1$=TempNetPath1$+mid$(NetPath1$,i,1)            
+	   next i
+	       NetPath1$=TempNetPath1$                                         
+	ELSE
+	   NetPath1$=UCASE$(NetPath1$)
+	END IF    
+	IF result%=SUCCESS THEN
+	for i=1 to len(Buff$)
+	   IF asc(mid$(Buff$,i,1)) = 32 OR asc(mid$(Buff$,i,1)) = 0 THEN
+	       Buff$=mid$(Buff$,1,i-1)
+	       GOTO donetrim2
+	   END IF
+	next i
+	donetrim2:           
+	    rem retcode%=WnetGetCaps(WNNC_NET_TYPE)   'Get network type
+	    IF retcode%=WNNC_NET_NetWare THEN     'If Novell, parse NetPath1$ test path with / or \
+	       TempNetPath1$=""                   'Initialize String.
+	       for i=1 to len(NetPath1$)
+		  IF asc(mid$(NetPath1$,i,1)) <> 92 THEN  'If the ith char <> \
+		     TempNetPath1$=TempNetPath1$+mid$(NetPath1$,i,1)
+		  ELSE
+		     TempNetPath1$=TempNetPath1$+"/"
+		  END IF
+	       next i
+	       NetPath1$=TempNetPath1$
+	    END IF                                   
+	    IF Buff$ <> NetPath1$ THEN
+		LOG "FAILURE: WNetGetConnection wrongly returned WN_SUCCESS."
+		LOG "Expected return value: /"+NetPath1$+"/"                 
+		LOG "Actual return value: /"+Buff$+"/"                 
+	    ELSE
+		LOG "Expected Returned Value: "+Buff$
+		LOG "Actual Received Value: "+NetPath1$
+		LOG "Variation Succeeded!"
+	    END IF
+
+	END IF
+    ELSEIF result% <> COMMON THEN
+	    TestResult%=RS_FAILED
+	    LOG "FAILURE: Unexpected return code: "+str$(retcode%)+" (decimal)"
+    ENDIF
+    LOG ""
+    IF result% = SUCCESS THEN
+	LOG "34. Calling WNetCancelConnection("""+NetDrive1$+""",FALSE)"
+	retcode%=WNetCancelConnection(UCASE$(NetDrive1$), FALSE)
+	result%=checkError(WN_SUCCESS, retcode%, TRUE)
+	LOG ""
+    END IF
+
+    REM *** EXPECTED FAILURE VARIATIONS
+    REM RETURN CODE WN_NOT_CONNECTED
+    LOG "35. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+    LOG "36. Calling WNetCancelConnection("""+NetDrive1$+""",TRUE)"
+    retcode%=WNetCancelConnection(UCASE$(NetDrive1$), TRUE)
+    result%=checkError(WN_SUCCESS, retcode%, TRUE)
+    LOG ""
+    
+ELSE
+    REM *** VERFIY UNSUPPORTED    
+    LOG "37. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+    retcode%=WNetAddConnection(NetPath1$, NetPwd1$, NetDrive1$)
+    result%=checkError(WN_NOT_SUPPORTED, retcode%, TRUE)
+    LOG ""
+END IF
+
+IF (AdminCaps% AND WNNC_ADM_LongNames) = 0 THEN
+	LOG "Skipping Long File name tests because"
+	LOG "WNetGetCaps doesn't indicate support for LFNs."
+	LOG ""
+	GOTO BOTTOM
+END IF    
+
+REM *********************************************
+REM *                                           *
+REM * Test LFNVolumeType                        *
+REM *                                           *
+REM *********************************************
+
+
+RetValue$=String$(64,"")  'Initialize the string
+retcode%=GetAnyIniVar2("Settings","LongFileNames",RetValue$,"Winfile.ini")
+IF retcode%=FALSE OR VAL(RetValue$)=FALSE OR RetValue$="" THEN
+   LOG "Skipping Long File name tests because"
+   LOG "LongFileNames support is disabeled"
+   LOG ""
+   GOTO BOTTOM
+
+ELSE
+
+   LOG "38. Calling WNetAddConnection("""+NetPath1$+""","""+NetPwd1$+""","""+NetDrive1$+""")"
+   retcode%=WNetAddConnection(NetPath1$,NetPwd1$,NetDrive1$)
+   result%=checkError(WN_SUCCESS, retcode%, TRUE)
+   LOG ""
+
+   LOG "39. Calling WNetAddConnection("""+NetPath2$+""","""+NetPwd2$+""","""+NetDrive2$+""")"
+   retcode%=WNetAddConnection(NetPath2$,NetPwd2$,NetDrive2$)
+   result%=checkError(WN_SUCCESS, retcode%, TRUE)
+   LOG ""
+
+   LOG "40. Calling LFNVolumeType("+str$(asc(Mid$(NetDrive1$,1,1))-64)+", <Pointer to integer>)"
+   DriveType1%=0
+   retcode1%=LFNVolumeType(asc(Mid$(NetDrive1$,1,1))-64, VARPTR(DriveType1%))
+   result%=checkDOSError(WN_SUCCESS, retcode1%, TRUE)
+   LOG "Drive Type% : "+str$(DriveType1%)
+   LOG ""
+
+   LOG "41. Calling LFNVolumeType("+str$(asc(Mid$(NetDrive2$,1,1))-64)+", <Pointer to integer>)"
+   DriveType2%=0
+   retcode2%=LFNVolumeType(asc(Mid$(NetDrive2$,1,1))-64, VARPTR(DriveType2%))
+   result%=checkDOSError(WN_SUCCESS, retcode2%, TRUE)
+   LOG "Drive Type% : "+str$(DriveType2%)
+   LOG ""
+   
+   
+   REM *********************************************
+   REM *                                           *
+   REM *      LFNFindFirst                         *
+   REM *      LFNFindNext                          *
+   REM *      LFNFindClose                         *
+   REM *      LFNMKDir                             *
+   REM *      LFNCopy                              *
+   REM *      LFNDel                               *
+   REM *      LFNMKDir                             *
+   REM *      Copying between LFN Servers          *
+   REM *                                           *
+   REM *********************************************
+
+
+   REM TEST LFN STUFF BETWEEN TWO LFN SERVERS
+   IF (retcode1%=WN_SUCCESS AND retcode2%=WN_SUCCESS AND DriveType1% = VOLUME_LONGNAMES AND DriveType2% = VOLUME_LONGNAMES) THEN
+
+      LOG "REMOVE THE TEST DIRECTORY IF THEY EXISTS"
+      retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name")
+      if retcode%=DIRTYPE THEN
+	 LOG "42. Calling LFNRMDir("""+NetDrive1$+NetDir1$+" + a long directory name"")"
+	 retcode%=LFNRMDir(NetDrive1$+NetDir1$+" + a long directory name")
+	 result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+	 if retcode% <> 0 THEN
+	    LOG "Can't delete LFN directory. May not be empty. "
+	    LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	    GOTO SKIPLFN
+	 END IF
+      END IF
+    
+      retcode%=LFNExists(NetDrive2$+NetDir2$+" + a long directory name")
+      if retcode%=DIRTYPE THEN
+	LOG "43. Calling LFNRMDir("""+NetDrive2$+NetDir2$+" + a long directory name"")"
+	retcode%=LFNRMDir(NetDrive2$+NetDir2$+" + a long directory name")
+	result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+	if retcode% <> 0 THEN
+	    LOG "Can't delete LFN directory. May not be empty. "
+	    LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	    GOTO SKIPLFN
+	END IF
+	LOG ""
+      END IF
+    
+
+     REM ***************************************************    
+     LOG "CREATE THE TEST DIRECTORIES"
+     LOG "44. Calling LFNMKDir("""+NetDrive1$+NetDir1$+" + a long directory name"")"
+     retcode%=LFNMKDir(NetDrive1$+NetDir1$+" + a long directory name")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	LOG "Can't create LFN directory. "
+	LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	GOTO SKIPLFN
+     END IF
+     LOG ""
+    
+     LOG "45. Calling LFNMKDir("""+NetDrive2$+NetDir2$+" + a long directory name"")"
+     retcode%=LFNMKDir(NetDrive2$+NetDir2$+" + a long directory name")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	LOG "Can't create LFN directory. "
+	LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	GOTO SKIPLFN
+     END IF
+     LOG ""
+    
+    
+     REM ***************************************************        
+     LOG "CREATE SUB DIRECTORIES"
+     LOG "46. Calling LFNMKDir("""+NetDrive1$+NetDir1$+" + a long directory name\long file name subdir"")"
+     retcode%=LFNMKDir(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	LOG "Can't create LFN directory. "
+	LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	GOTO SKIPLFN
+     END IF
+     LOG ""
+
+     LOG "47. Calling LFNMKDir("""+NetDrive2$+NetDir2$+" + a long directory name\long file name subdir"")"
+     retcode%=LFNMKDir(NetDrive2$+NetDir2$+" + a long directory name\long file name subdir")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	LOG "Can't create LFN subdirectory. "
+	LOG "   -  SKIPPING REMAINING LFN TESTS!!!"
+	GOTO SKIPLFN
+     END IF
+     LOG ""
+    
+     REM ***************************************************
+     LOG "LFNCOPY 8.3 name from local drive to long file name on LFN Drive"
+     LOG "48. Calling LFNCopy("""+NCTDriveLtr$+NCTPath$+"\msd.exe"","""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"",0)"
+     retcode%=LFNCopy(NCTDriveLtr$+NCTPath$+"\msd.exe",NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE",0)
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	LOG "Can't Copy 8.3 file name to LFN directory. "
+     END IF
+	 
+     REM Verify LFN Copy
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% = 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Copying LFN File."
+     END IF
+     LOG ""
+
+
+
+    
+     REM ***************************************************
+     LOG "LFNMove LFN File to subdirectory"
+ 
+     LOG "49. Calling LFNMove("""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"","""+NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNMove(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE",NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+       TestResult%=RS_FAILED
+       LOG "FAILURE: Can't Move LFN to subdirectory."
+     END IF
+     LOG ""
+	
+     REM Verify LFN MOVE
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% <> 0 THEN
+       TestResult%=RS_FAILED
+       LOG "FAILURE: Error Moving LFN File to subdirectory."
+       LOG ""
+     END IF
+    
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE")
+     if retcode% = 0 THEN
+       TestResult%=RS_FAILED
+       LOG "FAILURE: Error Moving LFN File to subdirectory."
+     END IF
+     LOG ""
+
+
+	    
+     REM ***************************************************
+     LOG "LFNCopy LFN File to parent directory"
+    
+     LOG "50. Calling LFNCopy("""+NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE"","""+NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNCopy(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE",NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE",0)
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't copy LFN from subdirectory to parent."
+     END IF
+     LOG ""
+	
+     REM Verify LFN Copy
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE")
+     if retcode% = 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Copying LFN File."
+     END IF
+     LOG ""
+
+    
+     REM ***************************************************
+     LOG "LFNDelete LFN File in subdirectory"
+    
+     LOG "51. Calling LFNDelete("""+NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNDelete(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't Delete LFN from subdirectory."
+     END IF
+	
+     REM Verify LFN Delete
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir\SECOND LONG FILE NAME FOR MSD.EXE")
+     if retcode% = FILETYPE THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Deleting LFN File."
+     END IF
+     LOG ""
+    
+    
+     REM ***************************************************
+     LOG "LFNMove LFN File to other LFN Network Drive"
+    
+     LOG "52. Calling LFNMove("""+NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE"","""+NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNMove(NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE",NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE:Can't Move LFN to other LFN drive."
+     END IF
+	
+     REM Verify LFN MOVE
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\PARENT LONG FILE NAME FOR MSD.EXE")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Moving LFN File to other LFN Drive."
+     END IF
+    
+     retcode%=LFNExists(NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% = 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Moving LFN File to othe LFN Drive."
+     END IF
+     LOG ""
+
+     REM ***************************************************
+     REM LFNCopy LFN File back to other LFN Network Drive
+    
+     LOG "53. Calling LFNCopy("""+NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"","""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNCopy(NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE",NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE",0)
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't copy LFN from subdirectory to parent."
+     END IF
+	
+     REM Verify LFN Copy
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% = 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Copying LFN File."
+     END IF
+     LOG ""
+
+     REM ***************************************************
+     REM LFNDelete LFN File on second LFN drive
+     LOG "54. Calling LFNDelete("""+NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNDelete(NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't Delete LFN from second net drive."
+     END IF
+	
+     REM Verify LFN Delete
+     retcode%=LFNExists(NetDrive2$+NetDir2$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Deleting LFN File."
+     END IF
+     LOG ""      
+		
+     REM ***************************************************
+     REM Test LFNSetAttrbiutes
+     REM      LFNGetAttributes
+
+     FOR TestAttr%= 7 TO 0 STEP -1
+	LOG "55. Calling LFNSetAttributes("""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"", "+str$(TestAttr%)+")"
+	retcode%=LFNSetAttributes(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE", TestAttr%)
+	result%=checkDOSError(WN_SUCCESS, retcode%, FALSE)
+	if retcode% <> 0 THEN
+	    TestResult%=RS_FAILED
+	    LOG "FAILURE: Couldn't Set Attribute value "+str$(TestAttr%)
+	END IF
+
+	wAttr%=0        
+	LOG "56. Calling LFNGetAttributes("""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"",VARPTR(wAttr%))"
+	retcode%=LFNGetAttributes(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE", VARPTR(wAttr%))
+	result%=checkDOSError(WN_SUCCESS, retcode%, FALSE)
+	if retcode% <> 0 THEN
+	    TestResult%=RS_FAILED
+	    LOG "FAILURE: Couldn't get LFN attributes."
+	ELSE
+	    IF wAttr% <> TestAttr% THEN
+		TestResult%=RS_FAILED
+		LOG "FAILURE: GetAttributes expected "+str$(TestAttr%)+" but got "+str$(wAttr%)
+	    ELSE
+		LOG "Variation Succeeded!"
+	    END IF
+	END IF
+	LOG ""
+     NEXT
+    
+
+     REM ***************************************************
+     REM LFNDelete LFN File
+     LOG "57. Calling LFNDelete("""+NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE"")"
+     retcode%=LFNDelete(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     result%=checkDOSError(WN_SUCCESS, retcode%, FALSE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't Delete LFN from first net drive."
+     END IF
+     LOG ""
+	
+     REM Verify LFN Delete
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\LONG FILE NAME FOR MSD.EXE")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error Deleting LFN File."
+     ELSE
+	LOG "Variation Succeeded!"
+     END IF
+     LOG ""    
+
+     REM ***************************************************    
+     REM REMOVE SUB DIRECTORIES
+     LOG "58. Calling LFNRMDir("""+NetDrive1$+NetDir1$+" + a long directory name\long file name subdir"")"
+     retcode%=LFNRMDir(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't delete LFN directory. May not be empty. "
+     END IF
+     LOG ""
+    
+     LOG "59. Calling LFNRMDir("""+NetDrive2$+NetDir2$+" + a long directory name\long file name subdir"")"
+     retcode%=LFNRMDir(NetDrive2$+NetDir2$+" + a long directory name\long file name subdir")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't delete LFN directory. May not be empty. "
+     END IF
+     LOG ""
+	
+     REM Verify remove sub directories
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name\long file name subdir")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error deleting LFN directory."
+     END IF
+    
+     retcode%=LFNExists(NetDrive2$+NetDir2$+" + a long directory name\long file name subdir")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error deleting LFN directory."
+     END IF
+    
+    
+     REM ***************************************************
+     REM REMOVE TOP LEVEL DIRECTORIES
+     LOG "60. Calling LFNRMDir("""+NetDrive1$+NetDir1$+" + a long directory name"")"
+     retcode%=LFNRMDir(NetDrive1$+NetDir1$+" + a long directory name")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't delete LFN directory. May not be empty. "
+     END IF
+     LOG ""
+    
+     LOG "61. Calling LFNRMDir("""+NetDrive2$+NetDir2$+" + a long directory name"")"
+     retcode%=LFNRMDir(NetDrive2$+NetDir2$+" + a long directory name")
+     result%=checkDOSError(WN_SUCCESS, retcode%, TRUE)
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Can't delete LFN directory. May not be empty. "
+     END IF
+     LOG ""
+	
+     REM Verify remove toplevel dirs
+     retcode%=LFNExists(NetDrive1$+NetDir1$+" + a long directory name")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error deleting LFN directory."
+     END IF
+    
+     retcode%=LFNExists(NetDrive2$+NetDir2$+" + a long directory name")
+     if retcode% <> 0 THEN
+	TestResult%=RS_FAILED
+	LOG "FAILURE: Error deleting LFN directory."
+     END IF
+     LOG ""
+   ELSE
+     LOG "SKIPPED ALL LFN TESTS because NetDrive1 and 2"
+     LOG "were either not connected properly or do not"
+     LOG "support long file names."
+     LOG ""
+   END IF
+
+   SKIPLFN:
+
+   LOG "62. Calling WNetCancelConnection("""+NetPath1$+""",TRUE)"
+   retcode%=WNetCancelConnection(UCASE$(NetDrive1$), TRUE)
+   result%=checkError(WN_SUCCESS, retcode%, TRUE)
+   LOG ""
+
+   LOG "63. Calling WNetCancelConnection("""+NetPath2$+""",TRUE)"
+   retcode%=WNetCancelConnection(UCASE$(NetDrive2$), TRUE)
+   result%=checkError(WN_SUCCESS, retcode%, TRUE)
+   LOG ""
+
+END IF
+
+BOTTOM:
+
+'retcode%=ChooseResult("Win Net Test", RS_FAILED)
+
+LOG "Test Result: "+str$(TestResult%)
+HctTestDone TestResult%

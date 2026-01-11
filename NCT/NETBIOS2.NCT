@@ -1,0 +1,613 @@
+
+print "Running Add Group Tests..."
+
+
+log "***********************"
+log "***********************"
+log "**                   **"
+log "**   ADDGROUP Tests  **"
+log "**                   **"
+log "***********************"
+log "***********************"
+
+time stamp
+clear
+
+log "*************************************"
+log "**  Add the same group name twice  **"
+log "**  should get dup name error      **"
+log "*************************************"
+
+addname group wait 1
+check retcode addname-group 00H
+
+addname group wait 1
+check retcode addname-group 0dH
+
+delete name  wait 1
+check retcode delete-name 00H
+
+
+log "*****************************************"
+log "**  Add a group name identical to one  **"
+log "**  already added with ADD.NAME.       **"
+log "*****************************************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname group wait 1
+check retcode addname-group 0dH
+
+delete name  wait 1
+check retcode delete-name 00H
+
+
+log "************************************************"
+log "**  Attempt to add a number of invalid names  **"
+log "************************************************"
+
+log "** Attempt to add a null group name '=0x00'. **"
+addname group wait 0
+check retcode addname-group 15H
+
+log "** Attempt to add '*' as a group name. **"
+addname group wait 20
+check retcode addname-group 15H
+
+tests
+
+
+
+print "Running Add Name Tests..."
+
+log "**********************"
+log "**********************"
+log "**                  **"
+log "**   ADDNAME Tests  **"
+log "**                  **"
+log "**********************"
+log "**********************"
+
+time stamp
+clear
+
+
+log "***********************************************"
+log "** attempt to add a number of invalid names. **"
+log "***********************************************"
+
+log "** attempt to add a null unique name '=0x00'. **"
+addname unique wait 0
+check retcode addname-unique 15H
+
+log "** attempt to add '*' as a unique name. **"
+addname unique wait 20
+check retcode addname-unique 15H
+
+
+log "*************************************"
+log "** Add the same unique name twice  **"
+log "** should get dup name error       **"
+log "*************************************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname unique wait 1
+check retcode addname-unique 0dH
+
+delete name wait 1
+check retcode delete-name 00H
+
+
+log "************************************************************"
+log "** Post a number of asynchronous LISTENs. Then attempt to **"
+log "** add a number of invalid names. Check that these failed.**"
+log "** Cancel the listens. check that the CANCELs succeed.    **"
+log "************************************************************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname unique wait 2
+check retcode addname-unique 00H
+
+listen for nowait 1 2
+
+listen for nowait 2 1
+
+listen for nowait 1 2
+
+listen for nowait 2 1
+
+addname unique wait 19
+check retcode addname-unique 15H
+
+addname unique wait 20
+check retcode addname_unique 15H
+
+
+cancel command listen-for
+check retcode cancel-command 00H
+check retcode listen-for 0bH
+
+cancel command listen-for
+check retcode cancel-command 00H
+check retcode listen-for 0bH
+
+cancel command listen-for
+check retcode cancel-command 00H
+check retcode listen-for 0bH
+
+cancel command listen-for
+check retcode cancel-command 00H
+check retcode listen-for 0bH
+
+
+delete name wait 1
+check retcode delete-name 00H
+
+delete name wait 2
+check retcode delete-name 00H
+
+
+log "******************************************************"
+log "** Attempt to add the same a large number of times. **"
+log "** Both synchronous and asynchronous.               **"
+log "******************************************************"
+
+log "** Synchronous case **"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname unique wait 1
+check retcode addname-unique 0dH
+
+addname unique wait 1
+check retcode addname-unique 0dH
+
+
+log "** Asynchronous case **"
+
+addname unique nowait 2
+addname unique nowait 2
+addname unique nowait 2
+
+check retcode addname-unique 00H
+check retcode addname-unique 0dH
+check retcode addname-unique 0dH
+
+delete name wait 1
+check retcode delete-name 00H
+
+delete name wait 2
+check retcode delete-name 00H
+
+
+log "*****************************************"
+log "**  Add a uniquename identical to one  **"
+log "**  already added as group name        **"
+log "*****************************************"
+
+addname group wait 1
+check retcode addname-group 00H
+
+addname unique wait 1
+check retcode addname-unique 0dH
+
+delete name wait 1
+check retcode delete-name 00H
+
+
+tests
+
+
+
+print "Running Datagram Tests..."
+
+log "***********************"
+log "***********************"
+log "**                   **"
+log "**   DATAGRAM Tests  **"
+log "**                   **"
+log "***********************"
+log "***********************"
+
+time stamp
+clear
+
+log "*******************"
+log "** Set up names **"
+log "*******************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname unique wait 2
+check retcode addname-unique 00H
+
+
+
+log "**********************************"
+log "** Perform Successful Datagrams **"
+log "**   of sizes 0-2, 255, 256,    **"
+log "**   and 511                    **"
+log "**********************************"
+
+
+log "** Transfer 0 bytes **"
+
+receive datagram nowait 2 0
+ 
+send datagram wait 2 1 0
+check retcode send-datagram 00H
+
+delay 2
+ 
+check retcode receive-datagram 00H
+
+
+
+log "** Transfer 1 byte **"
+                         
+receive datagram nowait 2 1
+
+send datagram wait 2 1 1
+check retcode send-datagram 00H
+
+delay 2
+
+check retcode receive-datagram 00H
+
+
+
+log "** Transfer 255 bytes **"
+
+receive datagram nowait 2 255
+
+send datagram wait 2 1 255
+check retcode send-datagram 00H
+
+delay 2
+
+check retcode receive-datagram 00H
+
+
+
+log "** Transfer 256 bytes **"
+
+receive datagram nowait 2 256
+
+send datagram wait 2 1 256
+check retcode send-datagram 00H
+
+delay 2
+
+check retcode receive-datagram 00H
+
+
+
+log "** Transfer 511 bytes **"
+
+receive datagram nowait 2 511
+
+send datagram wait 2 1 511
+check retcode send-datagram 00H
+
+delay 2
+
+check retcode receive-datagram 00H
+
+
+
+log "** Transfer 512 bytes **"
+
+receive datagram nowait 2 512
+
+send datagram wait 2 1 512
+check retcode send-datagram 00H
+
+delay 2
+
+check retcode receive-datagram 00H
+
+
+
+log "**************"
+log "** Clean Up **"
+log "**************"
+
+delete name wait 1
+check retcode delete-name 00H
+
+delete name wait 2
+check retcode delete-name 00H
+
+
+tests
+
+
+
+print "Running Delete Tests..."
+
+log "*********************"
+log "*********************"
+log "**                 **"
+log "**   DELETE Tests  **"
+log "**                 **"
+log "*********************"
+log "*********************"
+
+time stamp
+clear
+
+
+log "************************************************"
+log "** Add and then delete number of valid names. **"
+log "************************************************"
+
+log "Add 1-2 test names then delete them"
+
+addname unique wait 1
+check retcode addname-unique 00H
+addname unique wait 2
+check retcode addname-unique 00H
+
+delete name wait 1
+check retcode delete-name 00H
+delete name wait 2
+check retcode delete-name 00H
+
+
+log "****************************************************************"
+log "** Attempt to delete a number of valid but non-existent names.**"
+log "****************************************************************"
+
+delete name wait 1
+check retcode delete-name 15H
+delete name wait 2
+check retcode delete-name 15H
+
+
+log "**************************************************"
+log "** Attempt to delete a number of invalid names. **"
+log "**************************************************"
+
+delete name wait 19
+check retcode delete-name 15H
+delete name wait 20
+check retcode delete-name 15H
+
+
+log "*********************************************************"
+log "** Attempt to delete names with invalid NCB_LANA_NUMs. **"
+log "*********************************************************"
+
+custom
+command addname_unique
+name 1
+cend
+check retcode addname-unique 00H
+
+custom
+command delete_name
+name 1
+lana_num 0
+cend
+check retcode delete_name 00H
+
+
+log "*************************************************************"
+log "** ADD.NAME a valid name. Then attempt 10 DELETE.NAMEs for **"
+log "** this name.                                              **"
+log "*************************************************************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+delete name nowait 1
+delay 1
+delete name nowait 1
+delete name nowait 1
+
+check retcode delete-name 00H
+check retcode delete-name 15H
+check retcode delete-name 15H
+
+tests
+
+
+
+print "Running Send/Receive Tests..."
+
+log "***************************"
+log "***************************"
+log "**                       **"
+log "**   SEND/RECEIVE Tests  **"
+log "**                       **"
+log "***************************"
+log "***************************"
+
+time stamp
+clear
+
+
+log "******************"
+log "** Set up names **"
+log "******************"
+
+addname unique wait 1
+check retcode addname-unique 00H
+
+addname unique wait 2
+check retcode addname-unique 00H
+
+
+log "*******************"
+log "** Start session **"
+log "*******************"
+
+listen for nowait 2 1
+
+call request wait 1 2
+check retcode call-request 00H
+check retcode listen-for 00H
+
+
+
+log "**********************************"
+log "** Perform Successful Transfers **"
+log "**   of sizes 0-1, 255, 256,    **"
+log "**   1023, 1024                 **"
+log "**********************************"
+
+
+log "** Transfer 0 bytes **"
+
+receive data nowait 2 0
+
+send data wait 1 0
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+log "** Transfer 1 byte **"
+
+receive data nowait 2 1
+
+send data wait 1 1
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+log "** Transfer 255 bytes **"
+
+receive data nowait 2 255
+
+send data wait 1 255
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "** Transfer 256 bytes **"
+
+receive data nowait 2 256
+
+send data wait 1 256
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "** Transfer 1023 bytes **"
+
+receive data nowait 2 1023
+
+send data wait 1 1023
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "** Transfer 1024 bytes **"
+
+receive data nowait 2 1024
+
+send data wait 1 1024
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "*******************************"
+log "** Alternate good sends with **"
+log "**   invalid LSN sends for   **"
+log "**   buffer sizes of 0-1,    **"
+log "**   255, 256                **"
+log "*******************************"
+
+
+log "** Valid LSN Send 0 bytes **"
+
+receive data nowait 2 0
+
+send data wait 1 0
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "** Invalid LSN Send 1 byte **"
+
+send data wait 255 1
+check retcode send-data 08H
+
+
+
+log "** Invalid LSN Send 255 bytes **"
+
+send data wait 0 255
+check retcode send-data 08H
+
+
+
+log "** Valid LSN Send 256 bytes **"
+
+receive data nowait 2 256
+
+send data wait 1 256
+check retcode send-data 00H
+
+check retcode receive-data 00H
+
+
+
+log "********************"
+log "** Close sessions **"
+log "********************"
+
+delay 5
+
+close session wait 1
+check retcode close-session 00H
+
+delay 5
+
+close session wait 2
+check retcode close-session 0AH
+
+
+delete name wait 1
+check retcode delete-name 00H
+
+delete name wait 2
+check retcode delete-name 00H
+
+
+delay 5
+
+
+
+log "***************"
+log "***************"
+log "**           **"
+log "**  SUMMARY  **"
+log "**           **"
+log "***************"
+log "***************"
+
+
+tests
+
+
+print "Tests Completed"

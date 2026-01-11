@@ -1,0 +1,794 @@
+GLOBAL DefaultDialogs$
+
+'$INCLUDE: 'wply2wat.inc' 
+'$INCLUDE: 'player.inc' 
+'$INCLUDE: 'netinfo.inc' 
+'$INCLUDE: 'drvconn.inc' 
+'$INCLUDE: 'drvdconn.inc' 
+'$INCLUDE: 'clock.inc'
+'$INCLUDE: 'strsslp.inc'
+
+Viewport OFF
+HctTestBegin 0, "Network Stress Test"
+GetWinplayVars
+ClearLog "stress.log"
+
+'*************************************************************************
+' Microsoft Stress Test Script
+'
+' Script:       STRESS.SCR
+' Author:       JL
+' Date:         12/20/91
+'
+'*************************************************************************
+' Description:
+'*************************************************************************
+' Script used with WATTDRV to stress test the network IO operations within
+' various networking environments.
+'
+' This script runs 2 DOS Windowed VM's while running some of the Window's
+' applets in the foreground.
+'
+' After the PIF's are running, STRSSLP.INC starts which loops  
+' STRSSAPP.INC 12 times.
+'
+'   After the test is run, the test data files are deleted and the
+'   test directories are removed.
+'
+' Variables used in this script:
+'       AutoDelay               NCTPath                 NetDrive1
+'       NetPath1                NetDir1                 NetDrive2               
+'       NetPath2                NetDir2                 NetDrive3               
+'       NetPath3                NetDir3                 RemMinSz              
+'       RemMaxSz                RemInc                  RemIOLoc
+'       NCTDriveLtr
+'*************************************************************************
+' Modifications:
+' NAME          DATE            DESCRIPTION
+'
+
+
+'***************************************************************************
+' Test Controls dialog
+'***************************************************************************
+x%=usecontrols("NCT Stress Test")
+
+'***************************************************************************
+' LOG OUT HEADER INFORMATION TO LOG FILE
+'***************************************************************************
+
+lf$ = "stress.log"
+openlog (lf$)                               'clear log file lf$
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Log File Network Stress Test"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+'***************************************************************************
+' CONNECT THE NETWORK DRIVES & VERIFY CONNECTIONS
+'***************************************************************************
+
+drvconn             'call drive connection script - defined in drvconn.inc
+
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drive Connections"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 5 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3)   'verify net connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3)   'verify net connection
+retcode%=WinExec("wverify.exe 5 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3)   'verify net connection
+
+'*************************************************************************
+' Decide whether to make the batch files...or to run existing ones....
+'*************************************************************************
+
+IF NOT ((MakeBatchFile$ = "y") OR (MakeBatchFile$ = "Y")) THEN
+  ret%  = Exists (NCTDriveLtr+":"+NCTPath+"\STRESS1.BAT")        'does this file exists?
+  ret2% = Exists(NCTDriveLtr+":"+NCTPath+"\STRESS2.BAT")         'does this file exists?
+  ret3% = Exists (NCTDriveLtr+":"+NCTPath+"\STRESS1.PIF")        'does this file exists?
+  ret4% = Exists(NCTDriveLtr+":"+NCTPath+"\STRESS2.PIF")         'does this file exists?
+  
+  IF ((ret% = -1) AND (ret2% = -1) AND (ret3% = -1) AND (ret4% = -1)) THEN
+    goto SKIPBATCH                                               'only if ALL exists
+  END IF
+END IF
+
+'************************************************************************
+' LOAD NOTEPAD FOR BATCH FILE CREATION
+'************************************************************************
+
+retcode%=WinExec("Notepad",1)
+
+'*************************************************************************
+'*************************************************************************
+' CREATE BATCH FILE STRESS1.BAT - DRIVE STRESS
+'*************************************************************************
+'*************************************************************************
+'
+'
+WPlayKeys("@echo off{Enter}{Enter}")
+
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("Rem *** Batch File Name:   Stress1.bat{Enter}")
+WPlayKeys("Rem *** Created by Script: Stress.scr{Enter}")
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("Rem *{Enter}")
+WPlayKeys("Rem *{Enter}")
+WPlayKeys("{enter}{enter}")
+
+'*************************************************************************
+' CHECK EXISTANCE OF STRESS.FLG FILE FROM PREVIOUS RUN - DELETE IF EXISTS..
+'*************************************************************************
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg del "+NCTDriveLtr+":"+NctPath+"\stress.flg{ENTER}")
+
+'************************************************************************
+' CHANGE TO WORING DIRECTORIES (OUT FROM WINDOWS DIRECTORY)
+'************************************************************************
+'
+WPlayKeys("{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("Rem *** Change to working directories{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("md "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")       'cd to 1st net drive
+WPlayKeys("md "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")       'cd to 2nd net drive
+WPlayKeys("md "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")       'cd to 3rd net drive
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"{Enter}")     'cd to NCT dir
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")       'cd to 1st net drive
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")       'cd to 2nd net drive
+WPlayKeys("cd "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")       'cd to 3rd net drive
+WPlayKeys("{Enter}")
+
+'*********************************************************************
+' WRITE OUT DRIVE STRESS LOOP
+'*********************************************************************
+
+WPlayKeys("{Enter}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo ********* DRIVE STRESS TEST ***********{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *************************************** > "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo ********* DRIVE STRESS TEST *********** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo ***** DRIVE STRESS LOOP BEGINNING ***** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+
+
+WPlayKeys(":Loop{ENTER}")
+WPlayKeys("{Enter}")
+
+'************************
+'header info for log file
+'************************
+
+WPlayKeys("{Enter}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo ***** DRIVE STRESS LOOP BEGINNING *****{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Rem **************************************{Enter}")    'header info for batch file
+WPlayKeys("Rem *** BEGINNING OF DRIVE STRESS LOOP ***{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto end{ENTER}")   'if flag exists, then delete
+
+'****************************************************************************
+' MAIN DRVSTRES.EXE SECTION
+'****************************************************************************
+
+WPlayKeys("drvstres 65 15000 128 "+RemIOLoc+" "+NetDrive1+" "+NetDrive2+" "+NetDrive3+" /t /l{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error EXECUTING DRVSTRS.EXE! >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo PASS DRIVE STRESS COMPLETE >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ************************************{ENTER}")
+WPlayKeys("Echo ***** DRIVE STRESS LOOP ENDING *****{ENTER}")
+WPlayKeys("Echo ************************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' COPY SOME BOZO FILES & THEN DELETE ALL THE TEMP FILES CREATED/COPIED
+'***************************************************************************
+
+WPlayKeys("{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("Rem *** Delete all the temp data files ***{Enter}")
+WPlayKeys("Rem **************************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive1+":"+NetDir1+"\nctbozo1.111{Enter}")  'copy some bogus files to netdrive1
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive2+":"+NetDir2+"\nctbozo2.222{Enter}")  'copy some bogus files to netdrive2
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.pif "+NetDrive3+":"+NetDir3+"\nctbozo3.333{Enter}")  'copy some bogus files to netdrive3
+
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\nctbozo1.111\*.pif{ENTER}")       'del bogus files on netdrive1
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\nctbozo2.222\*.pif{ENTER}")       'del bogus files on netdrive2
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\nctbozo3.333\*.pif{ENTER}")       'del bogus files on netdrive3
+
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\drvstres.dat{ENTER}")    'del drvstres data files on local drive
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\nctbozo1.111\drvstres.dat{ENTER}")      'del drvstres data files on netdrive1
+WPlayKeys("del "+NetDrive2+":"+NetDir2+"\nctbozo2.222\drvstres.dat{ENTER}")      'del drvstres data files on netdrive2
+WPlayKeys("del "+NetDrive3+":"+NetDir3+"\nctbozo3.333\drvstres.dat{ENTER}")      'del drvstres data files on netdrive3
+
+WPlayKeys("goto loop{Enter}")    'go back around again....
+
+
+
+'***************************************************************************
+' ENDING SECTION - STRESS1.BAT
+'***************************************************************************
+
+WPlayKeys("Echo ************************************ >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo ***** DRIVE STRESS LOOP ENDING ***** >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo ************************************ >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+
+
+WPlayKeys(":end{Enter}")         'end section - write out log file & terminate
+
+WPlayKeys("cd "+NetDrive1+":\{Enter}")       'cd to 1st net drive \
+WPlayKeys("cd "+NetDrive2+":\{Enter}")       'cd to 2nd net drive \
+WPlayKeys("cd "+NetDrive3+":\{Enter}")       'cd to 3rd net drive \
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' LOG THE OUTPUT FROM TEMP LOG FILE TO MAIN LOG FILE-DELETE TEMP LOG FILE
+' ALSO NOTEPAD FILE_SAVEAS
+'***************************************************************************
+
+WPlayKeys("type "+NCTDriveLtr+":"+NctPath+"\stress1.log >> "+NCTDriveLtr+":"+NctPath+"\stress.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\stress1.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\test.log{ENTER}")
+
+WPlayKeys("exit{Enter}")         'exit the VM
+
+WPlayKeys("%FA")                 ' notepad - save the file as stress1.bat
+
+WPlayKeys( NCTDriveLtr+":"+NctPath+"\STRESS1.BAT{Enter}%Y")
+
+'*************************************************************************
+'*************************************************************************
+' CREATE SECOND BATCH FILE:  STRESS2.BAT - DOS UTILITIES
+'*************************************************************************
+'*************************************************************************
+
+WPlayKeys("%FN")                 ' notepad - open new file
+
+WPlayKeys("@echo off{Enter}{Enter}")
+
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("Rem *** Batch File Name:   Stress2.bat{Enter}")
+WPlayKeys("Rem *** Created by Script: Stress.scr{Enter}")
+WPlayKeys("Rem ***********************************{Enter}")
+WPlayKeys("{Enter}")
+'
+
+WPlayKeys("Echo ****************************************** > "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo *****DOS UTILS BATCH FILE BEGINNING******* >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ******* BATCH FILE: STRESS2.BAT ********** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg del "+NCTDriveLtr+":"+NctPath+"\stress.flg{ENTER}")
+
+' change to working directories (out of Windows dir)
+
+
+WPlayKeys(":Loop{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto end{ENTER}")
+WPlayKeys("{Enter}")
+'
+'
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("Rem *** Change to working directories{Enter}")
+WPlayKeys("Rem *********************************{Enter}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"{Enter}")
+WPlayKeys("cd "+NetDrive1+":"+NetDir1+"{Enter}")
+WPlayKeys("cd "+NetDrive2+":"+NetDir2+"{Enter}")
+
+WPlayKeys("{Enter}")
+
+'************************************************************************
+' MAKE FILE ON FLOPPY DRIVE - COPY TO NCT DIRECTORY
+'************************************************************************
+'
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY *****{ENTER}")
+WPlayKeys("Echo ***************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** FLOPPY TO NCT DIR FILE COPY ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo *************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir > "+NCTFlopLtr+":\VMTEST.FIL{ENTER}") 'make test file
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NCT DIR COPY FAILED @ LINE 36! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NCT DIR COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' COPY FILE FROM FLOPPY DRIVE TO NETWORK DRIVE
+'*************************************************************************
+'
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ********************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** COPY FILE FROM FLOPPY TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ******************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTFlopLtr+":\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error FLOPPY TO NET COPY FAILED @ LINE 52! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo FLOPPY TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'*************************************************************************
+' DEL FILE FROM NETWORK DRIVE & COPY FILE FROM NCT DIR TO NETWORK DRIVE
+'*************************************************************************
+'
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK *****{ENTER}")
+WPlayKeys("Echo ******************************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** COPY FROM NCT DRIVE TO NETWORK ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ****************************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("del "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"{ENTER}")
+WPlayKeys("fcom "+NCTDriveLtr+":"+NctPath+"\VMTEST.FIL "+NETDrive1+":"+NeTDIR1+"\VMTEST.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NCT DIR TO NET COPY FAILED @ LINE 69! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NCT DIR TO NET COPY PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' DIR > TO SORT.FIL ON NETWORK, THEN REDIRECT TO SORT COMMAND
+'***************************************************************************
+'
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT *****{ENTER}")
+WPlayKeys("Echo **************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** DIRECTORY SORT ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ************************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("sort < "+NetDrive1+":"+NetDir1+"\sort.fil{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error NET FILE SORT FAILED @ LINE 85! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo NET FILE SORT PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' ATTRIB FILE READ-ONLY; ATTEMPT TO DELETE FILE
+'***************************************************************************
+'
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST *****{ENTER}")
+WPlayKeys("Echo ***********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** ATTRIB TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo *********************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("dir "+NCTDriveLtr+":"+NctPath+" > "+NetDrive1+":"+NetDir1+"\NDIR1.fil{ENTER}")
+WPlayKeys("attrib {+}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB {+}R NET FILE FAILED @ LINE 100! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB {+}R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys("del "+NETDRIVE1+":"+NETDIR1+"\*.FIL{ENTER}")
+
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo COULDN'T DELETE READ-ONLY NET FILE! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error DELETED READ-ONLY NET FILE-@406! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' RENAME A NETWORK FILE
+'***************************************************************************
+'
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME *****{ENTER}")
+WPlayKeys("Echo *******************************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** NETWORK FILE RENAME ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ******************************* >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+WPlayKeys("attrib {-}R "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL{ENTER}")
+WPlayKeys("if errorlevel 1 echo Error ATTRIB -R NET FILE FAILED @ LINE 117! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not errorlevel 1 echo ATTRIB -R NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys("ren "+NETDRIVE1+":"+NETDIR1+"\NDIR1.FIL VM2.FIL{ENTER}")
+WPlayKeys("if NOT exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo RENAME NET FILE PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if exist "+NetDrive1+":"+NetDir1+"\ndir1.fil echo Error RENAME NET FILE FAILED @ LINE 121! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+'***************************************************************************
+' XCOPY TEST - LOCAL TO NET & NET TO NET
+'***************************************************************************
+'
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST *****{ENTER}")
+WPlayKeys("Echo **********************{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** XCOPY TEST ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ********************** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4{ENTER}")
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.wtd md "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\*.boo{ENTER}")      'SETTING UP TREE STRUCTURE
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\*.boo{ENTER}")
+WPlayKeys("copy "+NCTDriveLtr+":"+NctPath+"\*.wtd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\*.boo{ENTER}")
+WPlayKeys("{Enter}")                  
+
+WPlayKeys("md "+NetDrive1+":"+NetDir1+"\1{Enter}")      'md dir on netdrive1
+
+WPlayKeys("xcopy "+NCTDriveLtr+":"+NctPath+"\1 "+NeTDrive1+":"+NeTDir1+"\1 /s/v{ENTER}")     'local to net xcopy
+
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NCT DIR TO NET FAILED @ LINE 147! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NCT DIR TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto clean{ENTER}")
+
+WPlayKeys("{Enter}")
+
+WPlayKeys("md "+NetDrive2+":"+NetDir2+"\1{Enter}")
+WPlayKeys("xcopy "+NeTDrive1+":"+NeTDir1+"\1 "+NeTDrive2+":"+NeTDir2+"\1 /s/v{ENTER}")
+WPlayKeys("if Errorlevel 1 echo Error XCOPY NET TO NET DRIVE FAILED LINE 153! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if not Errorlevel 1 echo XCOPY NET TO NET PASSED! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto clean{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("{Enter}")
+
+
+'***************************************************************************
+' CLEAN UP FILES
+'***************************************************************************
+'
+WPlayKeys(":Clean{Enter}")
+
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS *****{ENTER}")
+WPlayKeys("Echo *********************************{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("{Enter}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ***** CLEAN UP FILES & DIRS ***** >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo ********************************* >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys( NetDrive2+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\APPLET.BOO goto nctdrv{ENTER}")
+
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("cd "+NeTDrive2+":"+NetDir2+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.FIL{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NetDrive2+":"+Netdir2+"\1\APPLET.BOO goto nctdrv{ENTER}")
+WPlayKeys("echo "+NetDrive2+":"+Netdir2+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+
+WPlayKeys(":nctdrv{Enter}")
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+WPlayKeys("if NOT exist "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\APPLET.BOO goto net1{ENTER}")
+
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("cd "+NCTDriveLtr+":"+NctPath+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("{Enter}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\1\APPLET.boo goto net1{ENTER}")
+WPlayKeys("echo "+NCTDriveLtr+":"+NctPath+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys(":net1{Enter}")
+
+WPlayKeys( NetDrive1+":{ENTER}")
+WPlayKeys("del "+NetDrive1+":"+NetDir1+"\*.fil{Enter}")
+
+WPlayKeys("if NOT exist "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\APPLET.boo goto cont{ENTER}")
+
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\2\3\4\5\applet.boo does exist! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("cd "+NeTDrive1+":"+NetDir1+"\1\2\3\4\5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 5{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 4{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 3{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 2{ENTER}")
+WPlayKeys("del *.boo{ENTER}")
+WPlayKeys("cd ..{ENTER}")
+WPlayKeys("rd 1{ENTER}")
+WPlayKeys("del *.fil{ENTER}")
+WPlayKeys("{Enter}")
+WPlayKeys("if exist "+NetDrive1+":"+Netdir1+"\1\APPLET.boo goto cont{ENTER}")
+WPlayKeys("echo "+NetDrive1+":"+Netdir1+"\1\applet.boo has been deleted! >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+WPlayKeys("Echo . >> "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys(":cont{enter}")
+
+WPlayKeys( NCTDriveLtr+":{ENTER}")
+
+WPlayKeys("if exist "+NCTDriveLtr+":"+NctPath+"\stress.flg goto end{ENTER}")
+
+WPlayKeys("goto loop{Enter}")
+
+'***************************************************************************
+' ENDING SECTION FOR STRESS2.BAT & NOTEPAD FILE_SAVEAS
+'***************************************************************************
+
+WPlayKeys(":end{ENTER}")
+WPlayKeys("type "+NCTDriveLtr+":"+NctPath+"\stress2.log >> "+NCTDriveLtr+":"+NctPath+"\stress.log{ENTER}")
+WPlayKeys("del "+NCTDriveLtr+":"+NctPath+"\stress2.log{ENTER}")
+
+WPlayKeys("exit{ENTER}")
+
+WPlayKeys("%FA")                 ' save the file as Stress2.bat
+WPlayKeys( NCTDriveLtr+":"+NctPath+"\STRESS2.BAT{Enter}%Y")
+
+WPlayKeys("%{F4}")               ' close Notepad
+
+'**********************************************************************
+' CREATE PIF FILES FOR EACH OF THE BATCH FILES
+'**********************************************************************
+
+'**********************************************************************
+' MAKE STRESS1.PIF
+'**********************************************************************
+
+retcode%=WinExec ("PIFEdit",1)                           'exec pifeditor
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("STRESS1.BAT")
+WPlayKeys ("%TNCT VM1 - Drive Stress Test")      'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'startup dir
+WPlayKeys ("%W")                                 'Set to Windowed PIF
+WPlayKeys ("%B")                                 'background mode
+WPlayKeys ("%FA")                                'file save_as
+WPlayKeys ("%N"+NCTDriveLtr+":"+NctPath+"\STRESS1.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+WPlayKeys ("%{F4}")                              'Close the Editor
+
+'***********************************************************************
+' MAKE STRESS2.PIF
+'***********************************************************************
+'
+retcode%=WinExec ("PIFEdit",1)                           'exec pifeditor
+WPlayKeys ("%P")                                 'program
+WPlayKeys ("STRESS2.BAT")                        'batch file
+WPlayKeys ("%TNCT VM2 - DOS STRESS TEST")        'title
+WPlayKeys ("%S"+NCTDriveLtr+":"+NCTPath)        'startup directory
+WPlayKeys ("%W")                                 'Set to Windowed PIF
+WPlayKeys ("%B")                                 'background
+WPlayKeys ("%FA")                                'file save_as
+WPlayKeys ("%N"+NCTDriveLtr+":"+NctPath+"\STRESS2.PIF{ENTER}%Y")
+ret%=SleepDelay(5)
+WPlayKeys ("%{F4}")                              'Close the Editor
+
+SKIPBATCH:      'come here if decided to skip making the batch & pif files
+
+'**********************************************************************
+' RUN THE PIF BATCH FILES - THIS STARTS 2 DOS VM'S RUNNING BKGRD MODE
+'**********************************************************************
+'
+retcode%=WinExec( NCTDriveLtr+":"+NctPath+"\STRESS1.PIF",1)
+ret%=SleepDelay(5)
+retcode%=WinExec( NCTDriveLtr+":"+NctPath+"\STRESS2.PIF",1)
+ret%=SleepDelay(5)
+
+'***************************************************************************
+' WHILE DOS VM'S ARE RUNNING IN BACKGROUND - DO SOME WINDOW OPERATIONS
+' CALL STRSSLP.SCR TO RUN WINDOW OPERATIONS
+'***************************************************************************
+
+strsslp              'call strsslp script - defined in strsslp.inc
+
+'************************************************************************
+' START AN INSTANCE OF CLOCK - DIGITAL MODE - NORMAL SIZE
+'************************************************************************
+'
+Clock                 'start a minimized clock - DEFINED IN CLOCK.INC
+
+SelectWindow "Clock"              'restore back to normal size
+RestoreWindow
+PositionWindow 3,3                'move clock to upper left corner
+
+'***************************************************************************
+' AFTER STRSSLP IS FINISHED & RETURNED, create stress.flg WHICH WILL SET THE
+' FLAG NECESSARY TO STOP THE 2 DOS VM'S RUNNING
+'***************************************************************************
+
+retcode%=WinExec("wverify.exe 1 "+NCTDriveLtr+":"+NCTPath+"\stress.flg",1)  ' Create stop file
+
+'***************************************************************************
+'wait until VM's have closed
+'***************************************************************************
+Ret%=SleepDelay(50)                          'wait 50 seconds
+
+ii% = 1
+loop% = 0
+
+While ii > 0  
+
+  IF WindowExists ("NCT VM") <> 0 THEN          'if exists then wait
+     Ret%=SleepDelay(20)                          'wait 20 seconds
+     Loop = loop + 1                              'increment loop counter
+  ELSE
+     ii = -1                                      'since gone - quit while loop
+  END IF
+  
+  IF loop > 36 THEN                               'check if past 12 mins
+     ii =  -1                                     'if past 12 min then quit
+  END IF
+
+WEND   
+
+IF loop > 36 THEN
+  wlog lf$, "Error: @ least one VM not closed!!"
+  goto ending                                     'do not disconnect  
+END IF
+
+
+'************************************************************************
+' CLOSE THE CLOCK
+'************************************************************************
+
+retcode%=WinExec("Clock",1)
+ret%=SleepDelay(3)
+
+WPlayKeys("%{F4}")               'close Clock 
+ret%=SleepDelay(3)
+'***************************************************************************
+' DISCONNECT THE NETWORK DRIVES & VERIFY DISCONNECTION
+'***************************************************************************
+ 
+drvdconn            'disconnect the drives - defined in drvdconn.inc
+
+wlog lf$, " "
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "Verify Network Drives are Disconnected"
+wlog lf$, "***********************************************************"
+wlog lf$, " "
+
+retcode%=WinExec("wverify.exe 6 "+NetDrive1+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive2+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3) 'verify connection
+retcode%=WinExec("wverify.exe 6 "+NetDrive3+":\ /L"+NCTDriveLtr+":"+NctPath+"\stress.log",3) 'verify connection
+
+'***************************************************************************
+' QUIT
+'***************************************************************************
+ending:
+
+wlog lf$, " "
+wlog lf$, "Test ended: "+DATETIME$
+wlog lf$, " "
+wlog lf$, "***********************************************************"
+wlog lf$, "End Log File For Network Stress Test"
+wlog lf$, "***********************************************************"
+
+
+result%=HctCopyErrorsFromLogFile (NctDriveLtr+":"+NctPath+"\stress.log")
+if (result%=0) THEN
+    tresult%=RS_PASSED
+ELSEIF  (result%=1) THEN
+    tresult%=RS_FAILED
+ELSE
+    tresult%=4
+END IF
+
+HctTestDone tresult%
