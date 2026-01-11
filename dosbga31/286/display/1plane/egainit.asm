@@ -23,7 +23,9 @@ incDevice = 1				;allow assembly of needed constants
 	.xlist
 	include cmacros.inc
 	include gdidefs.inc
-	include cursor.inc
+	include display.inc
+	include macros.mac
+	include	cursor.inc
 	.list
 
 	??_out	egainit
@@ -94,6 +96,9 @@ cBegin
 
 	mov	ax,SCREEN_HEIGHT/2
 	mov	real_y,ax
+
+	mov	ax,SCREEN_HEIGHT
+	mov	physical_device.bmHeight,ax
 
 	mov	ax,1			;no way to have error
 

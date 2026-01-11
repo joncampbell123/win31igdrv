@@ -386,7 +386,7 @@ PHYS_DEVICE_SIZE equ	size BITMAP
 SCRSEL		equ	ScreenSelector
 P		equ	 COLOR_FORMAT AND 000FFh	;# color planes
 B		equ	(COLOR_FORMAT AND 0FF00h) SHR 8	;# bits per pixel
-H		equ	SCREEN_HEIGHT			;new display height
+H		equ	0				;new display height
 W		equ	SCREEN_WIDTH			;display width, pels
 WB		equ	SCREEN_W_BYTES			;display width, bytes
 
