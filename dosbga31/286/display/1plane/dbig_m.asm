@@ -65,25 +65,8 @@ incDevice = 1				;Include control for gdidefs.inc
 	.list
 
 
-;------------------------------ Macro ----------------------------------;
-;	cdw - conditional dw
-;
-;	cdw is used to conditionally define a word to one of the
-;	given values.
-;
-;	usage:
-;		cdw	v1,v2
-;
-;	v1 will be used if LARGE_SCREEN_SIZE if defined.
-;	v1 will be used otherwise.
-;-----------------------------------------------------------------------;
-
 cdw	macro	v1,v2
-ifdef	LARGE_SCREEN_SIZE
-	dw	v1
-else
 	dw	v2
-endif
 	endm
 
 	externA	ScreenSelector
