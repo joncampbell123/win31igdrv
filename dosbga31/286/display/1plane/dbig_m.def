@@ -38,7 +38,6 @@ EXPORTS
     SetAttribute	@18	NODATA		;We don't handle this
     DeviceBitmapBits    @19                     ;for device independent bitmaps
     CreateBitmap	@20                     ;for device independent maps
-    DIBScreenBlt	@21			;DIB screen blt
 
     do_polylines	@90			;Need these to get fixed
     do_scanlines	@91
