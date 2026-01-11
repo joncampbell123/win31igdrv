@@ -40,6 +40,20 @@
 ;     . Created.					                     ;
 ;       -by-  Amit Chatterjee  [amitc]   on   Dec-06-1988  07:25:52          ;
 ;----------------------------------------------------------------------------;
+; DOSBox-X dev notes:                                                        ;
+; - Ummm.... does Windows 3.1 even call this function?                       ;
+; - Only some drivers from Windows 3.0 on have this function. None of the    ;
+;   display drivers from Windows 1.x and 2.x have this function.             ;
+; - This function is not mentioned anywhere in the Windows 3.1 DDK.          ;
+;   This is the most documentation you'll ever find about it.                ;
+; - For whatever reason, this function appears in the VGA and SVGA stock     ;
+;   drivers distributed with the DirectX runtime for Windows 9x, as if they  ;
+;   had ported the drivers but never bothered to modify them.                ;
+; - This also appears in the Tseng ET4000 drivers for Windows 3.0 and 3.1.   ;
+; - DIScreenBlt is a typo (or maybe MASM in 1985 had an absurdly short label ;
+;   length limit?), the function is exported as DIBScreenBlt. There are a    ;
+;   few typos in the overall driver source it seems.                         ;
+;----------------------------------------------------------------------------;
 
 ifdef	HERCULES
 	CGAHERC = 1
