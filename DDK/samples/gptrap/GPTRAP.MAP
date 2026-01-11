@@ -1,0 +1,35 @@
+
+ GPTRAP
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000020H _LTEXT                 CODE 32-bit
+ 0001:00000020 00000003CH _LDATA                 CODE 32-bit
+ 0002:00000000 00000001EH _ITEXT                 ICODE 32-bit
+ 0002:00000020 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000020 GPTrap_DDB              GPTrap_DDB
+
+  Address         Publics by Name
+
+ 0001:00000000       GPTrap_Control
+ 0001:00000020       GPTrap_DDB
+ 0002:00000000       GPTrap_Sys_Critical_Init
+ 0001:00000012       MyGPFaultHandler
+
+  Address         Publics by Value
+
+ 0001:00000000       GPTrap_Control
+ 0001:00000012       MyGPFaultHandler
+ 0001:00000020       GPTrap_DDB
+ 0002:00000000       GPTrap_Sys_Critical_Init

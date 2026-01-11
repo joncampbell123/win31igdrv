@@ -1,0 +1,1703 @@
+;	Static Name Aliases
+;
+	TITLE   adlib.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_FIX	SEGMENT  WORD PUBLIC 'CODE'
+_FIX	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _percMasks
+PUBLIC  _voiceSlot
+PUBLIC  _slotPerc
+PUBLIC  _slotVoice
+PUBLIC  _offsetSlot
+PUBLIC  _operSlot
+EXTRN	SNDOUTPUT:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	_wDebugLevel:WORD
+_BSS      SEGMENT
+COMM NEAR	_slotRelVolume:	 1:	 18
+COMM NEAR	_percBits:	BYTE:	 1
+COMM NEAR	_notePitch:	 1:	 11
+COMM NEAR	_amDepth:	BYTE:	 1
+COMM NEAR	_voiceKeyOn:	 1:	 11
+COMM NEAR	_vibDepth:	BYTE:	 1
+COMM NEAR	_noteSel:	BYTE:	 1
+COMM NEAR	_modeWaveSel:	BYTE:	 1
+COMM NEAR	_fPercussion:	BYTE:	 2
+COMM NEAR	_pitchRangeStep:	BYTE:	 2
+COMM NEAR	_paramSlot:	 1:	 252
+COMM NEAR	_fNumNotes:	 2:	 300
+COMM NEAR	_fNumFreqPtr:	 2:	 11
+COMM NEAR	_halfToneOffset:	 2:	 11
+COMM NEAR	_noteDIV12:	 1:	 96
+COMM NEAR	_noteMOD12:	 1:	 96
+_BSS      ENDS
+_DATA      SEGMENT
+_offsetSlot	DB	00H
+	DB	01H
+	DB	02H
+	DB	03H
+	DB	04H
+	DB	05H
+	DB	08H
+	DB	09H
+	DB	0aH
+	DB	0bH
+	DB	0cH
+	DB	0dH
+	DB	010H
+	DB	011H
+	DB	012H
+	DB	013H
+	DB	014H
+	DB	015H
+_operSlot	DB	00H
+	DB	00H
+	DB	00H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	01H
+	DB	01H
+	DB	01H
+_percMasks	DB	010H
+	DB	08H
+	DB	04H
+	DB	02H
+	DB	01H
+	ORG	$+1
+_voiceSlot	DB	00H
+	DB	01H
+	DB	02H
+	DB	00H
+	DB	01H
+	DB	02H
+	DB	03H
+	DB	04H
+	DB	05H
+	DB	03H
+	DB	04H
+	DB	05H
+	DB	06H
+	DB	07H
+	DB	08H
+	DB	06H
+	DB	07H
+	DB	08H
+_slotPerc	DB	0cH
+	DB	0fH
+	DB	010H
+	DB	00H
+	DB	0eH
+	DB	00H
+	DB	011H
+	DB	00H
+	DB	0dH
+	DB	00H
+_slotVoice	DB	00H
+	DB	03H
+	DB	01H
+	DB	04H
+	DB	02H
+	DB	05H
+	DB	06H
+	DB	09H
+	DB	07H
+	DB	0aH
+	DB	08H
+	DB	0bH
+	DB	0cH
+	DB	0fH
+	DB	0dH
+	DB	010H
+	DB	0eH
+	DB	011H
+$SG2584	DB	' ',  00H
+$SG2585	DB	'Set melodic voice',  00H
+$SG2589	DB	' ',  00H
+$SG2590	DB	'Set bass drum',  00H
+$SG2593	DB	' ',  00H
+$SG2594	DB	'Set percussion',  00H
+$SG2621	DB	' ',  00H
+$SG2622	DB	'NoteON',  00H
+$SG2635	DB	' ',  00H
+$SG2636	DB	'NoteOff',  00H
+$SG2661	DB	' ',  00H
+$SG2662	DB	'SndSetAllPrm',  00H
+_DATA      ENDS
+_FIX      SEGMENT
+	ASSUME	CS: _FIX
+	PUBLIC	SETSLOTPARAM
+SETSLOTPARAM	PROC FAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   adlib.c
+;|***  *
+;|***  *   Copyright Ad Lib Inc, 1988, 1989
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "adlib.h"
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** static void NEAR PASCAL ChangePitch(BYTE voice, WORD pitchBend);
+;|*** static void NEAR PASCAL SndSetAllPrm(BYTE slot);
+;|*** static void NEAR PASCAL SndSAVEK(BYTE slot);
+;|*** static void NEAR PASCAL SndSFeedFm(BYTE slot);
+;|*** static void NEAR PASCAL SndSAttDecay(BYTE slot);
+;|*** static void NEAR PASCAL SndSSusRelease(BYTE slot);
+;|*** static void NEAR PASCAL SndWaveSelect(BYTE slot);
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     public data
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** BYTE slotRelVolume[18];     /* relative volume of slots */
+;|*** BYTE percBits;              /* control bits of percussive voices */
+;|*** BYTE amDepth;               /* chip global parameters ... */
+;|*** BYTE vibDepth;              /* ... */
+;|*** BYTE noteSel;               /* ... */
+;|*** BYTE modeWaveSel;           /* != 0 if used with 'wave-select' parms */
+;|*** BOOL fPercussion;           /* percussion mode parameter */
+;|*** int  pitchRangeStep;        /* == pitchRange * NR_STEP_PITCH */
+;|*** WORD fNumNotes[NR_STEP_PITCH][12];
+;|*** NPWORD fNumFreqPtr[11];     /* lines of fNumNotes table (one per voice) */
+;|*** int  halfToneOffset[11];    /* one per voice */
+;|*** BYTE noteDIV12[96];         /* table of (0..95) DIV 12 */
+;|*** BYTE noteMOD12[96];         /* table of (0..95) MOD 12 */
+;|*** 
+;|*** /* this table gives the offset of each slot within the chip. */
+;|*** BYTE offsetSlot[] = {
+;|***          0,  1,  2,  3,  4,  5,
+;|***          8,  9, 10, 11, 12, 13,
+;|***         16, 17, 18, 19, 20, 21
+;|*** };
+;|*** 
+;|*** /* this table indicates if the slot is a modulator (0) or a carrier (1). */
+;|*** BYTE operSlot[] = {
+;|***         0, 0, 0,           /* 1 2 3 */
+;|***         1, 1, 1,           /* 4 5 6 */
+;|***         0, 0, 0,           /* 7 8 9 */
+;|***         1, 1, 1,           /* 10 11 12 */
+;|***         0, 0, 0,           /* 13 14 15 */
+;|***         1, 1, 1,           /* 16 17 18 */
+;|*** };
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     local data
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** static BYTE notePitch[11];    /* pitch value for each voice (implicit 0 init) */
+;|*** static BYTE voiceKeyOn[11];   /* keyOn bit for each voice (implicit 0 init) */
+;|*** static BYTE percMasks[] = {
+;|***         0x10, 0x08, 0x04, 0x02, 0x01 };
+;|*** 
+;|*** /* voice number associated with each slot (melodic mode only) */
+;|*** static BYTE voiceSlot[] = {
+;|***         0, 1, 2,
+;|***         0, 1, 2,
+;|***         3, 4, 5,
+;|***         3, 4, 5,
+;|***         6, 7, 8,
+;|***         6, 7, 8,
+;|*** };
+;|*** 
+;|*** /* slot numbers for percussive voices
+;|***  * (0 indicates that there is only one slot)
+;|***  */
+;|*** static BYTE slotPerc[][2] = {
+;|***         {12, 15},        /* Bass Drum */
+;|***         {16, 0},         /* SD */
+;|***         {14, 0},         /* TOM */
+;|***         {17, 0},         /* TOP-CYM */
+;|***         {13, 0}          /* HH */
+;|*** };
+;|*** 
+;|*** /* slot numbers as a function of the voice and the operator (melodic only) */
+;|*** static BYTE slotVoice[][2] = {
+;|***         {0, 3},          /* voice 0 */
+;|***         {1, 4},          /* 1 */
+;|***         {2, 5},          /* 2 */
+;|***         {6, 9},          /* 3 */
+;|***         {7, 10},         /* 4 */
+;|***         {8, 11},         /* 5 */
+;|***         {12, 15},        /* 6 */
+;|***         {13, 16},        /* 7 */
+;|***         {14, 17}         /* 8 */
+;|*** };
+;|*** 
+;|*** static BYTE paramSlot[18][NUMLOCPARAM];    /* all the parameters of slots... */
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     macros
+;|*** 
+;|***  ***************************************************************************/
+;|*** 
+;|*** #define GetLocPrm(slot, prm)   ((WORD)paramSlot[slot][prm])
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     public functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetSlotParam | Sets the 14 parameters (13 in <p param>,
+;|***  *     1 in <p waveSel>) of slot <p slot>. Updates both the parameter array
+;|***  *     and the chip.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @parm NPBYTE | param | Pointer to the new parameter array.
+;|***  *
+;|***  * @parm BYTE | waveSel | The new waveSel value. 
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL SetSlotParam(BYTE slot, NPBYTE param, BYTE waveSel)
+;|*** {
+; Line 143
+	*** 000000	c8 04 00 00 		enter	4,0
+	*** 000004	57 			push	di
+	*** 000005	56 			push	si
+;	slot = 10
+;	param = 8
+;	waveSel = 6
+;	i = -2
+;	ptr = -4
+	*** 000006	b0 0e 			mov	al,14	;000eH
+	*** 000008	f6 66 0a 		mul	BYTE PTR [bp+10]	;slot
+	*** 00000b	05 00 00 		add	ax,OFFSET DGROUP:_paramSlot
+	*** 00000e	8b 56 08 		mov	dx,WORD PTR [bp+8]	;param
+	*** 000011	b9 06 00 		mov	cx,6
+	*** 000014	8b f8 			mov	di,ax
+	*** 000016	8b f2 			mov	si,dx
+	*** 000018	1e 			push	ds
+	*** 000019	07 			pop	es
+	*** 00001a	f3 			rep
+	*** 00001b	a5 			movsw
+	*** 00001c	a4 			movsb
+	*** 00001d	05 0d 00 		add	ax,13	;000dH
+	*** 000020	89 46 fc 		mov	WORD PTR [bp-4],ax	;ptr
+	*** 000023	8c 5e fe 		mov	WORD PTR [bp-2],ds	;i
+;|*** int    i;
+;|*** LPBYTE ptr;
+;|*** 
+;|***     for (i = 0, ptr = &paramSlot[slot][0]; i < NUMLOCPARAM - 1; i++)
+;|***         *ptr++ = *param++;
+;|***     *ptr = waveSel &= 0x3;
+; Line 149
+	*** 000026	8a 46 06 		mov	al,BYTE PTR [bp+6]	;waveSel
+	*** 000029	24 03 			and	al,3
+	*** 00002b	c4 5e fc 		les	bx,DWORD PTR [bp-4]	;ptr
+	*** 00002e	26 88 07 		mov	BYTE PTR es:[bx],al
+;|***     SndSetAllPrm(slot);
+; Line 150
+	*** 000031	8a 46 0a 		mov	al,BYTE PTR [bp+10]	;slot
+	*** 000034	50 			push	ax
+	*** 000035	e8 00 00 		call	SNDSETALLPRM
+;|*** }
+; Line 151
+	*** 000038	5e 			pop	si
+	*** 000039	5f 			pop	di
+	*** 00003a	c9 			leave	
+	*** 00003b	ca 06 00 		ret	6
+
+SETSLOTPARAM	ENDP
+	PUBLIC	SETFREQ
+SETFREQ	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetFreq | Changes the pitch of voices 0 to 8, for melodic or
+;|***  *     percussive mode.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to set.
+;|***  *
+;|***  * @parm BYTE | pitch | Specifies the pitch (0 to 95).
+;|***  *
+;|***  * @parm BYTE | keyOn | Flag specifying whether the key is on or off.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL SetFreq(BYTE voice, BYTE pitch, BYTE keyOn)
+;|*** {
+; Line 168
+	*** 00003e	c8 02 00 00 		enter	2,0
+	*** 000042	57 			push	di
+	*** 000043	56 			push	si
+;	register si = FNum
+;	t1 = -4
+;	voice = 10
+;	pitch = 8
+;	keyOn = 6
+;|*** WORD  FNum;
+;|*** BYTE  t1;
+;|***     
+;|***     /* remember the keyon and pitch of the voice */
+;|***     voiceKeyOn[voice] = keyOn;
+; Line 173
+	*** 000044	8a 46 06 		mov	al,BYTE PTR [bp+6]	;keyOn
+	*** 000047	8a 5e 0a 		mov	bl,BYTE PTR [bp+10]	;voice
+	*** 00004a	2a ff 			sub	bh,bh
+	*** 00004c	88 87 00 00 		mov	BYTE PTR _voiceKeyOn[bx],al
+;|***     notePitch[voice] = pitch;
+; Line 174
+	*** 000050	8a 46 08 		mov	al,BYTE PTR [bp+8]	;pitch
+	*** 000053	88 87 00 00 		mov	BYTE PTR _notePitch[bx],al
+;|*** 
+;|***     pitch += halfToneOffset[voice];
+;|***     if (pitch > 95)
+; Line 177
+	*** 000057	03 db 			add	bx,bx
+	*** 000059	8a 87 00 00 		mov	al,BYTE PTR _halfToneOffset[bx]
+	*** 00005d	00 46 08 		add	BYTE PTR [bp+8],al	;pitch
+	*** 000060	80 7e 08 5f 		cmp	BYTE PTR [bp+8],95	;005fH	;pitch
+	*** 000064	76 04 			jbe	$I2563
+;|***         pitch = 95;
+; Line 178
+	*** 000066	c6 46 08 5f 		mov	BYTE PTR [bp+8],95	;005fH	;pitch
+;|*** 
+;|***     /* get the FNum for the voice */
+;|***     FNum = * (fNumFreqPtr[voice] + noteMOD12[pitch]);
+; Line 181
+					$I2563:
+;|*** 
+;|***     /* output the FNum, KeyOn and Block values */
+;|***     SndOutput((BYTE)(0xA0 | voice), (BYTE)FNum); /* FNum bits 0 - 7 (D0 - D7) */
+; Line 184
+	*** 00006a	8a 46 0a 		mov	al,BYTE PTR [bp+10]	;voice
+	*** 00006d	0c a0 			or	al,160	;00a0H
+	*** 00006f	50 			push	ax
+	*** 000070	8b b7 00 00 		mov	si,WORD PTR _fNumFreqPtr[bx]
+	*** 000074	8a 5e 08 		mov	bl,BYTE PTR [bp+8]	;pitch
+	*** 000077	2a ff 			sub	bh,bh
+	*** 000079	8b c3 			mov	ax,bx
+	*** 00007b	8a 9f 00 00 		mov	bl,BYTE PTR _noteMOD12[bx]
+	*** 00007f	03 db 			add	bx,bx
+	*** 000081	8b 30 			mov	si,WORD PTR [bx][si]
+	*** 000083	56 			push	si
+	*** 000084	8b f8 			mov	di,ax
+	*** 000086	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     t1 = (BYTE)(keyOn ? 32 : 0);                 /* Key On (D5) */
+;|***     t1 += (noteDIV12[pitch] << 2);               /* Block (D2 - D4) */
+;|***     t1 += (0x3 & (FNum >> 8));                   /* FNum bits 8 - 9 (D0 - D1) */
+;|***     SndOutput((BYTE)(0xB0 | voice), t1);
+; Line 188
+	*** 00008b	8a 46 0a 		mov	al,BYTE PTR [bp+10]	;voice
+	*** 00008e	0c b0 			or	al,176	;00b0H
+	*** 000090	50 			push	ax
+	*** 000091	8a 85 00 00 		mov	al,BYTE PTR _noteDIV12[di]
+	*** 000095	c0 e0 02 		shl	al,2
+	*** 000098	80 7e 06 01 		cmp	BYTE PTR [bp+6],1	;keyOn
+	*** 00009c	f5 			cmc	
+	*** 00009d	1a c9 			sbb	cl,cl
+	*** 00009f	80 e1 20 		and	cl,32	;0020H
+	*** 0000a2	02 c1 			add	al,cl
+	*** 0000a4	8b ce 			mov	cx,si
+	*** 0000a6	8a cd 			mov	cl,ch
+	*** 0000a8	80 e1 03 		and	cl,3
+	*** 0000ab	02 c1 			add	al,cl
+	*** 0000ad	50 			push	ax
+	*** 0000ae	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 189
+	*** 0000b3	5e 			pop	si
+	*** 0000b4	5f 			pop	di
+	*** 0000b5	c9 			leave	
+	*** 0000b6	ca 06 00 		ret	6
+	*** 0000b9	90 			nop	
+
+SETFREQ	ENDP
+	PUBLIC	SNDSAMVIBRHYTHM
+SNDSAMVIBRHYTHM	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSAmVibRhythm | Sets the AM Depth, VIB depth and Rhythm values.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL SndSAmVibRhythm(void)
+;|*** {
+; Line 199
+;	t1 = -2
+;|*** BYTE t1;
+;|*** 
+;|***     t1 = (BYTE)(amDepth ? 0x80 : 0);
+;|***     t1 |= vibDepth ? 0x40 : 0;
+;|***     t1 |= fPercussion ? 0x20 : 0;
+;|***     t1 |= percBits;
+;|***     SndOutput(0xBD, t1);
+; Line 206
+	*** 0000ba	68 bd 00 		push	189	;00bdH
+	*** 0000bd	80 3e 00 00 01 		cmp	BYTE PTR _amDepth,1
+	*** 0000c2	f5 			cmc	
+	*** 0000c3	1a c0 			sbb	al,al
+	*** 0000c5	24 80 			and	al,128	;0080H
+	*** 0000c7	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 0000cc	f5 			cmc	
+	*** 0000cd	1a c9 			sbb	cl,cl
+	*** 0000cf	80 e1 20 		and	cl,32	;0020H
+	*** 0000d2	0a c1 			or	al,cl
+	*** 0000d4	80 3e 00 00 01 		cmp	BYTE PTR _vibDepth,1
+	*** 0000d9	f5 			cmc	
+	*** 0000da	1a c9 			sbb	cl,cl
+	*** 0000dc	80 e1 40 		and	cl,64	;0040H
+	*** 0000df	0a c1 			or	al,cl
+	*** 0000e1	0a 06 00 00 		or	al,BYTE PTR _percBits
+	*** 0000e5	50 			push	ax
+	*** 0000e6	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 207
+	*** 0000eb	cb 			ret	
+
+SNDSAMVIBRHYTHM	ENDP
+	PUBLIC	SNDSNOTESEL
+SNDSNOTESEL	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSNoteSel | Sets the NoteSel value.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL SndSNoteSel(void)
+;|*** {
+;|***     SndOutput(0x08, (BYTE)(noteSel ? 64 : 0));
+; Line 218
+	*** 0000ec	6a 08 			push	8
+	*** 0000ee	80 3e 00 00 01 		cmp	BYTE PTR _noteSel,1
+	*** 0000f3	f5 			cmc	
+	*** 0000f4	1a c0 			sbb	al,al
+	*** 0000f6	24 40 			and	al,64	;0040H
+	*** 0000f8	50 			push	ax
+	*** 0000f9	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 219
+	*** 0000fe	cb 			ret	
+	*** 0000ff	90 			nop	
+
+SNDSNOTESEL	ENDP
+	PUBLIC	SNDSKSLLEVEL
+SNDSKSLLEVEL	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSKslLevel | Sets the KSL and LEVEL values.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL SndSKslLevel(BYTE slot)
+;|*** {
+; Line 231
+	*** 000100	55 			push	bp
+	*** 000101	8b ec 			mov	bp,sp
+;	slot = 4
+;	t1 = -2
+;|*** WORD t1;
+;|*** 
+;|***     t1 = 63 - (GetLocPrm(slot, prmLevel) & 0x3f);        /* amplitude */
+;|***     t1 = slotRelVolume[slot] * t1;
+;|***     t1 += t1 + MAXVOLUME;                                /* round off to 0.5 */
+;|***     t1 = 63 - t1 / (2 * MAXVOLUME);
+;|*** 
+;|***     t1 |= GetLocPrm(slot, prmKsl) << 6;
+;|***     SndOutput((BYTE)(0x40 | offsetSlot[slot]), (BYTE)t1);
+; Line 240
+	*** 000103	2a ff 			sub	bh,bh
+	*** 000105	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 000108	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 00010c	0c 40 			or	al,64	;0040H
+	*** 00010e	50 			push	ax
+	*** 00010f	8a 8f 00 00 		mov	cl,BYTE PTR _slotRelVolume[bx]
+	*** 000113	2a ed 			sub	ch,ch
+	*** 000115	b8 3f 00 		mov	ax,63	;003fH
+	*** 000118	6b db 0e 		imul	bx,bx,14	;000eH
+	*** 00011b	8a 97 08 00 		mov	dl,BYTE PTR _paramSlot[bx+8]
+	*** 00011f	23 d0 			and	dx,ax
+	*** 000121	2b c2 			sub	ax,dx
+	*** 000123	f7 e1 			mul	cx
+	*** 000125	03 c0 			add	ax,ax
+	*** 000127	05 7f 00 		add	ax,127	;007fH
+	*** 00012a	b9 fe 00 		mov	cx,254	;00feH
+	*** 00012d	2b d2 			sub	dx,dx
+	*** 00012f	f7 f1 			div	cx
+	*** 000131	2c 3f 			sub	al,63	;003fH
+	*** 000133	f6 d8 			neg	al
+	*** 000135	8a 8f 00 00 		mov	cl,BYTE PTR _paramSlot[bx]
+	*** 000139	c0 e1 06 		shl	cl,6
+	*** 00013c	0a c1 			or	al,cl
+	*** 00013e	50 			push	ax
+	*** 00013f	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 241
+	*** 000144	c9 			leave	
+	*** 000145	c2 02 00 		ret	2
+
+SNDSKSLLEVEL	ENDP
+	PUBLIC	SETVOICETIMBRE
+SETVOICETIMBRE	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetVoiceTimbre | This routine sets the parameters of the
+;|***  *     voice <p voice>.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to set.
+;|***  *
+;|***  * @parm NPOPERATOR | pOper0 | Pointer to operator 0.
+;|***  *
+;|***  * @comm In melodic mode, <p voice> varies from 0 to 8.  In percussive mode,
+;|***  *     voices 0 to 5 are melodic and 6 to 10 are percussive.
+;|***  *
+;|***  *     A timbre (melodic or percussive) is defined as follows: the 13 first
+;|***  *     parameters of operator 0 (ksl, multi, feedBack, attack, sustain,
+;|***  *     eg-type, decay, release, level, am, vib, ksr, fm), followed by the
+;|***  *     13 parameters of operator 1 (if a percussive voice, all the parameters
+;|***  *     are zero), followed by the wave-select parameter for the operators 0
+;|***  *     and 1.
+;|***  *
+;|***  *     <p pOper0> is actually pointing to the <e op0> element of the
+;|***  *     <T TIMBRE> structure, which is defined as follows:
+;|***  *
+;|***  *     typedef struct {
+;|***  *         BYTE      mode;              0 = melodic, 1 = percussive
+;|***  *         BYTE      percVoice;         if mode == 1, voice number to be used
+;|***  *         OPERATOR  op0;               a 13 byte array of op0 parameters
+;|***  *         OPERATOR  op1;               a 13 byte array of op1 parameters
+;|***  *         BYTE      wave0;             waveform for operator 0
+;|***  *         BYTE      wave1;             waveform for operator 1
+;|***  *     } TIMBRE, *NPTIMBRE, FAR *LPTIMBRE;
+;|***  *
+;|***  *     The old timbre files (*.INS) do not contain the parameters
+;|***  *     'wave0' and 'wave1'.  Set these two parameters to zero if
+;|***  *     you are using the old file format.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL SetVoiceTimbre(BYTE voice, NPOPERATOR pOper0)
+;|*** {
+; Line 282
+	*** 000148	c8 04 00 00 		enter	4,0
+	*** 00014c	57 			push	di
+	*** 00014d	56 			push	si
+;	voice = 6
+;	pOper0 = 4
+;	prm0 = -2
+;	register si = prm1
+;	wave0 = -3
+;	wave1 = -4
+;	wavePtr = -10
+;|*** NPBYTE prm0;
+;|*** NPBYTE prm1;
+;|*** BYTE   wave0;
+;|*** BYTE   wave1;
+;|*** NPBYTE wavePtr;
+;|*** 
+;|***     prm0 = (NPBYTE)pOper0;
+;|***     prm1 = prm0 + NUMLOCPARAM - 1;
+; Line 290
+	*** 00014e	8b 76 04 		mov	si,WORD PTR [bp+4]	;pOper0
+	*** 000151	89 76 fe 		mov	WORD PTR [bp-2],si	;prm0
+	*** 000154	8b de 			mov	bx,si
+	*** 000156	83 c6 0d 		add	si,13	;000dH
+;|***     wavePtr = prm0 + 2 * (NUMLOCPARAM - 1);
+;|***     wave0 = *wavePtr++;
+; Line 292
+	*** 000159	8a 47 1a 		mov	al,BYTE PTR [bx+26]
+	*** 00015c	83 c3 1a 		add	bx,26	;001aH
+	*** 00015f	88 46 fd 		mov	BYTE PTR [bp-3],al	;wave0
+;|***     wave1 = *wavePtr;
+; Line 293
+	*** 000162	8a 47 01 		mov	al,BYTE PTR [bx+1]
+	*** 000165	88 46 fc 		mov	BYTE PTR [bp-4],al	;wave1
+;|*** 
+;|***     if (!fPercussion || voice < BD) {        /* melodic only */
+; Line 295
+	*** 000168	83 3e 00 00 00 		cmp	WORD PTR _fPercussion,0
+	*** 00016d	74 62 			je	$I2582
+	*** 00016f	80 7e 06 06 		cmp	BYTE PTR [bp+6],6	;voice
+	*** 000173	72 5c 			jb	$I2582
+;|***         D3("Set melodic voice");
+;|***             SetSlotParam(slotVoice[voice][0], prm0, wave0);
+;|***             SetSlotParam(slotVoice[voice][1], prm1, wave1);
+;|***     }
+;|***     else if (voice == BD) {                   /* bass drum */
+; Line 300
+	*** 000175	75 2d 			jne	$I2587
+;|***         D3("Set bass drum");
+; Line 301
+	*** 000177	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 00017c	72 12 			jb	$I2588
+	*** 00017e	1e 			push	ds
+	*** 00017f	68 00 00 		push	OFFSET DGROUP:$SG2589
+	*** 000182	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000187	1e 			push	ds
+	*** 000188	68 00 00 		push	OFFSET DGROUP:$SG2590
+	*** 00018b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             SetSlotParam(slotPerc[0][0], prm0, wave0);
+; Line 302
+					$I2588:
+	*** 000190	a0 00 00 		mov	al,BYTE PTR _slotPerc
+	*** 000193	50 			push	ax
+	*** 000194	ff 76 fe 		push	WORD PTR [bp-2]	;prm0
+	*** 000197	8a 46 fd 		mov	al,BYTE PTR [bp-3]	;wave0
+	*** 00019a	50 			push	ax
+	*** 00019b	0e 			push	cs
+	*** 00019c	e8 00 00 		call	NEAR PTR SETSLOTPARAM
+;|***             SetSlotParam(slotPerc[0][1], prm1, wave1);
+; Line 303
+	*** 00019f	a0 01 00 		mov	al,BYTE PTR _slotPerc+1
+	*** 0001a2	eb 63 			jmp	SHORT $L2710
+					$I2587:
+;|***     }
+;|***     else {                                    /* percussion, 1 slot */
+;|***         D3("Set percussion");
+; Line 306
+	*** 0001a4	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0001a9	72 12 			jb	$I2592
+	*** 0001ab	1e 			push	ds
+	*** 0001ac	68 00 00 		push	OFFSET DGROUP:$SG2593
+	*** 0001af	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001b4	1e 			push	ds
+	*** 0001b5	68 00 00 		push	OFFSET DGROUP:$SG2594
+	*** 0001b8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             SetSlotParam(slotPerc[voice - BD][0], prm0, wave0);
+; Line 307
+					$I2592:
+	*** 0001bd	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 0001c0	2a ff 			sub	bh,bh
+	*** 0001c2	03 db 			add	bx,bx
+	*** 0001c4	8a 87 f4 ff 		mov	al,BYTE PTR _slotPerc[bx-12]
+	*** 0001c8	50 			push	ax
+	*** 0001c9	ff 76 fe 		push	WORD PTR [bp-2]	;prm0
+	*** 0001cc	8a 46 fd 		mov	al,BYTE PTR [bp-3]	;wave0
+	*** 0001cf	eb 3b 			jmp	SHORT $L2711
+;|***     if (!fPercussion || voice < BD) {        /* melodic only */
+; Line 295
+					$I2582:
+;|***         D3("Set melodic voice");
+; Line 296
+	*** 0001d1	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0001d6	72 12 			jb	$I2583
+	*** 0001d8	1e 			push	ds
+	*** 0001d9	68 00 00 		push	OFFSET DGROUP:$SG2584
+	*** 0001dc	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001e1	1e 			push	ds
+	*** 0001e2	68 00 00 		push	OFFSET DGROUP:$SG2585
+	*** 0001e5	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             SetSlotParam(slotVoice[voice][0], prm0, wave0);
+; Line 297
+					$I2583:
+	*** 0001ea	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 0001ed	2a ff 			sub	bh,bh
+	*** 0001ef	03 db 			add	bx,bx
+	*** 0001f1	8a 87 00 00 		mov	al,BYTE PTR _slotVoice[bx]
+	*** 0001f5	50 			push	ax
+	*** 0001f6	ff 76 fe 		push	WORD PTR [bp-2]	;prm0
+	*** 0001f9	8a 46 fd 		mov	al,BYTE PTR [bp-3]	;wave0
+	*** 0001fc	50 			push	ax
+	*** 0001fd	8b fb 			mov	di,bx
+	*** 0001ff	0e 			push	cs
+	*** 000200	e8 00 00 		call	NEAR PTR SETSLOTPARAM
+;|***             SetSlotParam(slotVoice[voice][1], prm1, wave1);
+; Line 298
+	*** 000203	8a 85 01 00 		mov	al,BYTE PTR _slotVoice[di+1]
+					$L2710:
+	*** 000207	50 			push	ax
+	*** 000208	56 			push	si
+	*** 000209	8a 46 fc 		mov	al,BYTE PTR [bp-4]	;wave1
+					$L2711:
+	*** 00020c	50 			push	ax
+	*** 00020d	0e 			push	cs
+	*** 00020e	e8 00 00 		call	NEAR PTR SETSLOTPARAM
+;|***     }
+;|***     else if (voice == BD) {                   /* bass drum */
+;|***         D3("Set bass drum");
+;|***             SetSlotParam(slotPerc[0][0], prm0, wave0);
+;|***             SetSlotParam(slotPerc[0][1], prm1, wave1);
+;|***     }
+;|***     else {                                    /* percussion, 1 slot */
+;|***         D3("Set percussion");
+;|***             SetSlotParam(slotPerc[voice - BD][0], prm0, wave0);
+;|***     }
+;|*** }
+; Line 309
+	*** 000211	5e 			pop	si
+	*** 000212	5f 			pop	di
+	*** 000213	c9 			leave	
+	*** 000214	c2 04 00 		ret	4
+	*** 000217	90 			nop	
+
+SETVOICETIMBRE	ENDP
+	PUBLIC	SETVOICEPITCH
+SETVOICEPITCH	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetVoicePitch | Changes the pitch value of a voice.  Does
+;|***  *     not affect the percussive voices, except for the bass drum.  The change
+;|***  *     takes place immediately.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to set.
+;|***  *
+;|***  * @parm WORD | pitchBend | Specifies the new pitch bend value (0 to 0x3fff,
+;|***  *     where 0x2000 == exact tuning).
+;|***  *
+;|***  * @comm The variation in pitch is a function of the previous call to
+;|***  *     <f SetPitchRange> and the value of <p pitchBend>.  A value of 0 means
+;|***  *     -half-tone * pitchRangeStep, 0x2000 means no variation (exact pitch) and
+;|***  *      0x3fff means +half-tone * pitchRangeStep.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL SetVoicePitch(BYTE voice, WORD pitchBend)
+;|*** {
+; Line 331
+	*** 000218	55 			push	bp
+	*** 000219	8b ec 			mov	bp,sp
+;	voice = 6
+;	pitchBend = 4
+;|***     if (!fPercussion || voice <= BD) {       /* melodic and bass drum voices */
+; Line 332
+	*** 00021b	83 3e 00 00 00 		cmp	WORD PTR _fPercussion,0
+	*** 000220	74 06 			je	$I2601
+	*** 000222	80 7e 06 06 		cmp	BYTE PTR [bp+6],6	;voice
+	*** 000226	77 2d 			ja	$EX2599
+					$I2601:
+;|***         if (pitchBend > MAX_PITCH)     
+; Line 333
+	*** 000228	81 7e 04 ff 3f 		cmp	WORD PTR [bp+4],16383	;3fffH	;pitchBend
+	*** 00022d	77 05 			ja	$L2699
+	*** 00022f	8b 4e 04 		mov	cx,WORD PTR [bp+4]	;pitchBend
+	*** 000232	eb 03 			jmp	SHORT $I2602
+					$L2699:
+;|***                 pitchBend = MAX_PITCH;
+; Line 334
+	*** 000234	b9 ff 3f 		mov	cx,16383	;3fffH
+;|***         ChangePitch(voice, pitchBend);
+; Line 335
+					$I2602:
+	*** 000237	8a 46 06 		mov	al,BYTE PTR [bp+6]	;voice
+	*** 00023a	50 			push	ax
+	*** 00023b	51 			push	cx
+	*** 00023c	e8 00 00 		call	CHANGEPITCH
+;|***         SetFreq(voice, notePitch[voice], voiceKeyOn[voice]);
+; Line 336
+	*** 00023f	8a 46 06 		mov	al,BYTE PTR [bp+6]	;voice
+	*** 000242	50 			push	ax
+	*** 000243	8a d8 			mov	bl,al
+	*** 000245	2a ff 			sub	bh,bh
+	*** 000247	8a 87 00 00 		mov	al,BYTE PTR _notePitch[bx]
+	*** 00024b	50 			push	ax
+	*** 00024c	8a 87 00 00 		mov	al,BYTE PTR _voiceKeyOn[bx]
+	*** 000250	50 			push	ax
+	*** 000251	0e 			push	cs
+	*** 000252	e8 00 00 		call	NEAR PTR SETFREQ
+;|***     }
+;|*** }
+; Line 338
+					$EX2599:
+	*** 000255	c9 			leave	
+	*** 000256	c2 04 00 		ret	4
+	*** 000259	90 			nop	
+
+SETVOICEPITCH	ENDP
+	PUBLIC	SETVOICEVOLUME
+SETVOICEVOLUME	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetVoiceVolume | Sets the volume of the voice <p voice> to
+;|***  *     <p volume>. The resulting output level is (timbreVolume * volume / 127).
+;|***  *     The change takes place immediately.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to set.
+;|***  *
+;|***  * @parm BYTE | volume | Specifies the new volume level (0 to 127).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL SetVoiceVolume(BYTE voice, BYTE volume)
+;|*** {
+; Line 354
+	*** 00025a	55 			push	bp
+	*** 00025b	8b ec 			mov	bp,sp
+	*** 00025d	56 			push	si
+;	voice = 6
+;	volume = 4
+;	slot = -2
+;	register si = slots
+;|*** BYTE   slot;
+;|*** NPBYTE slots;
+;|*** 
+;|***     if (volume > MAXVOLUME)
+; Line 358
+	*** 00025e	80 7e 04 7f 		cmp	BYTE PTR [bp+4],127	;007fH	;volume
+	*** 000262	76 04 			jbe	$I2610
+;|***             volume = MAXVOLUME;
+; Line 359
+	*** 000264	c6 46 04 7f 		mov	BYTE PTR [bp+4],127	;007fH	;volume
+;|*** 
+;|***     if (!fPercussion || voice <= BD) {      /* melodic voice */
+; Line 361
+					$I2610:
+	*** 000268	83 3e 00 00 00 		cmp	WORD PTR _fPercussion,0
+	*** 00026d	74 1f 			je	$I2612
+	*** 00026f	80 7e 06 06 		cmp	BYTE PTR [bp+6],6	;voice
+	*** 000273	76 19 			jbe	$I2612
+;|***         slots = slotVoice[voice];
+;|***         slotRelVolume[slots[1]] = volume;
+;|***         SndSKslLevel(slots[1]);
+;|***         if (!GetLocPrm(slots[0], prmFm)) {
+;|***             /* additive synthesis: set volume of first slot too */
+;|***             slotRelVolume[slots[0]] = volume;
+;|***             SndSKslLevel(slots[0]);
+;|***         }
+;|***     }
+;|***     else {                                  /* percussive voice */
+;|***         slot = slotPerc[voice - BD][0];
+;|***         slotRelVolume[slot] = volume;
+; Line 373
+	*** 000275	8a 46 04 		mov	al,BYTE PTR [bp+4]	;volume
+	*** 000278	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 00027b	2a ff 			sub	bh,bh
+	*** 00027d	03 db 			add	bx,bx
+	*** 00027f	8a 9f f4 ff 		mov	bl,BYTE PTR _slotPerc[bx-12]
+	*** 000283	8b cb 			mov	cx,bx
+	*** 000285	2a ff 			sub	bh,bh
+	*** 000287	88 87 00 00 		mov	BYTE PTR _slotRelVolume[bx],al
+;|***         SndSKslLevel(slot);
+; Line 374
+	*** 00028b	51 			push	cx
+	*** 00028c	eb 3a 			jmp	SHORT $L2712
+;|***     if (!fPercussion || voice <= BD) {      /* melodic voice */
+; Line 361
+					$I2612:
+;|***         slots = slotVoice[voice];
+; Line 362
+	*** 00028e	8b 76 06 		mov	si,WORD PTR [bp+6]	;voice
+	*** 000291	81 e6 ff 00 		and	si,255	;00ffH
+	*** 000295	03 f6 			add	si,si
+	*** 000297	81 c6 00 00 		add	si,OFFSET DGROUP:_slotVoice
+;|***         slotRelVolume[slots[1]] = volume;
+; Line 363
+	*** 00029b	8a 46 04 		mov	al,BYTE PTR [bp+4]	;volume
+	*** 00029e	8a 5c 01 		mov	bl,BYTE PTR [si+1]
+	*** 0002a1	2a ff 			sub	bh,bh
+	*** 0002a3	88 87 00 00 		mov	BYTE PTR _slotRelVolume[bx],al
+;|***         SndSKslLevel(slots[1]);
+; Line 364
+	*** 0002a7	8a c3 			mov	al,bl
+	*** 0002a9	50 			push	ax
+	*** 0002aa	e8 53 fe 		call	SNDSKSLLEVEL
+;|***         if (!GetLocPrm(slots[0], prmFm)) {
+; Line 365
+	*** 0002ad	8a 04 			mov	al,BYTE PTR [si]
+	*** 0002af	2a e4 			sub	ah,ah
+	*** 0002b1	6b d8 0e 		imul	bx,ax,14	;000eH
+	*** 0002b4	38 a7 0c 00 		cmp	BYTE PTR _paramSlot[bx+12],ah
+	*** 0002b8	75 11 			jne	$EX2607
+;|***             /* additive synthesis: set volume of first slot too */
+;|***             slotRelVolume[slots[0]] = volume;
+; Line 367
+	*** 0002ba	8a 46 04 		mov	al,BYTE PTR [bp+4]	;volume
+	*** 0002bd	8a 1c 			mov	bl,BYTE PTR [si]
+	*** 0002bf	2a ff 			sub	bh,bh
+	*** 0002c1	88 87 00 00 		mov	BYTE PTR _slotRelVolume[bx],al
+;|***             SndSKslLevel(slots[0]);
+; Line 368
+	*** 0002c5	8a c3 			mov	al,bl
+	*** 0002c7	50 			push	ax
+					$L2712:
+	*** 0002c8	e8 35 fe 		call	SNDSKSLLEVEL
+;|***         }
+;|***     }
+;|***     else {                                  /* percussive voice */
+;|***         slot = slotPerc[voice - BD][0];
+;|***         slotRelVolume[slot] = volume;
+;|***         SndSKslLevel(slot);
+;|***     }
+;|*** }
+; Line 376
+					$EX2607:
+	*** 0002cb	5e 			pop	si
+	*** 0002cc	c9 			leave	
+	*** 0002cd	c2 04 00 		ret	4
+
+SETVOICEVOLUME	ENDP
+	PUBLIC	NOTEON
+NOTEON	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | NoteOn | This routine starts a note playing.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to use (0 to 8 in melodic mode,
+;|***  *     0 to 10 in percussive mode).
+;|***  *
+;|***  * @parm BYTE | pitch | Specifies the pitch (0 to 127, where 60 == MID_C).  The
+;|***  *     card can play between 12 and 107.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL NoteOn(BYTE voice, BYTE pitch)
+;|*** {
+; Line 392
+	*** 0002d0	55 			push	bp
+	*** 0002d1	8b ec 			mov	bp,sp
+;	voice = 6
+;	pitch = 4
+;|***     D3("NoteON");
+; Line 393
+	*** 0002d3	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0002d8	72 12 			jb	$I2620
+	*** 0002da	1e 			push	ds
+	*** 0002db	68 00 00 		push	OFFSET DGROUP:$SG2621
+	*** 0002de	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0002e3	1e 			push	ds
+	*** 0002e4	68 00 00 		push	OFFSET DGROUP:$SG2622
+	*** 0002e7	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     /* adjust pitch for chip */
+;|***     if (pitch < (MID_C - CHIP_MID_C))
+; Line 396
+					$I2620:
+	*** 0002ec	80 7e 04 0c 		cmp	BYTE PTR [bp+4],12	;000cH	;pitch
+	*** 0002f0	73 06 			jae	$I2623
+;|***         pitch = 0;
+; Line 397
+	*** 0002f2	c6 46 04 00 		mov	BYTE PTR [bp+4],0	;pitch
+;|***     else
+; Line 398
+	*** 0002f6	eb 04 			jmp	SHORT $I2624
+					$I2623:
+;|***         pitch -= (MID_C - CHIP_MID_C);
+; Line 399
+	*** 0002f8	80 6e 04 0c 		sub	BYTE PTR [bp+4],12	;000cH	;pitch
+					$I2624:
+;|***         
+;|***     if (voice < BD || !fPercussion)         /* this is a melodic voice */
+; Line 401
+	*** 0002fc	80 7e 06 06 		cmp	BYTE PTR [bp+6],6	;voice
+	*** 000300	72 47 			jb	$I2626
+	*** 000302	83 3e 00 00 00 		cmp	WORD PTR _fPercussion,0
+	*** 000307	74 40 			je	$I2626
+;|***         SetFreq(voice, pitch, 1);
+;|***     else {                                  /* this is a percussive voice */
+;|***         if (voice == BD)
+; Line 404
+	*** 000309	80 7e 06 06 		cmp	BYTE PTR [bp+6],6	;voice
+	*** 00030d	75 07 			jne	$I2628
+;|***                 SetFreq(BD, pitch, 0);
+; Line 405
+	*** 00030f	6a 06 			push	6
+	*** 000311	8a 46 04 		mov	al,BYTE PTR [bp+4]	;pitch
+	*** 000314	eb 19 			jmp	SHORT $L2713
+					$I2628:
+	*** 000316	80 7e 06 08 		cmp	BYTE PTR [bp+6],8	;voice
+	*** 00031a	75 1a 			jne	$I2629
+;|***         else if (voice == TOM) {
+;|***             /* for the last 4 percussions, only the TOM may change */
+;|***             /* in frequency, which also modifies the SD */
+;|***             SetFreq(TOM, pitch, 0);
+; Line 409
+	*** 00031c	6a 08 			push	8
+	*** 00031e	8a 46 04 		mov	al,BYTE PTR [bp+4]	;pitch
+	*** 000321	50 			push	ax
+	*** 000322	6a 00 			push	0
+	*** 000324	0e 			push	cs
+	*** 000325	e8 00 00 		call	NEAR PTR SETFREQ
+;|***             SetFreq(SD, (BYTE)(pitch + TOM_TO_SD), 0);
+; Line 410
+	*** 000328	6a 07 			push	7
+	*** 00032a	8a 46 04 		mov	al,BYTE PTR [bp+4]	;pitch
+	*** 00032d	04 07 			add	al,7
+					$L2713:
+	*** 00032f	50 			push	ax
+	*** 000330	6a 00 			push	0
+	*** 000332	0e 			push	cs
+	*** 000333	e8 00 00 		call	NEAR PTR SETFREQ
+;|***         }
+;|***                 
+;|***         percBits |= percMasks[voice - BD];
+; Line 413
+					$I2629:
+	*** 000336	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 000339	2a ff 			sub	bh,bh
+	*** 00033b	8a 87 fa ff 		mov	al,BYTE PTR _percMasks[bx-6]
+	*** 00033f	08 06 00 00 		or	BYTE PTR _percBits,al
+;|***         SndSAmVibRhythm();
+; Line 414
+	*** 000343	0e 			push	cs
+	*** 000344	e8 00 00 		call	NEAR PTR SNDSAMVIBRHYTHM
+	*** 000347	eb 0e 			jmp	SHORT $EX2619
+;|***     if (voice < BD || !fPercussion)         /* this is a melodic voice */
+; Line 401
+					$I2626:
+;|***         SetFreq(voice, pitch, 1);
+; Line 402
+	*** 000349	8a 46 06 		mov	al,BYTE PTR [bp+6]	;voice
+	*** 00034c	50 			push	ax
+	*** 00034d	8a 46 04 		mov	al,BYTE PTR [bp+4]	;pitch
+	*** 000350	50 			push	ax
+	*** 000351	6a 01 			push	1
+	*** 000353	0e 			push	cs
+	*** 000354	e8 00 00 		call	NEAR PTR SETFREQ
+;|***     else {                                  /* this is a percussive voice */
+;|***         if (voice == BD)
+;|***                 SetFreq(BD, pitch, 0);
+;|***         else if (voice == TOM) {
+;|***             /* for the last 4 percussions, only the TOM may change */
+;|***             /* in frequency, which also modifies the SD */
+;|***             SetFreq(TOM, pitch, 0);
+;|***             SetFreq(SD, (BYTE)(pitch + TOM_TO_SD), 0);
+;|***         }
+;|***                 
+;|***         percBits |= percMasks[voice - BD];
+;|***         SndSAmVibRhythm();
+;|***     }
+;|*** }
+; Line 416
+					$EX2619:
+	*** 000357	c9 			leave	
+	*** 000358	c2 04 00 		ret	4
+	*** 00035b	90 			nop	
+
+NOTEON	ENDP
+	PUBLIC	NOTEOFF
+NOTEOFF	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | NoteOff | This routine stops playing the note which was
+;|***  *     started in <f NoteOn>.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to use (0 to 8 in melodic mode,
+;|***  *     0 to 10 in percussive mode).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL NoteOff(BYTE voice)
+;|*** {
+; Line 430
+	*** 00035c	55 			push	bp
+	*** 00035d	8b ec 			mov	bp,sp
+;	voice = 4
+;|***     D3("NoteOff");
+; Line 431
+	*** 00035f	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 000364	72 12 			jb	$I2634
+	*** 000366	1e 			push	ds
+	*** 000367	68 00 00 		push	OFFSET DGROUP:$SG2635
+	*** 00036a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00036f	1e 			push	ds
+	*** 000370	68 00 00 		push	OFFSET DGROUP:$SG2636
+	*** 000373	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     if (!fPercussion || voice < BD)
+; Line 433
+					$I2634:
+	*** 000378	83 3e 00 00 00 		cmp	WORD PTR _fPercussion,0
+	*** 00037d	74 1b 			je	$I2638
+	*** 00037f	80 7e 04 06 		cmp	BYTE PTR [bp+4],6	;voice
+	*** 000383	72 15 			jb	$I2638
+;|***         SetFreq(voice, notePitch[voice], 0);              /* shut off */
+;|***     else {
+;|***         percBits &= ~percMasks[voice - BD];
+; Line 436
+	*** 000385	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;voice
+	*** 000388	2a ff 			sub	bh,bh
+	*** 00038a	8a 87 fa ff 		mov	al,BYTE PTR _percMasks[bx-6]
+	*** 00038e	f6 d0 			not	al
+	*** 000390	20 06 00 00 		and	BYTE PTR _percBits,al
+;|***         SndSAmVibRhythm();
+; Line 437
+	*** 000394	0e 			push	cs
+	*** 000395	e8 00 00 		call	NEAR PTR SNDSAMVIBRHYTHM
+	*** 000398	eb 13 			jmp	SHORT $EX2633
+;|***     if (!fPercussion || voice < BD)
+; Line 433
+					$I2638:
+;|***         SetFreq(voice, notePitch[voice], 0);              /* shut off */
+; Line 434
+	*** 00039a	8a 46 04 		mov	al,BYTE PTR [bp+4]	;voice
+	*** 00039d	50 			push	ax
+	*** 00039e	8a d8 			mov	bl,al
+	*** 0003a0	2a ff 			sub	bh,bh
+	*** 0003a2	8a 87 00 00 		mov	al,BYTE PTR _notePitch[bx]
+	*** 0003a6	50 			push	ax
+	*** 0003a7	6a 00 			push	0
+	*** 0003a9	0e 			push	cs
+	*** 0003aa	e8 00 00 		call	NEAR PTR SETFREQ
+;|***     else {
+;|***         percBits &= ~percMasks[voice - BD];
+;|***         SndSAmVibRhythm();
+;|***     }
+;|*** }
+; Line 439
+					$EX2633:
+	*** 0003ad	c9 			leave	
+	*** 0003ae	c2 02 00 		ret	2
+	*** 0003b1	90 			nop	
+
+NOTEOFF	ENDP
+	PUBLIC	CHANGEPITCH
+CHANGEPITCH	PROC NEAR
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     private functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | ChangePitch | This routine sets the <t halfToneOffset[]> and
+;|***  *     <t fNumFreqPtr[]> arrays.  These two global variables are used to
+;|***  *     determine the frequency variation to use when a note is played.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to use.
+;|***  *
+;|***  * @parm WORD | pitchBend | Specifies the pitch bend value (0 to 0x3fff,
+;|***  *     where 0x2000 is exact tuning).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL ChangePitch(BYTE voice, WORD pitchBend)
+;|*** {
+; Line 462
+	*** 0003b2	c8 04 00 00 		enter	4,0
+	*** 0003b6	57 			push	di
+	*** 0003b7	56 			push	si
+;	voice = 6
+;	pitchBend = 4
+;	oldt1 = -2
+;	oldHt = -2
+;	oldPtr = -4
+;	t1 = -2
+;	t2 = -10
+;	register si = delta
+;	dw = -16
+	*** 0003b8	8b 3e 00 00 		mov	di,WORD PTR _pitchRangeStep
+	*** 0003bc	8b 76 04 		mov	si,WORD PTR [bp+4]	;pitchBend
+;|*** static int    oldt1 = -1;
+;|*** static int    oldHt;
+;|*** static NPWORD oldPtr;
+;|*** int           t1;
+;|*** int           t2;
+;|*** int           delta;
+;|*** 
+;|*** #if (MID_PITCH != 8192)
+;|*** #pragma message("ChangePitch: DANGER! C-RUNTIME NOT IN FIXED SEGMENT!!!")
+;|***     t1 = (int)(((long)((int)pitchBend - MID_PITCH) * pitchRangeStep)/MID_PITCH);
+;|*** #else
+;|***     DWORD   dw;
+;|*** 
+;|***     dw = (DWORD)((long)((int)pitchBend - MID_PITCH) * pitchRangeStep);
+;|***     t1 = (int)((LOBYTE(HIWORD(dw)) << 8) | HIBYTE(LOWORD(dw))) >> 5;
+;|*** #endif
+;|*** 
+;|***     if (oldt1 == t1) {
+; Line 480
+	*** 0003bf	8d 84 00 e0 		lea	ax,WORD PTR [si-8192]
+	*** 0003c3	f7 ef 			imul	di
+	*** 0003c5	8b da 			mov	bx,dx
+	*** 0003c7	8a c4 			mov	al,ah
+	*** 0003c9	2a e4 			sub	ah,ah
+	*** 0003cb	8a fb 			mov	bh,bl
+	*** 0003cd	2a db 			sub	bl,bl
+	*** 0003cf	0b d8 			or	bx,ax
+	*** 0003d1	c1 fb 05 		sar	bx,5
+	*** 0003d4	89 5e fe 		mov	WORD PTR [bp-2],bx	;oldt1
+	*** 0003d7	43 			inc	bx
+	*** 0003d8	75 17 			jne	$I2652
+;|***         fNumFreqPtr[voice] = oldPtr;
+; Line 481
+	*** 0003da	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;oldPtr
+	*** 0003dd	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 0003e0	2a ff 			sub	bh,bh
+	*** 0003e2	03 db 			add	bx,bx
+	*** 0003e4	89 87 00 00 		mov	WORD PTR _fNumFreqPtr[bx],ax
+;|***         halfToneOffset[voice] = oldHt;
+; Line 482
+	*** 0003e8	8b 46 fe 		mov	ax,WORD PTR [bp-2]	;oldt1
+	*** 0003eb	89 87 00 00 		mov	WORD PTR _halfToneOffset[bx],ax
+;|***     }
+;|*** 
+;|***     else {
+; Line 485
+	*** 0003ef	eb 65 			jmp	SHORT $EX2644
+					$I2652:
+	*** 0003f1	8b 7e fe 		mov	di,WORD PTR [bp-2]	;oldt1
+;|***         if (t1 < 0) {
+; Line 486
+	*** 0003f4	0b ff 			or	di,di
+	*** 0003f6	7d 33 			jge	$I2654
+;|***             t2 = NR_STEP_PITCH - 1 - t1;
+;|***             oldHt = halfToneOffset[voice] = -(t2 / NR_STEP_PITCH);
+; Line 488
+	*** 0003f8	b8 18 00 		mov	ax,24	;0018H
+	*** 0003fb	2b c7 			sub	ax,di
+	*** 0003fd	b9 e7 ff 		mov	cx,-25	;ffe7H
+	*** 000400	8b d8 			mov	bx,ax
+	*** 000402	99 			cwd	
+	*** 000403	f7 f9 			idiv	cx
+	*** 000405	8b cb 			mov	cx,bx
+	*** 000407	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 00040a	2a ff 			sub	bh,bh
+	*** 00040c	03 db 			add	bx,bx
+	*** 00040e	89 87 00 00 		mov	WORD PTR _halfToneOffset[bx],ax
+;|***             delta = (t2 - NR_STEP_PITCH + 1) % NR_STEP_PITCH;
+; Line 489
+	*** 000412	8b c1 			mov	ax,cx
+	*** 000414	2d 18 00 		sub	ax,24	;0018H
+	*** 000417	b9 19 00 		mov	cx,25	;0019H
+	*** 00041a	99 			cwd	
+	*** 00041b	f7 f9 			idiv	cx
+	*** 00041d	8b f2 			mov	si,dx
+;|***             if (delta)
+; Line 490
+	*** 00041f	0b f2 			or	si,dx
+	*** 000421	74 22 			je	$I2656
+;|***                 delta = NR_STEP_PITCH - delta;
+; Line 491
+	*** 000423	8b c1 			mov	ax,cx
+	*** 000425	2b c6 			sub	ax,si
+	*** 000427	8b f0 			mov	si,ax
+;|***         }
+;|***         else {
+; Line 493
+	*** 000429	eb 1a 			jmp	SHORT $I2656
+					$I2654:
+;|***             oldHt = halfToneOffset[voice] = t1 / NR_STEP_PITCH;
+; Line 494
+	*** 00042b	8b c7 			mov	ax,di
+	*** 00042d	b9 19 00 		mov	cx,25	;0019H
+	*** 000430	99 			cwd	
+	*** 000431	f7 f9 			idiv	cx
+	*** 000433	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 000436	2a ff 			sub	bh,bh
+	*** 000438	03 db 			add	bx,bx
+	*** 00043a	89 87 00 00 		mov	WORD PTR _halfToneOffset[bx],ax
+;|***             delta = t1 % NR_STEP_PITCH;
+; Line 495
+	*** 00043e	8b c7 			mov	ax,di
+	*** 000440	99 			cwd	
+	*** 000441	f7 f9 			idiv	cx
+	*** 000443	8b f2 			mov	si,dx
+;|***         }
+; Line 496
+					$I2656:
+;|***     
+;|***         oldPtr = fNumFreqPtr[voice] = fNumNotes[delta];
+; Line 498
+	*** 000445	6b c6 18 		imul	ax,si,24	;0018H
+	*** 000448	05 00 00 		add	ax,OFFSET DGROUP:_fNumNotes
+	*** 00044b	8a 5e 06 		mov	bl,BYTE PTR [bp+6]	;voice
+	*** 00044e	2a ff 			sub	bh,bh
+	*** 000450	03 db 			add	bx,bx
+	*** 000452	89 87 00 00 		mov	WORD PTR _fNumFreqPtr[bx],ax
+;|***         oldt1 = t1;
+;|***     }
+;|*** }
+; Line 501
+					$EX2644:
+	*** 000456	5e 			pop	si
+	*** 000457	5f 			pop	di
+	*** 000458	c9 			leave	
+	*** 000459	c2 04 00 		ret	4
+
+CHANGEPITCH	ENDP
+	PUBLIC	SNDSETALLPRM
+SNDSETALLPRM	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSetAllPrm | Transfers all the parameters from slot <p slot>
+;|***  *     to the chip.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndSetAllPrm(BYTE slot)
+;|*** {
+; Line 514
+	*** 00045c	55 			push	bp
+	*** 00045d	8b ec 			mov	bp,sp
+;	slot = 4
+;|***     D3("SndSetAllPrm");
+; Line 515
+	*** 00045f	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 000464	72 12 			jb	$I2660
+	*** 000466	1e 			push	ds
+	*** 000467	68 00 00 		push	OFFSET DGROUP:$SG2661
+	*** 00046a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00046f	1e 			push	ds
+	*** 000470	68 00 00 		push	OFFSET DGROUP:$SG2662
+	*** 000473	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     SndSAmVibRhythm();
+; Line 517
+					$I2660:
+	*** 000478	0e 			push	cs
+	*** 000479	e8 00 00 		call	NEAR PTR SNDSAMVIBRHYTHM
+;|***     SndSNoteSel();
+; Line 518
+	*** 00047c	0e 			push	cs
+	*** 00047d	e8 00 00 		call	NEAR PTR SNDSNOTESEL
+;|***     SndSKslLevel(slot);
+; Line 519
+	*** 000480	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 000483	50 			push	ax
+	*** 000484	e8 79 fc 		call	SNDSKSLLEVEL
+;|***     SndSFeedFm(slot);
+; Line 520
+	*** 000487	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 00048a	50 			push	ax
+	*** 00048b	e8 00 00 		call	SNDSFEEDFM
+;|***     SndSAttDecay(slot);
+; Line 521
+	*** 00048e	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 000491	50 			push	ax
+	*** 000492	e8 00 00 		call	SNDSATTDECAY
+;|***     SndSSusRelease(slot);
+; Line 522
+	*** 000495	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 000498	50 			push	ax
+	*** 000499	e8 00 00 		call	SNDSSUSRELEASE
+;|***     SndSAVEK(slot);
+; Line 523
+	*** 00049c	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 00049f	50 			push	ax
+	*** 0004a0	e8 00 00 		call	SNDSAVEK
+;|***     SndWaveSelect(slot);
+; Line 524
+	*** 0004a3	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 0004a6	50 			push	ax
+	*** 0004a7	e8 00 00 		call	SNDWAVESELECT
+;|*** }
+; Line 525
+	*** 0004aa	c9 			leave	
+	*** 0004ab	c2 02 00 		ret	2
+
+SNDSETALLPRM	ENDP
+	PUBLIC	SNDSAVEK
+SNDSAVEK	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSAVEK | Sets the AM, VIB, EG-TYP (sustaining), KSR, and
+;|***  *     MULTI values.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndSAVEK(BYTE slot)
+;|*** {
+; Line 538
+	*** 0004ae	55 			push	bp
+	*** 0004af	8b ec 			mov	bp,sp
+;	slot = 4
+;	t1 = -2
+;|*** BYTE t1;
+;|*** 
+;|***     t1 = (BYTE)(GetLocPrm(slot, prmAm) ? 0x80 : 0);
+;|***     t1 += GetLocPrm(slot, prmVib) ? 0x40 : 0;
+;|***     t1 += GetLocPrm(slot, prmStaining) ? 0x20 : 0;
+;|***     t1 += GetLocPrm(slot, prmKsr) ? 0x10 : 0;
+;|***     t1 += GetLocPrm(slot, prmMulti) & 0xf;
+;|***     SndOutput((BYTE)(0x20 | offsetSlot[slot]), t1);
+; Line 546
+	*** 0004b1	2a ff 			sub	bh,bh
+	*** 0004b3	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 0004b6	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 0004ba	0c 20 			or	al,32	;0020H
+	*** 0004bc	50 			push	ax
+	*** 0004bd	6b db 0e 		imul	bx,bx,14	;000eH
+	*** 0004c0	80 bf 09 00 01 		cmp	BYTE PTR _paramSlot[bx+9],1
+	*** 0004c5	f5 			cmc	
+	*** 0004c6	1a c0 			sbb	al,al
+	*** 0004c8	24 80 			and	al,128	;0080H
+	*** 0004ca	80 bf 0b 00 01 		cmp	BYTE PTR _paramSlot[bx+11],1
+	*** 0004cf	f5 			cmc	
+	*** 0004d0	1a c9 			sbb	cl,cl
+	*** 0004d2	80 e1 10 		and	cl,16	;0010H
+	*** 0004d5	02 c1 			add	al,cl
+	*** 0004d7	80 bf 05 00 01 		cmp	BYTE PTR _paramSlot[bx+5],1
+	*** 0004dc	f5 			cmc	
+	*** 0004dd	1a c9 			sbb	cl,cl
+	*** 0004df	80 e1 20 		and	cl,32	;0020H
+	*** 0004e2	02 c1 			add	al,cl
+	*** 0004e4	80 bf 0a 00 01 		cmp	BYTE PTR _paramSlot[bx+10],1
+	*** 0004e9	f5 			cmc	
+	*** 0004ea	1a c9 			sbb	cl,cl
+	*** 0004ec	80 e1 40 		and	cl,64	;0040H
+	*** 0004ef	02 c1 			add	al,cl
+	*** 0004f1	8a 8f 01 00 		mov	cl,BYTE PTR _paramSlot[bx+1]
+	*** 0004f5	80 e1 0f 		and	cl,15	;000fH
+	*** 0004f8	02 c1 			add	al,cl
+	*** 0004fa	50 			push	ax
+	*** 0004fb	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 547
+	*** 000500	c9 			leave	
+	*** 000501	c2 02 00 		ret	2
+
+SNDSAVEK	ENDP
+	PUBLIC	SNDSFEEDFM
+SNDSFEEDFM	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSFeedFm | Sets the FEEDBACK and FM (connection) values. 
+;|***  *     Applicable only to operator 0 for melodic voices.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndSFeedFm(BYTE slot)
+;|*** {
+; Line 560
+	*** 000504	c8 02 00 00 		enter	2,0
+;	slot = 4
+;	t1 = -2
+;|*** BYTE t1;
+;|*** 
+;|***     if (operSlot[slot])
+; Line 563
+	*** 000508	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 00050b	2a ff 			sub	bh,bh
+	*** 00050d	38 bf 00 00 		cmp	BYTE PTR _operSlot[bx],bh
+	*** 000511	75 21 			jne	$EX2669
+;|***         return;
+;|***         
+;|***     t1 = (BYTE)(GetLocPrm(slot, prmFeedBack) << 1);
+;|***     t1 |= GetLocPrm(slot, prmFm) ? 0 : 1;
+;|***     SndOutput((BYTE)(0xC0 | voiceSlot[slot]), t1);
+; Line 568
+	*** 000513	8a 87 00 00 		mov	al,BYTE PTR _voiceSlot[bx]
+	*** 000517	0c c0 			or	al,192	;00c0H
+	*** 000519	50 			push	ax
+	*** 00051a	6b db 0e 		imul	bx,bx,14	;000eH
+	*** 00051d	80 bf 0c 00 01 		cmp	BYTE PTR _paramSlot[bx+12],1
+	*** 000522	1a c0 			sbb	al,al
+	*** 000524	f6 d8 			neg	al
+	*** 000526	8a 8f 02 00 		mov	cl,BYTE PTR _paramSlot[bx+2]
+	*** 00052a	02 c9 			add	cl,cl
+	*** 00052c	0a c1 			or	al,cl
+	*** 00052e	50 			push	ax
+	*** 00052f	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 569
+					$EX2669:
+	*** 000534	c9 			leave	
+	*** 000535	c2 02 00 		ret	2
+
+SNDSFEEDFM	ENDP
+	PUBLIC	SNDSATTDECAY
+SNDSATTDECAY	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSAttDecay | Sets the ATTACK and DECAY values.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndSAttDecay(BYTE slot)
+;|*** {
+; Line 581
+	*** 000538	55 			push	bp
+	*** 000539	8b ec 			mov	bp,sp
+;	slot = 4
+;	t1 = -2
+;|*** BYTE t1;
+;|*** 
+;|***     t1 = (BYTE)(GetLocPrm(slot, prmAttack) << 4);
+;|***     t1 |= GetLocPrm(slot, prmDecay) & 0xf;
+;|***     SndOutput((BYTE)(0x60 | offsetSlot[slot]), t1);
+; Line 586
+	*** 00053b	2a ff 			sub	bh,bh
+	*** 00053d	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 000540	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 000544	0c 60 			or	al,96	;0060H
+	*** 000546	50 			push	ax
+	*** 000547	6b db 0e 		imul	bx,bx,14	;000eH
+	*** 00054a	8a 87 03 00 		mov	al,BYTE PTR _paramSlot[bx+3]
+	*** 00054e	c0 e0 04 		shl	al,4
+	*** 000551	8a 8f 06 00 		mov	cl,BYTE PTR _paramSlot[bx+6]
+	*** 000555	80 e1 0f 		and	cl,15	;000fH
+	*** 000558	0a c1 			or	al,cl
+	*** 00055a	50 			push	ax
+	*** 00055b	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 587
+	*** 000560	c9 			leave	
+	*** 000561	c2 02 00 		ret	2
+
+SNDSATTDECAY	ENDP
+	PUBLIC	SNDSSUSRELEASE
+SNDSSUSRELEASE	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndSSusRelease | Sets the SUSTAIN and RELEASE values.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndSSusRelease(BYTE slot)
+;|*** {
+; Line 599
+	*** 000564	55 			push	bp
+	*** 000565	8b ec 			mov	bp,sp
+;	slot = 4
+;	t1 = -2
+;|*** BYTE t1;
+;|*** 
+;|***     t1 = (BYTE)(GetLocPrm(slot, prmSustain) << 4);
+;|***     t1 |= GetLocPrm(slot, prmRelease) & 0xf;
+;|***     SndOutput((BYTE)(0x80 | offsetSlot[slot]), t1);
+; Line 604
+	*** 000567	2a ff 			sub	bh,bh
+	*** 000569	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 00056c	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 000570	0c 80 			or	al,128	;0080H
+	*** 000572	50 			push	ax
+	*** 000573	6b db 0e 		imul	bx,bx,14	;000eH
+	*** 000576	8a 87 04 00 		mov	al,BYTE PTR _paramSlot[bx+4]
+	*** 00057a	c0 e0 04 		shl	al,4
+	*** 00057d	8a 8f 07 00 		mov	cl,BYTE PTR _paramSlot[bx+7]
+	*** 000581	80 e1 0f 		and	cl,15	;000fH
+	*** 000584	0a c1 			or	al,cl
+	*** 000586	50 			push	ax
+	*** 000587	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 605
+	*** 00058c	c9 			leave	
+	*** 00058d	c2 02 00 		ret	2
+
+SNDSSUSRELEASE	ENDP
+	PUBLIC	SNDWAVESELECT
+SNDWAVESELECT	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SndWaveSelect | Sets the wave-select parameter.
+;|***  *
+;|***  * @parm BYTE | slot | Specifies which slot to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL SndWaveSelect(BYTE slot)
+;|*** {
+; Line 617
+	*** 000590	c8 02 00 00 		enter	2,0
+;	slot = 4
+;	wave = -1
+;|*** BYTE wave;
+;|*** 
+;|***     if (modeWaveSel)
+; Line 620
+	*** 000594	80 3e 00 00 00 		cmp	BYTE PTR _modeWaveSel,0
+	*** 000599	74 13 			je	$I2684
+;|***         wave = (BYTE)(GetLocPrm(slot, prmWaveSel) & 0x03);
+; Line 621
+	*** 00059b	8a 46 04 		mov	al,BYTE PTR [bp+4]	;slot
+	*** 00059e	2a e4 			sub	ah,ah
+	*** 0005a0	6b d8 0e 		imul	bx,ax,14	;000eH
+	*** 0005a3	8a 87 0d 00 		mov	al,BYTE PTR _paramSlot[bx+13]
+	*** 0005a7	24 03 			and	al,3
+	*** 0005a9	88 46 ff 		mov	BYTE PTR [bp-1],al	;wave
+;|***     else
+; Line 622
+	*** 0005ac	eb 04 			jmp	SHORT $I2685
+					$I2684:
+;|***         wave = 0;
+; Line 623
+	*** 0005ae	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;wave
+					$I2685:
+;|***     SndOutput((BYTE)(0xE0 | offsetSlot[slot]), wave);
+; Line 624
+	*** 0005b2	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;slot
+	*** 0005b5	2a ff 			sub	bh,bh
+	*** 0005b7	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 0005bb	0c e0 			or	al,224	;00e0H
+	*** 0005bd	50 			push	ax
+	*** 0005be	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;wave
+	*** 0005c1	50 			push	ax
+	*** 0005c2	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 625
+	*** 0005c7	c9 			leave	
+	*** 0005c8	c2 02 00 		ret	2
+	*** 0005cb	90 			nop	
+
+SNDWAVESELECT	ENDP
+_FIX	ENDS
+END

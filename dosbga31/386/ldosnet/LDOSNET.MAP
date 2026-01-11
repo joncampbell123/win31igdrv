@@ -1,0 +1,85 @@
+
+ DOSNET
+
+ Start         Length     Name                   Class
+ 0001:00000000 0000007B0H _LTEXT                 CODE 32-bit
+ 0001:000007B0 000000845H _LDATA                 CODE 32-bit
+ 0002:00000000 00000012DH _ITEXT                 ICODE 32-bit
+ 0002:00000130 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 00000002CH _DATA                  PCODE 32-bit
+ 0004:00000000 0000000B4H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000AD8 DOSNET_DDB              DOSNET_DDB
+
+  Address         Publics by Name
+
+ 0001:00000AD4       $DOSNET_Do_PSP_Adjust
+ 0001:00000ACC       $DOSNET_Get_Version
+ 0001:00000AD0       $DOSNET_Send_FILESYSCHANGE
+ 0001:00000027       @DOSNET_Do_PSP_Adjust
+ 0001:00000006       @DOSNET_Get_Version
+ 0001:00000044       @DOSNET_Send_FILESYSCHANGE
+ 0001:00000A52       DNDontDestroyMsg
+ 0001:00000AAB       DNDontDestroyMsgDrive
+ 0001:000007B0       DNNetUseGlobalMsg
+ 0001:000007E1       DNNetUseGlobalMsgDrive
+ 0001:00000863       DNNetUseInherMsg
+ 0001:00000894       DNNetUseInherMsgDrive
+ 0001:00000965       DNNetUseParentMsg
+ 0001:00000996       DNNetUseParentMsgDrive
+ 0001:00000B10       DN_CB_Offset
+ 0001:00000608       DN_I21_CallBack
+ 0001:000005DB       DOSNET_AllocInfoStruc
+ 0001:00000358       DOSNET_Create_VM
+ 0001:00000AD8       DOSNET_DDB
+ 0001:0000016A       DOSNET_Destroy_VM
+ 0002:0000003F       DOSNET_Device_Init
+ 0001:000006BB       DOSNET_Dump_Debug_Info
+ 0001:0000071E       DOSNET_Dump_VM
+ 0001:000003E4       DOSNET_Int_21
+ 0001:000000F3       DOSNET_Query_Destroy
+ 0001:00000085       DOSNET_Sys_Control
+ 0002:00000000       DOSNET_Sys_Critical_Init
+ 0001:00000238       DOSNET_VM_Terminate
+
+  Address         Publics by Value
+
+ 0001:00000006       @DOSNET_Get_Version
+ 0001:00000027       @DOSNET_Do_PSP_Adjust
+ 0001:00000044       @DOSNET_Send_FILESYSCHANGE
+ 0001:00000085       DOSNET_Sys_Control
+ 0001:000000F3       DOSNET_Query_Destroy
+ 0001:0000016A       DOSNET_Destroy_VM
+ 0001:00000238       DOSNET_VM_Terminate
+ 0001:00000358       DOSNET_Create_VM
+ 0001:000003E4       DOSNET_Int_21
+ 0001:000005DB       DOSNET_AllocInfoStruc
+ 0001:00000608       DN_I21_CallBack
+ 0001:000006BB       DOSNET_Dump_Debug_Info
+ 0001:0000071E       DOSNET_Dump_VM
+ 0001:000007B0       DNNetUseGlobalMsg
+ 0001:000007E1       DNNetUseGlobalMsgDrive
+ 0001:00000863       DNNetUseInherMsg
+ 0001:00000894       DNNetUseInherMsgDrive
+ 0001:00000965       DNNetUseParentMsg
+ 0001:00000996       DNNetUseParentMsgDrive
+ 0001:00000A52       DNDontDestroyMsg
+ 0001:00000AAB       DNDontDestroyMsgDrive
+ 0001:00000ACC       $DOSNET_Get_Version
+ 0001:00000AD0       $DOSNET_Send_FILESYSCHANGE
+ 0001:00000AD4       $DOSNET_Do_PSP_Adjust
+ 0001:00000AD8       DOSNET_DDB
+ 0001:00000B10       DN_CB_Offset
+ 0002:00000000       DOSNET_Sys_Critical_Init
+ 0002:0000003F       DOSNET_Device_Init
+
+Program entry point at 0004:0000

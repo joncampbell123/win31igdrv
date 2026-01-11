@@ -1,0 +1,1053 @@
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-1
+
+
+					page	,132
+				;-----------------------------Module-Header-----------------------------;
+				; Module Name:	PS2.ASM
+				;
+				; Windows mouse driver data and initialization routines for using the
+				; PS/2 mouse port.
+				;
+				; Created: 21-Aug-1987
+				; Author:  Mr. Mouse [mickeym], Walt Moore [waltm]
+				;
+				; Modifications:
+				;
+				; 28-Mar-1990  jimmat  Also disabled interrupts on Int 33h enable
+				; call from ps2_disable routine.  This has the same problem as the Int 15h
+				; calls documented below (in this case, it's the DOS mouse driver making
+				; the Int 15h calls, not the Windows driver).  What a hack for these
+				; 2500 XL machines!  They should fix their BIOS!
+				;
+				; 07-Feb-1990. -by- Jim Mathews [jimmat] & Amit Chatterjee [amitc]
+				; Across all INT 15H calls in the enable and disable procedures we will
+				; mask off all interrupts but for IRQ 1 & 2. This was done to fix a bug that
+				; occured on TANDY 2500XL machines. 
+				;
+				; On these machines the mouse port communicates with the 8042 keyboard 
+				; controller which is also used by HIMEM.SYS to toggle the state of the A20
+				; line. A command byte that is output to the 8042 and is intended for the 
+				; mouse port is preceeded by a special 'escape' byte (D4H) which tells the
+				; 8042 that the next byte is for the mouse. If an interrupt causes the DOSX
+				; to switch to protected mode after the escape byte has been output but before
+				; the actual mouse command could be output, then DOSX would program the 8042
+				; to enable the A20 line and make the 8042 lose the synchronization with the
+				; BIOS code. To take care of this problem we disble all interrupts but for
+				; IRQ 1 & 2 when we make INT 15H mouse related calls.
+				;
+				; Copyright (c) 1986,1987  Microsoft Corporation
+				;
+				; Exported Functions:
+				;	None
+				; Public Functions:
+				;	ps2_enable
+				;	ps2_disable
+				;	ps2_search
+				; Public Data:
+				;	None
+				; General Description:
+				;	This module contains the functions to find, enable, disable,
+				;	and process interrupts for an 8255 Bus Mouse.
+				;-----------------------------------------------------------------------;
+				
+					title	PS/2 Mouse Hardware Dependent Code
+				
+					.list
+				
+				
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-2
+
+
+					??_out	PS2
+				
+				
+					externNP hook_us_in		;Hook us into our interrupt
+					externNP unhook_us		;Hook us out of our interrupt
+					externNP enable_our_int 	;Enable us at the 8259
+				
+				
+				
+ = 0030				GET_DOS_VERSION equ	30h		;Int 21h, get dos version number
+ = 0004				PT_DEV_PRES	equ	00000100b	;Pointing device is installed
+				
+				
+				;	Subfunctions to int 15h
+				
+ = 00C0				I15_GET_CONFIG		equ	0C0h	;Get configuration
+ = 00C2				I15_MOUSE_SUBFUNC	equ	0C2h	;Mouse subfunction to int 15h
+				
+ = 0000				PS2MSF_ENAB_DISAB	equ	0	;  Enable/Disable subfunction
+ = 0001				PS2MSF_RESET		equ	1	;  Reset
+ = 0002				PS2MSF_SET_SAMPLE	equ	2	;  Set sample rate
+ = 0003				PS2MSF_SET_RES		equ	3	;  Set resolution
+ = 0005				PS2MSF_INIT		equ	5	;  Initialize subfunction
+ = 0006				PS2MSF_SET_SCALING	equ	6	;  Set scaling
+ = 0007				PS2MSF_INSTALL_IH	equ	7	;  Install interrupt handler
+				
+				;	parameters for the subfunctions, usually passed in BH
+				
+ = 0003				PS2M_PACKET_SIZE	equ	3	;Use three byte packets for mouse
+ = 0004				PS2M_TRANS_ERROR	equ	4	;Transmission error code
+ = 0003				PS2M_CNTS_PER_MM	equ	3	;3 count per mm = ~ 200 ppi
+ = 0000				PS2M_DISABLE		equ	0	;Disable the mouse
+ = 0001				PS2M_ENABLE		equ	1	;Enable the mouse
+ = 0001				PS2M_SCALING		equ	1	;1:1 scaling
+ = 0002				PS2M_SAMPLING_40	equ	2	;40 reports per second
+ = 0005				PS2M_SAMPLING_100	equ	5	;100 reports per second
+				
+				
+				;	PS_2 status byte definition
+				
+ = 0001				PS2_B1_STATUS	equ	00000001b	;Status of left button
+ = 0002				PS2_B2_STATUS	equ	00000010b	;Status of right button
+				;		equ	00000100b
+				;		equ	00001000b
+ = 0010				PS2_NEG_X	equ	00010000b	;X delta is negative
+ = 0020				PS2_NEG_Y	equ	00100000b	;Y delta is negative
+				
+				
+				sBegin	Data
+ 0000                        2	_DATA segment 
+				
+				externB vector				;Vector # of mouse interrupt
+				externB mouse_flags			;Various flags as follows
+				externW enable_proc			;Address of routine to	enable mouse
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-3
+
+
+				externW disable_proc			;Address of routine to disable mouse
+				externB device_int			;Start of mouse specific int handler
+				externW interrupt_rate			;Maximum interrupt rate of mouse
+				externW IntCS				;CS alias for Data Segment
+				externD event_proc			;Mouse event procedure when enabled
+				externD bios_proc			;Contents of old interrupt vector
+				
+				sEnd	Data
+ 0000                        1	_DATA ends 
+				
+				
+				sBegin	Code
+ 0000                        2	_TEXT segment 
+				assumes cs,Code
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-4
+
+
+				page
+				
+				;	This is the start of the data which will be copied into
+				;	the device_int area reserved in the data segment.
+				
+ = 0000				PS2_START	equ	this word
+				
+				
+				;--------------------------Interrupt-Routine----------------------------;
+				; ps2_int - Mouse Interrupt Handler for the PS/2 Bus Mouse
+				;
+				; This is the handler for the interrupt generated by the PS/2
+				; mouse.  It will reside in the Data segment.
+				;
+				; Entry:
+				;	DS = Data
+				; Returns:
+				;	AX = status
+				;	BX = delta X
+				;	CX = delta Y
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	SI,DS,ES,BP
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,DI,FLAGS
+				; Calls:
+				;	None
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes cs,Code
+					assumes ds,nothing
+					assumes es,nothing
+					assumes ss,nothing
+				
+				
+ = 0000				PS2_PROC_START	equ	$-PS2_START	;Delta to this procedure
+						.errnz	PS2_PROC_START	;Must be first
+				
+ 0000				ps2_int proc	far
+				
+					assumes cs,Data
+ 0000  9C				pushf				;PS/2 mouse -- get data & issue EOI
+ 0001  2E: FF 1E 0000 E			call	bios_proc		;  using the BIOS routines
+ 0006  2E: F6 06 0079 E FF		test	bptr device_int[PS2_DATA_FLAG],0FFh
+ 000C  74 5A				jz	ps2_int_exit		;Not a valid PS/2 mouse interrupt
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-5
+
+
+				
+ 000E  50				push	ax			;Save the world
+ 000F  53				push	bx
+ 0010  51				push	cx
+ 0011  52				push	dx
+ 0012  56				push	si
+ 0013  57				push	di
+ 0014  55				push	bp
+ 0015  1E				push	ds
+ 0016  06				push	es
+ 0017  B8 ---- R			mov	ax,_DATA
+ 001A  8E D8				mov	ds,ax
+					assumes ds,Data
+					assumes cs,Code
+				
+ 001C  8B 1E 007A E			mov	bx,wptr device_int[PS2_DELTA_X]
+					if2
+					.errnz	PS2_DELTA_Y-PS2_DELTA_X-1
+					endif
+				
+ 0020  A0 007C E			mov	al,bptr device_int[PS2_STATUS]
+ 0023  8A E0				mov	ah,al
+ 0025  86 06 007D E			xchg	al,bptr device_int[PS2_OLD_STATUS]
+				
+ 0029  B1 02				mov	cl,2			;B=button, S=sign, P=prev button state
+				;					;AX = xxSSxxBB xxxxxxPP
+ 002B  D2 CC				ror	ah,cl			;AX = BBxxSSxx xxxxxxPP
+ 002D  D3 C0				rol	ax,cl			;AX = xxSSxxxx xxxxPPBB
+ 002F  41				inc	cx
+ 0030  D2 E4				shl	ah,cl			;AX = Sxxxxxxx xxxxPPBB, 'C' is Y sign
+ 0032  1A ED				sbb	ch,ch			;Set sign of Y delta
+					.errnz	PS2_NEG_Y-00100000b
+ 0034  8A CF				mov	cl,bh			;CX = Y delta
+ 0036  F7 D9				neg	cx			;They don't know which direction is up
+				
+ 0038  D0 E4				shl	ah,1
+ 003A  1A FF				sbb	bh,bh			;BX = delta X
+				
+ 003C  93				xchg	bx,ax			;Get button deltas
+ 003D  83 E3 0F				and	bx,0000000000001111b
+ 0040  88 3E 0079 E			mov	bptr device_int[PS2_DATA_FLAG],bh
+ 0044  8A 9F 0069 E			mov	bl,bptr device_int[bx][STATE_XLATE]
+ 0048  93				xchg	ax,bx
+				
+ 0049  8B D3				mov	dx,bx			;Set movement bit if movement
+ 004B  0B D1				or	dx,cx
+ 004D  F7 DA				neg	dx
+ 004F  13 C0				adc	ax,ax
+					.errnz	SF_MOVEMENT-00000001b
+ 0051  74 0C				jz	ps2_no_data		;Nothing happened
+				
+ 0053  BA 0002				mov	dx,NUMBER_BUTTONS
+ 0056  33 F6			        xor     si,si		; 0 ExtraMessageInfo for 3.1
+ 0058  33 FF			        xor     di,di		; 0 ExtraMessageInfo for 3.1
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-6
+
+
+ 005A  FB				sti
+ 005B  FF 1E 0000 E			call	event_proc
+				
+ 005F				ps2_no_data:
+ 005F  07				pop	es
+ 0060  1F				pop	ds
+ 0061  5D				pop	bp
+ 0062  5F				pop	di
+ 0063  5E				pop	si
+ 0064  5A				pop	dx
+ 0065  59				pop	cx
+ 0066  5B				pop	bx
+ 0067  58				pop	ax
+				
+ 0068				ps2_int_exit:
+ 0068  CF				iret
+				
+ 0069				ps2_int endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-7
+
+
+				page
+				
+				;-----------------------------------------------------------------------;
+				; state_xlate
+				;
+				;	state_xlate is used to translate the current and previous
+				;	button state information into the values required by
+				;	Windows.  It is indexed as follows:
+				;
+				;	    pB2 pB1 cB2 cB1
+				;
+				;	     |	 |   |	 |
+				;	     |	 |   |	  --- 1 if button 1 is	down, 0 if button 1 is	up
+				;	     |	 |   |
+				;	     |	 |    ------- 1 if button 2 is	down, 0 if button 2 is	up
+				;	     |	 |
+				;	     |	  ----------- 1 if button 1 was down, 0 if button 1 was up
+				;	     |
+				;	      --------------- 1 if button 2 was down, 0 if button 2 was up
+				;
+				;	This table must be copied to the data segment along with the
+				;	interrupt handler.
+				;
+				;-----------------------------------------------------------------------;
+				
+ = 0069				STATE_XLATE	equ	$-PS2_START	;delta to this table
+				
+ 0069  00				db	0			shr 1
+ 006A  01				db	(SF_B1_DOWN)		shr 1
+ 006B  04				db	(SF_B2_DOWN)		shr 1
+ 006C  05				db	(SF_B2_DOWN+SF_B1_DOWN) shr 1
+				
+ 006D  02				db	(SF_B1_UP)		shr 1
+ 006E  00				db	0			shr 1
+ 006F  06				db	(SF_B1_UP+SF_B2_DOWN)	shr 1
+ 0070  04				db	(SF_B2_DOWN)		shr 1
+				
+ 0071  08				db	(SF_B2_UP)		shr 1
+ 0072  09				db	(SF_B1_DOWN+SF_B2_UP)	shr 1
+ 0073  00				db	0			shr 1
+ 0074  01				db	(SF_B1_DOWN)		shr 1
+				
+ 0075  0A				db	(SF_B2_UP+SF_B1_UP)	shr 1
+ 0076  08				db	(SF_B2_UP)		shr 1
+ 0077  02				db	(SF_B1_UP)		shr 1
+ 0078  00				db	0			shr 1
+				
+					.errnz	NUMBER_BUTTONS-2	;Won't work unless a two button mouse
+				
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-8
+
+
+				page
+				
+				;	PS2_DATA_FLAG is where the flag indicating there is
+				;	valid mouse data is stored.  If this location is non-
+				;	zero, then the following locations contain valid data.
+				
+ = 0079				PS2_DATA_FLAG	equ	$-PS2_START	;Delta to this byte
+ 0079  00					db	0
+				
+				
+				;	PS2_DELTA_X is where the delta X returned by the PS2 mouse
+				;	handler will be stored.
+				
+ = 007A				PS2_DELTA_X	equ	$-PS2_START	;Delta to this byte
+ 007A  00					db	0
+				
+				
+				;	PS2_DELTA_Y is where the delta Y returned by the PS2 mouse
+				;	handler will be stored.
+				
+ = 007B				PS2_DELTA_Y	equ	$-PS2_START	;Delta to this byte
+ 007B  00					db	0
+				
+				
+				;	PS2_STATUS is where the status returned by the PS2 mouse
+				;	handler will be stored.
+				
+ = 007C				PS2_STATUS	equ	$-PS2_START	;Delta to this byte
+ 007C  00					db	0
+				
+				
+				;	PS2_OLD_STATUS is where the previous status returned by
+				;	the PS2 mouse handler will be stored.  It is used to
+				;	compute the button deltas.
+				
+ = 007D				PS2_OLD_STATUS	equ	$-PS2_START	;Delta to this byte
+ 007D  00					db	0
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-9
+
+
+				page
+				
+				;--------------------------Interrupt-Routine----------------------------;
+				; ps2_soft_int - Mouse Interrupt Handler for the PS/2 Mouse
+				;
+				; This is the back end interrupt handler for the PS/2.	This is the
+				; routine that the BIOS will call when it finally passes the mouse
+				; event on to the installed handler.
+				;
+				; This routine just stores the passed data and sets a flag for the
+				; front end indicating that there is mouse data available.  This
+				; is required since the BIOS handler will not issue reenable mouse
+				; interrupts until this routine returns, which would allow interrupts
+				; to be missed.
+				;
+				; Entry:
+				;	byte ptr ss:[sp][0Ch] = status
+				;	byte ptr ss:[sp][0Ah] = delta X
+				;	byte ptr ss:[sp][08h] = delta Y
+				; Returns:
+				;	None
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	All
+				; Registers Destroyed:
+				;	None
+				; Calls:
+				;	None
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+ = 007E				PS2_SOFT_START	equ	$-PS2_START	;Delta to this procedure
+				
+ 007E				ps2_soft_int	proc	far
+				
+				;	Great care was taken to not have any labels in the following
+				;	code to prevent the stupid assembler from complaining (yes,
+				;	we have to deal with MASM ourselves).
+				
+					assumes cs,Data
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+ = byte ptr [bp+0ch]		status	equ	byte ptr [bp+0ch]
+ = byte ptr [bp+0ah]		delta_x equ	byte ptr [bp+0ah]
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-10
+
+
+ = byte ptr [bp+08h]		delta_y equ	byte ptr [bp+08h]
+				
+ 007E  55				push	bp
+ 007F  8B EC				mov	bp,sp
+ 0081  50				push	ax
+ 0082  1E				push	ds
+ 0083  B8 ---- R			mov	ax,_DATA
+ 0086  8E D8				mov	ds,ax
+ 0088  8A 46 0A				mov	al,delta_x
+ 008B  8A 66 08				mov	ah,delta_y
+ 008E  A3 007A E			mov	wptr device_int[PS2_DELTA_X],ax
+					.errnz	PS2_DELTA_Y-PS2_DELTA_X-1
+ 0091  8A 46 0C				mov	al,status
+ 0094  A2 007C E			mov	bptr device_int[PS2_STATUS],al
+ 0097  C6 06 0079 E FF			mov	bptr device_int[PS2_DATA_FLAG],0FFh
+ 009C  1F				pop	ds
+ 009D  58				pop	ax
+ 009E  5D				pop	bp
+ 009F  CB				ret				;Will restore the flags for us
+				
+ 00A0				ps2_soft_int	endp
+				
+				
+ = 00A0				PS2_INT_LENGTH	= $-PS2_START		;Length of code to copy
+					.errnz	PS2_INT_LENGTH gt MAX_INT_SIZE
+				
+				display_int_size  %PS2_INT_LENGTH
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-11
+
+
+				page
+				
+				;---------------------------Public-Routine------------------------------;
+				; ps2_search - Search for active PS/2 mouse port
+				;
+				; A search will be made for a mouse attached to a PS/2 via the
+				; keyboard/mouse port.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	'C' set if found
+				;	  AX = address of interrupt routine if interrupt vector found
+				;	  SI = offset within the Code segment of the handler
+				; Error Returns:
+				;	'C' clear if not found
+				; Registers Preserved:
+				;	DS,BP
+				; Registers Destroyed:
+				;	AX,BX,DX,DI,SI,ES,FLAGS
+				; Calls:
+				;	int 15h
+				;	int 21h
+				;	int 11h
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes cs,Code
+					assumes ds,Data
+				
+						public	ps2_search
+ 00A0				ps2_search	proc	near
+				
+ 00A0  F9				stc				;assume call might fail
+ 00A1  B4 C0				mov	ah,I15_GET_CONFIG	;Get configuration parameters
+ 00A3  CD 15				int	15h
+ 00A5  72 3F				jc	ps2_machine_not_found	;int 15 not supported
+				
+ 00A7  26: 8A 47 02			mov	al,es:[bx][2]		;AL = system model byte
+				
+ 00AB  B3 71				mov	bl,71h			;71h is 8086 machine h/w int vector
+				;	mov	bh,09h			;09h is 8086 machine h/w irq #
+ 00AD  3C FA				cmp	al,0FAh 		;8086 machine?
+ 00AF  74 0A				je	ps2_machine_found	;  yes
+				
+ 00B1  B3 74				mov	bl,74h			;74h is 286/386 machines h/w int vector
+				;	mov	bh,0Ch			;0Ch is 286/386 machines h/w irq #
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-12
+
+
+ 00B3  3C FC				cmp	al,0FCh 		;286 machines?
+ 00B5  74 04				je	ps2_machine_found	;  Yes
+ 00B7  3C F8				cmp	al,0F8h 		;386 machines?
+ 00B9  75 2B				jne	ps2_machine_not_found	;  No, wrong machine.
+				
+ 00BB				ps2_machine_found:
+ 00BB  88 1E 0000 E			mov	vector,bl		;Save vector #
+ 00BF  B4 30				mov	ah,GET_DOS_VERSION	;Get DOS version
+ 00C1  CD 21				int	21h
+ 00C3  3C 03				cmp	al,3			;Check for DOS 3.x+
+ 00C5  7C 1A				jl	ps2_cant_use_it 	;Wrong DOS
+ 00C7  CD 11				int	11h			;Check equipment table
+ 00C9  A8 04				test	al,PT_DEV_PRES		;Pointing device installed?
+ 00CB  74 14				jz	ps2_cant_use_it 	;  No, mouse hardware not present
+				
+ 00CD  C7 06 0000 E 00E8 R		mov	enable_proc,CodeOFFSET ps2_enable
+ 00D3  C7 06 0000 E 0182 R		mov	disable_proc,CodeOFFSET ps2_disable
+ 00D9  BE 0000 R			mov	si,CodeOFFSET ps2_int
+ 00DC  B9 00A0				mov	cx,PS2_INT_LENGTH
+ 00DF  F9				stc				;Show mouse was found
+ 00E0  C3				ret
+				
+ 00E1				ps2_cant_use_it:
+ 00E1  C6 06 0000 E FF			mov	vector,-1		;Restore to "no mouse" value
+				
+ 00E6				ps2_machine_not_found:
+ 00E6  F8				clc				;'C' clear shows not found
+ 00E7  C3				ret
+				
+ 00E8				ps2_search	endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-13
+
+
+				page
+				
+				;---------------------------Private-Routine-----------------------------;
+				; ps2_enable - Enable PS/2 Mouse
+				;
+				; The PS/2 mouse will be initialized and the interrupt vector hooked.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	None
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	DS,BP
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,SI,DI,ES<FLAGS
+				; Calls:
+				;	hook_us_in
+				;	int 15h
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+						public	ps2_enable	;Public for debugging
+ 00E8				ps2_enable	proc	near
+				
+ 00E8  B9 1404				mov	cx,20 shl 8 + PS2M_TRANS_ERROR	;# retries, error code
+				
+ 00EB				ps2_init:
+ 00EB  B8 C205				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_INIT
+ 00EE  B7 03				mov	bh,PS2M_PACKET_SIZE
+ 00F0  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 00F3  73 0D				jnc	ps2_reset		;Successful
+ 00F5  3A E1				cmp	ah,cl			;Transmission error? 
+ 00F7  74 03				je	@f
+ 00F9  E9 0181 R			jmp	ps2_enable_abort	;  No, quit
+ 00FC				@@:
+ 00FC  FE CD				dec	ch
+ 00FE  75 EB				jnz	ps2_init		;Try again if more retries
+ 0100  EB 7F				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 0102				ps2_reset:
+ 0102  B8 C201				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_RESET
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-14
+
+
+ 0105  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 0108  73 0A				jnc	ps2_set_res		;Successful
+ 010A  3A E1				cmp	ah,cl			;Transmission error?
+ 010C  75 73				jne	ps2_enable_abort	;  No, quit
+ 010E  FE CD				dec	ch
+ 0110  75 F0				jnz	ps2_reset		;Try again if more retries
+ 0112  EB 6D				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 0114				ps2_set_res:
+ 0114  B8 C203				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_SET_RES
+ 0117  B7 03				mov	bh,PS2M_CNTS_PER_MM
+ 0119  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 011C  73 0A				jnc	ps2_install_ih		;Successful
+ 011E  3A E1				cmp	ah,cl			;Transmission error?
+ 0120  75 5F				jne	ps2_enable_abort	;  No, quit
+ 0122  FE CD				dec	ch
+ 0124  75 EE				jnz	ps2_set_res		;Try again if more retries
+ 0126  EB 59				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 0128				ps2_install_ih:
+ 0128  B8 C207				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_INSTALL_IH
+ 012B  FF 36 0000 E			push	IntCS			;ES:BX is software int handler address
+ 012F  07				pop	es
+					assumes es,nothing
+ 0130  BB 007E E			mov	bx,DataOFFSET device_int[PS2_SOFT_START]
+ 0133  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 0136  73 0A				jnc	ps2_scaling		;Successful
+ 0138  3A E1				cmp	ah,cl			;Transmission error?
+ 013A  75 45				jne	ps2_enable_abort	;  No, quit
+ 013C  FE CD				dec	ch
+ 013E  75 E8				jnz	ps2_install_ih		;Try again if more retries
+ 0140  EB 3F				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 0142				ps2_scaling:
+ 0142  B8 C206				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_SET_SCALING
+ 0145  B7 01				mov	bh,PS2M_SCALING
+ 0147  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 014A  73 0A				jnc	ps2_samples		;Successful
+ 014C  3A E1				cmp	ah,cl			;Transmission error?
+ 014E  75 31				jne	ps2_enable_abort	;  No, quit
+ 0150  FE CD				dec	ch
+ 0152  75 EE				jnz	ps2_scaling		;Try again if more retries
+ 0154  EB 2B				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 0156				ps2_samples:
+ 0156  B8 C202				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_SET_SAMPLE
+ 0159  B7 02				mov	bh,PS2M_SAMPLING_40
+ 015B  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 015E  73 0A				jnc	ps2_enabling		;Successful
+ 0160  3A E1				cmp	ah,cl			;Transmission error?
+ 0162  75 1D				jne	ps2_enable_abort	;  No, quit
+ 0164  FE CD				dec	ch
+ 0166  75 EE				jnz	ps2_samples		;Try again if more retries
+ 0168  EB 17				jmp	short ps2_enable_abort	;Quit if out of retries
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-15
+
+
+				
+ 016A				ps2_enabling:
+ 016A  B8 C200				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_ENAB_DISAB
+ 016D  B7 01				mov	bh,PS2M_ENABLE
+ 016F  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+ 0172  73 0A				jnc	ps2_hook_us_in		;Successful
+ 0174  3A E1				cmp	ah,cl			;Transmission error?
+ 0176  75 09				jne	ps2_enable_abort	;  No, quit
+ 0178  FE CD				dec	ch
+ 017A  75 EE				jnz	ps2_enabling		;Try again if more retries
+ 017C  EB 03				jmp	short ps2_enable_abort	;Quit if out of retries
+				
+ 017E				ps2_hook_us_in:
+ 017E  E8 0000 E			call	hook_us_in		;Hook our vector.  Won't alter IRQ mask
+				
+ 0181				ps2_enable_abort:
+ 0181  C3				ret
+				
+ 0182				ps2_enable	endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-16
+
+
+				page
+				
+				;---------------------------Private-Routine-----------------------------;
+				; ps2_disable - Disable PS/2 Mouse
+				;
+				; The interrupt vector will be restored, and an enable call made
+				; to any Int 33h mouse driver.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	None
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	DS,BP
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,SI,DI,ES,FLAGS
+				; Calls:
+				;	int 15h
+				;	int MOUSE_SYS_VECT
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+ 0182				ps2_disable	proc	near
+				
+ 0182  B8 C200				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_ENAB_DISAB
+ 0185  B7 00				mov	bh,PS2M_DISABLE
+ 0187  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+				
+ 018A  E8 0000 E			call	unhook_us
+				
+				;	Restore any possible Int 33h mouse
+				
+ 018D  F6 06 0000 E 02			test	mouse_flags,MF_INT33H
+ 0192  74 0E				jz	ps2_disable_exit	;No int 33h mouse
+				
+ 0194  B8 C202				mov	ax,I15_MOUSE_SUBFUNC shl 8 + PS2MSF_SET_SAMPLE
+ 0197  B7 05				mov	bh,PS2M_SAMPLING_100
+ 0199  E8 01A3 R			call	IssueInt15		;INT 15H with interrupts disabled
+				
+ 019C  B8 0020				mov	ax,INT33H_ENABLE	;Enable old mouse driver if it's
+ 019F  E8 01B0 R			call	IssueInt33		;  there
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-17
+
+
+				
+ 01A2				ps2_disable_exit:
+ 01A2  C3				ret
+				
+ 01A3				ps2_disable	endp
+				
+				
+				;----------------------------------------------------------------------------;
+				; IssueInt15:								     ;
+				;									     ;
+				; Does an INT 15H with all interrupts but for IRQ 1 & 2 disabled at the PIC. ;
+				; (please read the modification history list at the begining of the file     ;
+				;  for more information on this.)					     ;
+				;									     ;
+				; Note: This routine assumes SI is not being passed to/from the interrupt    ;
+				;	handler!							     ;
+				;----------------------------------------------------------------------------;
+				
+ 01A3				IssueInt15 proc near
+				
+ 01A3  56				push	si			;save, used as work reg
+ 01A4  E8 01BD R			call	DisableInts
+ 01A7  56				push	si			;save old mask
+ 01A8  CD 15				int	15h
+ 01AA  5E				pop	si			;get old mask
+ 01AB  E8 01CC R			call	EnableInts		;  and restore
+ 01AE  5E				pop	si
+ 01AF  C3				ret
+				
+ 01B0				IssueInt15 endp
+				
+				;------------------------------------------------------------------------
+				; IssueInt33:
+				;
+				; Issue an Int 33h instruction with all interrupts except IRQ 1 & 2 masked
+				; off in the master PIC.  See IssueInt15 & modification history for more
+				; information.
+				;
+				; Note: This routine assumes SI is not being passed to/from the interrupt
+				;	handler!
+				;------------------------------------------------------------------------
+				
+ 01B0				IssueInt33 proc near
+				
+ 01B0  56				push	si			;save entry SI
+ 01B1  E8 01BD R			call	DisableInts		;disable ints, old mask retruned in SI
+ 01B4  56				push	si			;save old mask
+ 01B5  CD 33				int	MOUSE_SYS_VEC
+ 01B7  5E				pop	si			;get old mask
+ 01B8  E8 01CC R			call	EnableInts		;  and restore
+ 01BB  5E				pop	si
+ 01BC  C3				ret
+				
+ 01BD				IssueInt33 endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Page     1-18
+
+
+				
+				;------------------------------------------------------------------------
+				
+ 01BD				DisableInts proc near
+				
+ 01BD  50				push	ax
+ 01BE  E4 21				in	al,21h			;get the current interrupt mask
+ 01C0  8B F0				mov	si,ax			;  and return it in SI
+ 01C2  0C F9				or	al,11111001b		;mask off all but IRQ 1 & 2
+ 01C4  EB 00				jmp	short $+2
+ 01C6  EB 00				jmp	short $+2
+ 01C8  E6 21				out	21h,al
+ 01CA  58				pop	ax
+ 01CB  C3				ret
+				
+ 01CC				DisableInts endp
+				
+ 01CC				EnableInts proc near
+				
+ 01CC  50				push	ax			;restore PIC mask using value in SI
+ 01CD  8B C6				mov	ax,si
+ 01CF  E6 21				out	21h,al
+ 01D1  58				pop	ax
+ 01D2  C3				ret
+				
+ 01D3				EnableInts endp
+				
+				;----------------------------------------------------------------------------;
+				sEnd	Code
+ 01D3                        1	_TEXT ends 
+				end
+
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Symbols-1
+
+
+Macros:
+
+		N a m e			Lines
+
+display_int_size . . . . . . . .  	   3
+io_delay . . . . . . . . . . . .  	   3
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+BIOSDataSeg  . . . . . . . . . .  	006D	AT	0040	
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0000	WORD	PUBLIC	'DATA'
+_TEXT  . . . . . . . . . . . . .  	01D3	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ACK_PORT . . . . . . . . . . . .  	NUMBER	0020	
+ACK_SLAVE_PORT . . . . . . . . .  	NUMBER	00A0	
+
+BASH_INT_PROC  . . . . . . . . .  	NUMBER	000C	
+bios_proc  . . . . . . . . . . .  	V DWORD	0000	_DATA	External
+bios_time  . . . . . . . . . . .  	L BYTE	006C	BIOSDataSeg
+bptr . . . . . . . . . . . . . .  	TEXT  byte ptr		
+
+CALL_ON_ANY_INT  . . . . . . . .  	NUMBER	001F	
+CLEAR_COUNTERS . . . . . . . . .  	NUMBER	000B	
+CodeBASE . . . . . . . . . . . .  	ALIAS	 _TEXT		
+CodeOFFSET . . . . . . . . . . .  	TEXT  offset _TEXT:		
+
+DataBASE . . . . . . . . . . . .  	ALIAS	 DGROUP		
+DataOFFSET . . . . . . . . . . .  	TEXT  offset DGROUP:		
+DisableInts  . . . . . . . . . .  	N PROC	01BD	_TEXT	Length = 000F
+delta_x  . . . . . . . . . . . .  	TEXT  byte ptr [bp+0ah]		
+delta_y  . . . . . . . . . . . .  	TEXT  byte ptr [bp+08h]		
+device_int . . . . . . . . . . .  	V BYTE	0000	_DATA	External
+disable_proc . . . . . . . . . .  	V WORD	0000	_DATA	External
+dptr . . . . . . . . . . . . . .  	TEXT  dword ptr		
+
+EOI  . . . . . . . . . . . . . .  	NUMBER	0020	
+EnableInts . . . . . . . . . . .  	N PROC	01CC	_TEXT	Length = 0007
+enable_our_int . . . . . . . . .  	L NEAR	0000		External
+enable_proc  . . . . . . . . . .  	V WORD	0000	_DATA	External
+event_proc . . . . . . . . . . .  	V DWORD	0000	_DATA	External
+
+GET_DOS_VERSION  . . . . . . . .  	NUMBER	0030	
+
+hook_us_in . . . . . . . . . . .  	L NEAR	0000		External
+
+I15_GET_CONFIG . . . . . . . . .  	NUMBER	00C0	
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Symbols-2
+
+
+I15_MOUSE_SUBFUNC  . . . . . . .  	NUMBER	00C2	
+INT33H_BUS . . . . . . . . . . .  	NUMBER	0001	
+INT33H_ENABLE  . . . . . . . . .  	NUMBER	0020	
+INT33H_GETINFO . . . . . . . . .  	NUMBER	0024	
+INT33H_HP  . . . . . . . . . . .  	NUMBER	0005	
+INT33H_INPORT  . . . . . . . . .  	NUMBER	0003	
+INT33H_PS_2  . . . . . . . . . .  	NUMBER	0004	
+INT33H_RESET . . . . . . . . . .  	NUMBER	0000	
+INT33H_SERIAL  . . . . . . . . .  	NUMBER	0002	
+INT_REQUEST  . . . . . . . . . .  	NUMBER	000A	
+IN_SERVICE . . . . . . . . . . .  	NUMBER	000B	
+IntCS  . . . . . . . . . . . . .  	V WORD	0000	_DATA	External
+IssueInt15 . . . . . . . . . . .  	N PROC	01A3	_TEXT	Length = 000D
+IssueInt33 . . . . . . . . . . .  	N PROC	01B0	_TEXT	Length = 000D
+interrupt_rate . . . . . . . . .  	V WORD	0000	_DATA	External
+
+MASK_PORT  . . . . . . . . . . .  	NUMBER	0021	
+MASK_SLAVE_PORT  . . . . . . . .  	NUMBER	00A1	
+MAX_INT_SIZE . . . . . . . . . .  	NUMBER	00D2	
+MF_ENABLED . . . . . . . . . . .  	NUMBER	0001	
+MF_INT33H  . . . . . . . . . . .  	NUMBER	0002	
+MF_MOUSE_EXISTS  . . . . . . . .  	NUMBER	0080	
+MF_ON_SLAVEPIC . . . . . . . . .  	NUMBER	0040	
+MOUSE_SYS_VEC  . . . . . . . . .  	NUMBER	0033	
+MT_BUS . . . . . . . . . . . . .  	NUMBER	0001	
+MT_HP  . . . . . . . . . . . . .  	NUMBER	0005	
+MT_INPORT  . . . . . . . . . . .  	NUMBER	0003	
+MT_NO_MOUSE  . . . . . . . . . .  	NUMBER	0000	
+MT_PS2 . . . . . . . . . . . . .  	NUMBER	0004	
+MT_SERIAL  . . . . . . . . . . .  	NUMBER	0002	
+mouse_flags  . . . . . . . . . .  	V BYTE	0000	_DATA	External
+
+NUMBER_BUTTONS . . . . . . . . .  	NUMBER	0002	
+
+PS2MSF_ENAB_DISAB  . . . . . . .  	NUMBER	0000	
+PS2MSF_INIT  . . . . . . . . . .  	NUMBER	0005	
+PS2MSF_INSTALL_IH  . . . . . . .  	NUMBER	0007	
+PS2MSF_RESET . . . . . . . . . .  	NUMBER	0001	
+PS2MSF_SET_RES . . . . . . . . .  	NUMBER	0003	
+PS2MSF_SET_SAMPLE  . . . . . . .  	NUMBER	0002	
+PS2MSF_SET_SCALING . . . . . . .  	NUMBER	0006	
+PS2M_CNTS_PER_MM . . . . . . . .  	NUMBER	0003	
+PS2M_DISABLE . . . . . . . . . .  	NUMBER	0000	
+PS2M_ENABLE  . . . . . . . . . .  	NUMBER	0001	
+PS2M_PACKET_SIZE . . . . . . . .  	NUMBER	0003	
+PS2M_SAMPLING_100  . . . . . . .  	NUMBER	0005	
+PS2M_SAMPLING_40 . . . . . . . .  	NUMBER	0002	
+PS2M_SCALING . . . . . . . . . .  	NUMBER	0001	
+PS2M_TRANS_ERROR . . . . . . . .  	NUMBER	0004	
+PS2_B1_STATUS  . . . . . . . . .  	NUMBER	0001	
+PS2_B2_STATUS  . . . . . . . . .  	NUMBER	0002	
+PS2_DATA_FLAG  . . . . . . . . .  	NUMBER	0079	
+PS2_DELTA_X  . . . . . . . . . .  	NUMBER	007A	
+PS2_DELTA_Y  . . . . . . . . . .  	NUMBER	007B	
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Symbols-3
+
+
+PS2_INT_LENGTH . . . . . . . . .  	NUMBER	00A0	
+PS2_NEG_X  . . . . . . . . . . .  	NUMBER	0010	
+PS2_NEG_Y  . . . . . . . . . . .  	NUMBER	0020	
+PS2_OLD_STATUS . . . . . . . . .  	NUMBER	007D	
+PS2_PROC_START . . . . . . . . .  	NUMBER	0000	
+PS2_SOFT_START . . . . . . . . .  	NUMBER	007E	
+PS2_START  . . . . . . . . . . .  	WORD	0000	_TEXT
+PS2_STATUS . . . . . . . . . . .  	NUMBER	007C	
+PT_DEV_PRES  . . . . . . . . . .  	NUMBER	0004	
+ps2_cant_use_it  . . . . . . . .  	L NEAR	00E1	_TEXT
+ps2_disable  . . . . . . . . . .  	N PROC	0182	_TEXT	Length = 0021
+ps2_disable_exit . . . . . . . .  	L NEAR	01A2	_TEXT
+ps2_enable . . . . . . . . . . .  	N PROC	00E8	_TEXT	Global	Length = 009A
+ps2_enable_abort . . . . . . . .  	L NEAR	0181	_TEXT
+ps2_enabling . . . . . . . . . .  	L NEAR	016A	_TEXT
+ps2_hook_us_in . . . . . . . . .  	L NEAR	017E	_TEXT
+ps2_init . . . . . . . . . . . .  	L NEAR	00EB	_TEXT
+ps2_install_ih . . . . . . . . .  	L NEAR	0128	_TEXT
+ps2_int  . . . . . . . . . . . .  	F PROC	0000	_TEXT	Length = 0069
+ps2_int_exit . . . . . . . . . .  	L NEAR	0068	_TEXT
+ps2_machine_found  . . . . . . .  	L NEAR	00BB	_TEXT
+ps2_machine_not_found  . . . . .  	L NEAR	00E6	_TEXT
+ps2_no_data  . . . . . . . . . .  	L NEAR	005F	_TEXT
+ps2_reset  . . . . . . . . . . .  	L NEAR	0102	_TEXT
+ps2_samples  . . . . . . . . . .  	L NEAR	0156	_TEXT
+ps2_scaling  . . . . . . . . . .  	L NEAR	0142	_TEXT
+ps2_search . . . . . . . . . . .  	N PROC	00A0	_TEXT	Global	Length = 0048
+ps2_set_res  . . . . . . . . . .  	L NEAR	0114	_TEXT
+ps2_soft_int . . . . . . . . . .  	F PROC	007E	_TEXT	Length = 0022
+
+rs232_data . . . . . . . . . . .  	L WORD	0000	BIOSDataSeg	Length = 0004
+
+SF_ABSOLUTE  . . . . . . . . . .  	NUMBER	8000	
+SF_B1_DOWN . . . . . . . . . . .  	NUMBER	0002	
+SF_B1_UP . . . . . . . . . . . .  	NUMBER	0004	
+SF_B2_DOWN . . . . . . . . . . .  	NUMBER	0008	
+SF_B2_UP . . . . . . . . . . . .  	NUMBER	0010	
+SF_MOVEMENT  . . . . . . . . . .  	NUMBER	0001	
+STATE_XLATE  . . . . . . . . . .  	NUMBER	0069	
+SWAP_INT_PROC  . . . . . . . . .  	NUMBER	0014	
+status . . . . . . . . . . . . .  	TEXT  byte ptr [bp+0ch]		
+
+unhook_us  . . . . . . . . . . .  	L NEAR	0000		External
+
+VMD_DEVICE_ID  . . . . . . . . .  	NUMBER	000C	
+vector . . . . . . . . . . . . .  	V BYTE	0000	_DATA	External
+
+WF_PMODE . . . . . . . . . . . .  	NUMBER	0001	
+wptr . . . . . . . . . . . . . .  	TEXT  word ptr		
+
+X_SPEED  . . . . . . . . . . . .  	NUMBER	0002	
+
+Y_SPEED  . . . . . . . . . . . .  	NUMBER	0002	
+
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:12
+
+PS/2 Mouse Hardware Dependent Code                          Symbols-4
+
+
+?386regs . . . . . . . . . . . .  	NUMBER	0000	
+@0 . . . . . . . . . . . . . . .  	L NEAR	00FC	_TEXT
+@Cpu . . . . . . . . . . . . . .  	TEXT  1415		
+@FileName  . . . . . . . . . . .  	TEXT  ps2		
+@Version . . . . . . . . . . . .  	TEXT  510		
+__ROMBIOS  . . . . . . . . . . .  	NUMBER	0000		Communal
+
+
+   2307 Source  Lines
+   3220 Total   Lines
+    329 Symbols
+
+  46024 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

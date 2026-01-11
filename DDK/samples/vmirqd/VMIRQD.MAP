@@ -1,0 +1,47 @@
+
+ VMIRQD
+
+ Start         Length     Name                   Class
+ 0001:00000000 0000000F1H _LTEXT                 CODE 32-bit
+ 0001:000000F4 0000001E1H _LDATA                 CODE 32-bit
+ 0002:00000000 0000000D0H _ITEXT                 ICODE 32-bit
+ 0002:000000D0 000000027H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:000000F4 VMIRQD_DDB              VMIRQD_DDB
+
+  Address         Publics by Name
+
+ 0002:00000076       Mon_Init
+ 0001:0000008B       Mon_Out_String
+ 0001:00000000       VMIRQD_Control
+ 0001:000000F4       VMIRQD_DDB
+ 0002:00000000       VMIRQD_Device_Init
+ 0001:0000006C       VMIRQD_EOI
+ 0001:00000050       VMIRQD_Hw_Int
+ 0001:00000028       VMIRQD_IRET
+ 0001:0000003C       VMIRQD_Mask_Change
+ 0001:00000014       VMIRQD_Virt_Int
+
+  Address         Publics by Value
+
+ 0001:00000000       VMIRQD_Control
+ 0001:00000014       VMIRQD_Virt_Int
+ 0001:00000028       VMIRQD_IRET
+ 0001:0000003C       VMIRQD_Mask_Change
+ 0001:00000050       VMIRQD_Hw_Int
+ 0001:0000006C       VMIRQD_EOI
+ 0001:0000008B       Mon_Out_String
+ 0001:000000F4       VMIRQD_DDB
+ 0002:00000000       VMIRQD_Device_Init
+ 0002:00000076       Mon_Init

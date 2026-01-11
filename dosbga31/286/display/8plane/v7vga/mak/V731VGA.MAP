@@ -1,0 +1,1674 @@
+
+ DISPLAY
+
+ Start     Length     Name                   Class
+ 0001:0000 06571H     _TEXT                  CODE
+ 0002:0000 0079CH     _INIT                  CODE
+ 0003:0000 00306H     _BLUEMOON              CODE
+ 0004:0000 00308H     _PALETTE               CODE
+ 0005:0000 00F01H     _LINES                 CODE
+ 0006:0000 00225H     _PIXEL                 CODE
+ 0007:0000 00C29H     _SCANLINE              CODE
+ 0008:0000 00000H     _TEXTSTUFF             CODE
+ 0008:0000 020C8H     _DIMAPS                CODE
+ 0009:0000 046CCH     _DATA                  DATA
+
+ Origin   Group
+ 0009:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:038A BitBlt                  BitBlt
+ 0001:2F05 CheckCursor             CheckCursor
+ 0001:2D40 ColorInfo               ColorInfo
+ 0003:0000 Control                 Control
+ 0008:0CD9 CreateBitmap            CreateBitmap
+ 0003:0050 DeviceBitmap            DeviceBitmap
+ 0008:0C1A DeviceBitmapBits        DeviceBitmapBits
+ 0003:0300 DeviceMode              DeviceMode
+ 0008:0DC0 DIBtoDevice             DIBtoDevice
+ 0002:0000 Disable                 Disable
+ 0002:002A Enable                  Enable
+ 0003:005E EnumDFonts              EnumDFonts
+ 0003:0064 EnumObj                 EnumObj
+ 0001:4DD2 ExtTextOut              ExtTextOut
+ 0001:3AC6 FastBorder              FastBorder
+ 0001:2C3C GetCharWidth            GetCharWidth
+ 0002:0252 GetDriverResourceID     GetDriverResourceID
+ 0004:02CF GetPalette              GetPalette
+ 0004:006D GetPaletteTranslate     GetPaletteTranslate
+ 0003:012C Inquire                 Inquire
+ 0001:2E79 MoveCursor              MoveCursor
+ 0001:3DEC Output                  Output
+ 0006:0048 Pixel                   Pixel
+ 0001:3EB6 RealizeObject           RealizeObject
+ 0003:015E ScanLR                  ScanLR
+ 0003:0055 SetAttribute            SetAttribute
+ 0001:2DDA SetCursor               SetCursor
+ 0004:027E SetPalette              SetPalette
+ 0004:0000 SetPaletteTranslate     SetPaletteTranslate
+ 0001:4DC7 StrBlt                  StrBlt
+ 0001:5822 StretchBlt              StretchBlt
+ 0008:1424 StretchDIBits           StretchDIBits
+ 0004:01CE UpdateColors            UpdateColors
+ 0001:4CDC UserRepaintDisable      UserRepaintDisable
+
+  Address         Publics by Name
+
+ 0001:4DC6       ??BigFontFlags
+ 0009:254B       abPaletteAccl
+ 0009:214B       adPalette
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSToCSAlias     (KERNEL.171)
+ 0000:0000  Imp  AllocSelector        (KERNEL.175)
+ 0005:0716       all_passes_done
+ 0009:1EBA       bank_select
+ 0009:1EBA       bank_select_byte
+ 0007:03A5       begin_scanline
+ 0007:040C       begin_scanline_color
+ 0007:03E3       begin_scanline_mono
+ 0001:038A       BitBlt
+ 0001:075C       bitblt_dispatch
+ 0001:0820       bitblt_execute
+ 0001:0644       bitblt_prep_dst
+ 0001:06B8       bitblt_prep_final
+ 0001:0535       bitblt_prep_pattern
+ 0001:045B       bitblt_prep_rop_etal
+ 0001:05F2       bitblt_prep_src
+ 0001:53B8       bitmap_opaque
+ 0001:5407       bitmap_opaque_0s
+ 0001:3071       Bit_Double_Cursor
+ 0008:16AD       block_encode
+ 0001:0CD4       blt11
+ 0001:0E70       blt18
+ 0001:0AB9       blt216_pat_dst
+ 0001:0C41       blt216_pat_dst_cleanup
+ 0001:0B32       blt216_pat_dst_prep
+ 0001:086E       blt216_src_dst
+ 0001:0A0D       blt216_src_dst_cleanup
+ 0001:08F8       blt216_src_dst_prep
+ 0001:0F44       blt81
+ 0001:103E       blt88
+ 0001:1095       blt88_repmovsb
+ 0001:1171       bltstos
+ 0001:1242       bltstos_prep
+ 0001:13BD       bltstos_repmovsb
+ 0001:137D       bltstos_splitbank
+ 0001:13DD       bltstos_splitbank_prep
+ 0001:1267       bltstos_srccopy
+ 0001:1301       bltstos_srccopy_prep
+ 0001:1950       blt_clip
+ 0001:10D4       blt_ctoc_prep
+ 0001:0FBA       blt_ctom_prep
+ 0001:16E1       blt_dst_even_nibbles
+ 0001:1790       blt_dst_loop
+ 0001:17C7       blt_dst_nibbles
+ 0001:168C       blt_dst_nibble_loop
+ 0001:170D       blt_dst_odd_nibbles
+ 0001:1648       blt_dst_pattern_row_loop
+ 0001:0EB0       blt_mtoc_prep
+ 0001:14CD       blt_pat_dst
+ 0001:15EF       blt_pat_dst_even_nibbles
+ 0001:1733       blt_pat_dst_loop
+ 0001:1771       blt_pat_dst_nibbles
+ 0001:1596       blt_pat_dst_nibble_loop
+ 0001:161F       blt_pat_dst_odd_nibbles
+ 0001:154D       blt_pat_dst_pattern_row_loop
+ 0001:1432       blt_pat_dst_prep
+ 0001:15CE       blt_pat_dst_same_pattern_row_lo
+ 0001:19A2       blt_set_directions
+ 0001:4835       bm386_obwnc_four_char
+ 0001:47C9       bm386_obwnc_one_char
+ 0001:4805       bm386_obwnc_three_char
+ 0001:47E2       bm386_obwnc_two_char
+ 0005:0B39       Bm8_Diagonal_1Q
+ 0005:0ABE       Bm8_Diagonal_4Q
+ 0005:0BB7       Bm8_Move_Negative_Y
+ 0005:0BDB       Bm8_Move_Positive_Y
+ 0005:096A       Bm8_Negative_Y
+ 0005:0A5C       Bm8_Positive_X
+ 0005:09E3       Bm8_Positive_Y
+ 0005:0904       Bm_Diagonal_1Q
+ 0005:08D5       Bm_Diagonal_4Q
+ 0005:0843       Bm_Negative_Y
+ 0001:4A67       bm_obwnc_four_char
+ 0001:4A09       bm_obwnc_one_char
+ 0001:4A3D       bm_obwnc_three_char
+ 0001:4A1F       bm_obwnc_two_char
+ 0001:445D       bm_opaque_color
+ 0001:445C       bm_opaque_color_fix
+ 0005:0888       Bm_Positive_X
+ 0005:086C       Bm_Positive_Y
+ 0001:4428       bm_trans_color
+ 0001:4427       bm_trans_color_fix
+ 0001:5422       bo0_both_loop
+ 0001:541D       bo0_first_and_last
+ 0001:5435       bo0_first_only
+ 0001:5431       bo0_last_only
+ 0001:5437       bo0_one_only_loop
+ 0001:543D       bo0_restore_start_addr
+ 0001:53D4       bo1_both_loop
+ 0001:53D1       bo1_first_and_last
+ 0001:53E5       bo1_first_only
+ 0001:53EC       bo1_inner_start
+ 0001:53E1       bo1_last_only
+ 0001:53EB       bo1_restore_start_addr
+ 0001:5406       bo_done
+ 0001:53F5       bo_inner_loop
+ 0001:53EF       bo_start_inner_loop
+ 0001:1B04       brush_convert_color_to_color
+ 0001:1ADF       brush_convert_color_to_mono
+ 0001:1AC3       brush_convert_mono_to_color
+ 0001:1A9A       brush_convert_mono_to_mono
+ 0001:210F       build_all_done
+ 0001:20F4       build_clip_next_time
+ 0001:205D       build_have_proc
+ 0001:2106       build_no_clip_next_time
+ 0001:20D9       build_no_o_rect
+ 0001:2125       build_really_done
+ 0001:2063       build_restart
+ 0001:2112       build_restore_opaque
+ 0001:2082       build_ret_addr
+ 0001:20AA       build_ret_oem
+ 0001:2016       build_string
+ 0001:2054       build_worst_ok
+ 0000:017E  Abs  BW_THRESHOLD
+ 0005:0397       calculate_mask
+ 0001:2F05       CheckCursor
+ 0005:0789       Clip_Line
+ 0008:1E27       clip_rle
+ 0001:39F4       ColorDither
+ 0001:2D40       ColorInfo
+ 0001:5441       color_bitmap_opaque
+ 0000:0801  Abs  COLOR_FORMAT
+ 0007:035D       color_main_draw_loop
+ 0007:0197       color_main_loop
+ 0001:4AB5       color_opaque_output_286
+ 0001:4B46       color_opaque_output_386
+ 0001:4AA5       color_output_table_286
+ 0001:4AAD       color_output_table_386
+ 0001:4BDA       color_transp_output_286
+ 0001:4C57       color_transp_output_386
+ 0001:1BC9       compile_color_pattern_fetch
+ 0001:1FF9       compile_color_stosb
+ 0001:0FE5       compile_ctom
+ 0001:1016       compile_ctom_last_edge
+ 0001:1DEC       compile_dst_memory_yupdate
+ 0001:1E71       compile_dst_screen_yupdate
+ 0001:1FBF       compile_dst_splitbank_yupdate
+ 0001:1C61       compile_edge_mask
+ 0001:1C7E       compile_inner_loop_end
+ 0001:1C70       compile_inner_loop_start
+ 0001:1F4F       compile_jmp_back_to_start
+ 0001:1B94       compile_mono_pattern_fetch
+ 0001:0F1E       compile_mtoc_loop
+ 0001:0EDE       compile_mtoc_src1
+ 0001:0D01       compile_mtom_first_edge
+ 0001:0DCB       compile_mtom_last_edge
+ 0001:0D40       compile_mtom_loop
+ 0001:1C9D       compile_outer_loop
+ 0001:1C0A       compile_pattern_yupdate
+ 0001:1C2F       compile_rop
+ 0001:1EF7       compile_screen_yupdate
+ 0001:1CDF       compile_src_memory_yupdate
+ 0001:1D64       compile_src_screen_yupdate
+ 0001:1F75       compile_src_splitbank_yupdate
+ 0001:3811       Compute256Indices
+ 0001:38AB       ComputePColor
+ 0001:3846       ComputeSubSpace
+ 0001:3829       ComputeSymmetry
+ 0001:3873       ComputeTransform
+ 0001:539E       comp_byte_dont_combine
+ 0001:5361       comp_byte_interval
+ 0001:5198       comp_extent
+ 0001:521E       comp_ext_check_dda
+ 0001:51AE       comp_ext_check_for_just
+ 0001:528D       comp_ext_done_dda
+ 0001:523A       comp_ext_done_scanning
+ 0001:525D       comp_ext_done_slow_scan
+ 0001:5284       comp_ext_dont_distribute
+ 0001:51BE       comp_ext_hard_way
+ 0001:525F       comp_ext_have_breaks
+ 0001:51B3       comp_ext_have_ext
+ 0001:525A       comp_ext_invalid_char
+ 0001:51D7       comp_ext_no_char_extra
+ 0001:5291       comp_ext_peg_and_save
+ 0001:51B7       comp_ext_peg_right
+ 0001:51C8       comp_ext_proportional
+ 0001:51EC       comp_ext_prop_add_width
+ 0001:5219       comp_ext_prop_default
+ 0001:51E3       comp_ext_prop_loop
+ 0001:527B       comp_ext_run_dda
+ 0001:5286       comp_ext_save_err_term
+ 0001:5232       comp_ext_scan_break
+ 0001:524F       comp_ext_slow_scan
+ 0003:0000       Control
+ 0008:1F58       copyabs_e4i1
+ 0008:2043       copyabs_e4i8
+ 0008:1FE5       copyabs_e8i1
+ 0008:2084       copyabs_e8i8
+ 0008:1841       copyabs_i1e4
+ 0008:1877       copyabs_i1e8
+ 0008:18B6       copyabs_i8e4
+ 0008:1945       copyabs_i8e8
+ 0008:19A0       copyabs_i8e8_done
+ 0008:19A6       copyabs_i8e8_fini
+ 0008:1ECF       copyrle_e4i1
+ 0008:1F26       copyrle_e4i8
+ 0008:1EFD       copyrle_e8i1
+ 0008:1F47       copyrle_e8i8
+ 0008:1E6C       copyrle_exi1
+ 0008:1F11       copyrle_exi8
+ 0008:17E9       copyrle_i1e4
+ 0008:17E9       copyrle_i1e8
+ 0008:180A       copyrle_i8e4
+ 0008:1829       copyrle_i8e8
+ 0008:0311       copy_e1i1
+ 0008:04CA       copy_e1i8
+ 0008:0429       copy_e24i1
+ 0008:0587       copy_e24i8
+ 0008:05C1       copy_e24i8_partial
+ 0008:0388       copy_e4i1
+ 0008:0515       copy_e4i8
+ 0008:03EB       copy_e8i1
+ 0008:0551       copy_e8i8
+ 0008:056D       copy_e8i8_partial
+ 0008:08BE       copy_i1e1
+ 0008:0A1D       copy_i1e24
+ 0008:094B       copy_i1e4
+ 0008:09C7       copy_i1e8
+ 0008:0AE5       copy_i8e1
+ 0008:0BAB       copy_i8e24
+ 0008:0B21       copy_i8e4
+ 0008:0B79       copy_i8e8
+ 0008:0CD9       CreateBitmap
+ 0008:02F0       create_color_table
+ 0000:0008  Abs  CR_HATCH_BR_0
+ 0000:0008  Abs  CR_HATCH_BR_1
+ 0000:0008  Abs  CR_HATCH_BR_2
+ 0000:0008  Abs  CR_HATCH_BR_3
+ 0000:00FF  Abs  CR_HATCH_BR_4
+ 0000:0008  Abs  CR_HATCH_BR_5
+ 0000:0008  Abs  CR_HATCH_BR_6
+ 0000:0008  Abs  CR_HATCH_BR_7
+ 0009:000C       cursor_flags
+ 0009:0370       cursor_funcs
+ 0001:31D1       cursor_kludge
+ 0001:319C       cursor_restore_state
+ 0001:30AC       cursor_save_state
+ 0009:0004       cursor_xcoord
+ 0009:0008       cursor_xdraw
+ 0009:0006       cursor_ycoord
+ 0009:000A       cursor_ydraw
+ 0000:0080  Abs  D1_HATCH_BR_0
+ 0000:0040  Abs  D1_HATCH_BR_1
+ 0000:0020  Abs  D1_HATCH_BR_2
+ 0000:0010  Abs  D1_HATCH_BR_3
+ 0000:0008  Abs  D1_HATCH_BR_4
+ 0000:0004  Abs  D1_HATCH_BR_5
+ 0000:0002  Abs  D1_HATCH_BR_6
+ 0000:0001  Abs  D1_HATCH_BR_7
+ 0000:0001  Abs  D2_HATCH_BR_0
+ 0000:0002  Abs  D2_HATCH_BR_1
+ 0000:0004  Abs  D2_HATCH_BR_2
+ 0000:0008  Abs  D2_HATCH_BR_3
+ 0000:0010  Abs  D2_HATCH_BR_4
+ 0000:0020  Abs  D2_HATCH_BR_5
+ 0000:0040  Abs  D2_HATCH_BR_6
+ 0000:0080  Abs  D2_HATCH_BR_7
+ 0009:1EB8       dac_size
+ 0000:0081  Abs  DC_HATCH_BR_0
+ 0000:0042  Abs  DC_HATCH_BR_1
+ 0000:0024  Abs  DC_HATCH_BR_2
+ 0000:0018  Abs  DC_HATCH_BR_3
+ 0000:0018  Abs  DC_HATCH_BR_4
+ 0000:0024  Abs  DC_HATCH_BR_5
+ 0000:0042  Abs  DC_HATCH_BR_6
+ 0000:0081  Abs  DC_HATCH_BR_7
+ 0008:1D2A       decode_abs4
+ 0008:1C57       decode_abs8
+ 0008:20C0       decode_absolute_table
+ 0008:1DEE       decode_rle4
+ 0008:1DB9       decode_rle8
+ 0008:20B8       decode_rle_table
+ 0003:0050       DeviceBitmap
+ 0008:0C1A       DeviceBitmapBits
+ 0003:0300       DeviceMode
+ 0001:35A3       DeviceSelectDIB
+ 0009:1ECE       device_local_brush
+ 0009:2123       device_local_drawmode
+ 0009:2143       device_local_pen
+ 0001:3A9C       dev_initialization
+ 0001:60BC       dev_to_background
+ 0001:608C       dev_to_foreground
+ 0008:0E23       DibBlt
+ 0008:0DC0       DIBtoDevice
+ 0002:0000       Disable
+ 0001:4D93       disable_switching
+ 0008:135A       diScreen386
+ 0001:367E       dither
+ 0005:061F       do_another_pass
+ 0008:0CEC       do_bitmap_computations
+ 0003:00D8       do_color
+ 0005:0100       do_polylines
+ 0007:00D2       do_scanlines
+ 0005:0710       do_the_last_scan
+ 0001:4E97       draw_char_string
+ 0001:4EC8       draw_dispatch
+ 0005:03F9       Draw_Engine
+ 0005:02CB       Draw_Line
+ 0005:06EC       draw_loop
+ 0002:0349       driver_initialization
+ 0005:02A7       ega_line_dispatch
+ 0001:4306       ega_oc
+ 0002:002A       Enable
+ 0009:1ECD       enabled_flag
+ 0009:1D13       enable_216
+ 0002:022B       enable_find_substring
+ 0002:00BE       enable_read_profile
+ 0001:4DAE       enable_switching
+ 0008:20B0       encode_absolute_table
+ 0008:20A8       encode_rle_table
+ 0008:1716       encode_scanline_I1
+ 0008:175D       encode_scanline_I8
+ 0007:045B       end_scanline
+ 0003:005E       EnumDFonts
+ 0003:0064       EnumObj
+ 0008:00ED       eti_1
+ 0008:025D       eti_24
+ 0008:015D       eti_4
+ 0008:018D       eti_4_have_proc
+ 0008:01DA       eti_8
+ 0008:0075       eti_next_scan
+ 0001:2F4B       exclude
+ 0001:2F47       exclude_far
+ 0009:000E       exclude_global
+ 0009:0018       exclude_rect_bottom
+ 0009:0012       exclude_rect_left
+ 0009:0014       exclude_rect_right
+ 0009:0016       exclude_rect_top
+ 0009:0010       exclude_rect_valid
+ 0001:4F10       exit_strblt
+ 0001:4E78       exit_strblt_error
+ 0001:4F0D       exit_strblt_null
+ 0001:4DD2       ExtTextOut
+ 0001:3580       FarDeviceSelectDIB
+ 0002:06B4       farsetmode
+ 0001:18DA       far_set_banko
+ 0001:5F7E       far_set_bank_select
+ 0001:1932       far_set_both_banko
+ 0001:18FF       far_set_both_pages
+ 0002:0627       far_set_cursor_addr
+ 0002:0597       far_set_dacsize
+ 0001:18A7       far_set_page
+ 0001:3AC6       FastBorder
+ 0009:1DD6       fborder_count
+ 0005:04AA       find_out_dda
+ 0001:461E       four_char_setup
+ 0000:0000  Imp  FreeSelector         (KERNEL.176)
+ 0001:56B0       gdd_dev_is_bitmap
+ 0001:5788       gdd_different_segments
+ 0001:5723       gdd_dont_do_union
+ 0001:5795       gdd_do_last_segment
+ 0001:5792       gdd_do_next_whole_segment
+ 0001:5680       gdd_exclude_have_rect
+ 0001:5612       gdd_exclude_is_opaque
+ 0001:5623       gdd_exclude_text_or_both
+ 0001:56CE       gdd_finish_bitmap
+ 0001:577E       gdd_have_our_color
+ 0001:5765       gdd_have_segment
+ 0001:572C       gdd_have_y_ext
+ 0001:56F9       gdd_huge_bitmap
+ 0001:56EF       gdd_is_color_bitmap
+ 0001:56B5       gdd_small_bitmap
+ 0001:4743       gen386_cl_four_char
+ 0001:4787       gen386_cl_n_char
+ 0001:46E3       gen386_cl_one_char
+ 0001:4717       gen386_cl_three_char
+ 0001:46F8       gen386_cl_two_char
+ 0001:464B       gen386_nc_four_char
+ 0001:46A1       gen386_nc_n_char
+ 0001:458A       gen386_nc_one_char
+ 0001:45F2       gen386_nc_three_char
+ 0001:45B3       gen386_nc_two_char
+ 0001:4995       gen_cl_four_char
+ 0001:49CF       gen_cl_n_char
+ 0001:4943       gen_cl_one_char
+ 0001:496F       gen_cl_three_char
+ 0001:4955       gen_cl_two_char
+ 0001:48CF       gen_nc_four_char
+ 0001:4909       gen_nc_n_char
+ 0001:487D       gen_nc_one_char
+ 0001:48A9       gen_nc_three_char
+ 0001:488F       gen_nc_two_char
+ 0001:2C3C       GetCharWidth
+ 0009:1EAF       GetColor_addr
+ 0008:0634       GetDeviceBitmapBits
+ 0002:0252       GetDriverResourceID
+ 0000:0000  Imp  GetModuleHandle      (KERNEL.47)
+ 0004:02CF       GetPalette
+ 0004:006D       GetPaletteTranslate
+ 0000:0000  Imp  GetPrivateProfileString (KERNEL.128)
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0000:0000  Imp  GetProfileInt        (KERNEL.57)
+ 0001:502D       get_clip
+ 0001:3026       Get_Cursor_Width_Mask
+ 0001:55ED       get_device_data
+ 0001:1A63       get_edge_masks_bytes
+ 0001:1828       get_edge_masks_nibbles
+ 0001:1B59       get_exclusion_region
+ 0007:0479       get_fill_data
+ 0001:4FAB       get_font
+ 0001:5029       get_font_abort
+ 0001:4F2C       get_mode
+ 0001:4F8D       get_mode_char_extra
+ 0001:4F76       get_mode_check_for_dda
+ 0001:4F97       get_mode_finish_char_extra
+ 0001:4F9B       get_mode_get_background
+ 0001:4FA6       get_mode_neg_spacing
+ 0002:0288       hook_int_2Fh
+ 0009:1BB8       hwcursor
+ 0001:3574       hwcursor_check
+ 0001:3494       hwcursor_copy_data_rotated
+ 0009:1BC4       hwcursor_data
+ 0001:3574       hwcursor_dummy_ret
+ 0001:3574       hwcursor_exclude
+ 0001:3575       hwcursor_kludge
+ 0001:3409       hwcursor_move
+ 0009:1BB6       hwcursor_newdata
+ 0001:3464       hwcursor_off
+ 0001:3477       hwcursor_on
+ 0009:1BB4       hwcursor_rotated
+ 0001:34D0       hwcursor_rotate_column
+ 0001:33F0       hwcursor_set
+ 0001:354B       hwcursor_setaddr
+ 0001:3574       hwcursor_unexclude
+ 0000:0033  Abs  HYPOTENUSE
+ 0000:0000  Abs  H_HATCH_BR_0
+ 0000:0000  Abs  H_HATCH_BR_1
+ 0000:0000  Abs  H_HATCH_BR_2
+ 0000:0000  Abs  H_HATCH_BR_3
+ 0000:00FF  Abs  H_HATCH_BR_4
+ 0000:0000  Abs  H_HATCH_BR_5
+ 0000:0000  Abs  H_HATCH_BR_6
+ 0000:0000  Abs  H_HATCH_BR_7
+ 0002:03A0       info_table_base
+ 0008:1BD3       init_clip
+ 0001:6069       init_hw_regs
+ 0003:012C       Inquire
+ 0003:005A       inquire_data
+ 0002:0068       inquire_gdi_info
+ 0009:2149       is_protected
+ 0008:0773       ite_4
+ 0001:62DE       jak_286_scc_build
+ 0001:6257       jak_386_scc_build
+ 0001:60CA       jak_build_string
+ 0001:6222       jak_change
+ 0001:60CA       jak_non_justified_text
+ 0008:0D6E       james_bmc_main
+ 0001:2414       jcl_all_done
+ 0001:22E7       jcl_bad_character
+ 0001:23A9       jcl_current_is_visible
+ 0001:2308       jcl_dont_distribute
+ 0001:239E       jcl_dummy_is_visible
+ 0001:230D       jcl_extra_pixels
+ 0001:2351       jcl_good_character
+ 0001:22EC       jcl_have_break_char
+ 0001:2331       jcl_have_entire_width
+ 0001:2359       jcl_have_tot_extra
+ 0001:23FE       jcl_have_vis_start
+ 0001:232F       jcl_have_what_fits
+ 0001:238B       jcl_have_width
+ 0001:2348       jcl_next_char
+ 0001:2413       jcl_save_first
+ 0001:2399       jcl_see_if_next
+ 0001:23DB       jcl_step_clipped_char
+ 0001:2588       jc_all_done
+ 0001:2417       jc_bad_char
+ 0001:24D7       jc_been_clipped
+ 0001:258D       jc_char_is_clipped
+ 0001:2527       jc_check_dummy
+ 0001:24C5       jc_clip_enters_here
+ 0001:2438       jc_dont_distribute
+ 0001:254A       jc_dummys_been_clipped
+ 0001:259F       jc_dummy_is_clipped
+ 0001:2553       jc_dummy_still_wide
+ 0001:256B       jc_dummy_width_ok
+ 0001:243D       jc_extra_pixels
+ 0001:246C       jc_good_character
+ 0001:241C       jc_have_break_char
+ 0001:244C       jc_have_entire_width
+ 0001:2474       jc_have_tot_extra
+ 0001:244A       jc_have_what_fits
+ 0001:249B       jc_have_width
+ 0001:2463       jc_next_char
+ 0001:25AD       jc_restart
+ 0001:257D       jc_see_if_next
+ 0001:24E0       jc_still_wide
+ 0001:2512       jc_width_ok
+ 0001:22D6       justified_text
+ 0005:0000       LineSeg_check_stack
+ 0001:17E6       load_fglatches
+ 0001:38EC       MakeColorCntTable
+ 0001:398C       MakeDitherBitmap
+ 0005:034A       mask_needed
+ 0000:0066  Abs  MAX_STYLE_ERR
+ 0001:4EF9       maybe_output_o_rect
+ 0001:53B3       mono_bitmap_opaque
+ 0007:013F       mono_main_draw_loop
+ 0007:0109       mono_main_loop
+ 0001:2E79       MoveCursor
+ 0001:2D12       my_check_stack
+ 0000:0014  Abs  NbrofColours
+ 0008:1C31       next_scan
+ 0001:212B       non_justified_text
+ 0001:2D2B       not_smaller
+ 0005:0019       not_smaller_ls
+ 0007:0019       not_smaller_sl
+ 0001:2D30       no_room
+ 0005:001E       no_room_ls
+ 0007:001E       no_room_sl
+ 0001:5045       null_clip_rect
+ 0001:5105       null_opaque_rect
+ 0000:0100  Abs  NUM_PALETTES
+ 0001:468F       n_char_setup
+ 0001:457E       one_char_setup
+ 0001:4E83       only_draw_o_rect
+ 0001:55B5       oor_a_return
+ 0001:55AE       oor_check_lhs_only
+ 0001:549F       oor_check_x_bounds
+ 0001:548E       oor_check_y_bounds
+ 0001:55D9       oor_combine_with_lhs
+ 0001:54F9       oor_comp_bottom
+ 0001:5510       oor_comp_middle_y
+ 0001:54B0       oor_exclusive_rects
+ 0001:54DB       oor_inclusive_rects
+ 0001:555A       oor_no_bottom_area
+ 0001:55E1       oor_output_both_anyway
+ 0001:55B6       oor_output_both_sides
+ 0001:559D       oor_output_one_rect
+ 0001:55C6       oor_overlapping_middle
+ 0001:559A       oor_process_rhs
+ 0001:554A       oor_see_about_bottom
+ 0001:555B       oor_see_about_middle
+ 0001:5516       oor_see_if_top_or_bottom
+ 0001:50AA       opaque_isnt_clip
+ 0001:5053       opaque_rect_given
+ 0001:3DEC       Output
+ 0000:0000  Imp  OutputDebugString    (KERNEL.115)
+ 0001:5478       output_o_rect
+ 0001:28B5       pad_left_hand_side
+ 0001:28F2       pad_right_hand_side
+ 0009:1DD8       Palette
+ 0009:2021       PaletteIndexTable
+ 0009:2121       PaletteModified
+ 0000:0001  Abs  PaletteSupported
+ 0009:1F21       PaletteTranslationTable
+ 0007:0B29       pattern_preprocessing
+ 0001:1B0A       pattern_rotate
+ 0001:4AB5       pcolor_opaque_output_286
+ 0001:4B46       pcolor_opaque_output_386
+ 0001:4BDA       pcolor_transp_output_286
+ 0001:4C57       pcolor_transp_output_386
+ 0001:5193       peg_out_at_max_int
+ 0001:4501       pfour_char_setup
+ 0001:2C37       pfo_exit
+ 0001:2C38       pfo_exit_nothing_shows
+ 0001:2BE1       pfo_have_rhs
+ 0002:0380       physical_device
+ 0002:0491       physical_disable
+ 0002:040E       physical_enable
+ 0000:0020  Abs  PHYS_DEVICE_SIZE
+ 0006:0048       Pixel
+ 0001:28DB       plhs_add_padding
+ 0001:28F1       plhs_all_done
+ 0001:4571       pone_char_setup
+ 0001:2B0D       ppsd_color
+ 0001:2BAC       prepare_for_overlap
+ 0001:448E       preset_pro_text
+ 0000:0000  Imp  PrestoChangeoSelector (KERNEL.177)
+ 0001:2929       prhs_have_rhs
+ 0001:2927       prhs_new_rhs
+ 0001:292A       process_stack_data
+ 0001:29A2       psd_collect_chars
+ 0001:2A6F       psd_color
+ 0001:2A6E       psd_exit
+ 0001:29D2       psd_have_exact_fit
+ 0001:2A01       psd_have_more_than_enough
+ 0001:2992       psd_not_clipped
+ 0001:2A58       psd_see_about_last
+ 0001:2A2F       psd_unlikely_cases
+ 0001:4535       pthree_char_setup
+ 0001:455A       ptwo_char_setup
+ 0001:5106       quick_clip
+ 0001:517B       quick_clip_case_1_or_2
+ 0001:5185       quick_clip_case_3_or_4
+ 0001:5192       quick_clip_doesnt_show
+ 0001:514E       quick_clip_do_x
+ 0001:518C       quick_clip_exit
+ 0001:5174       quick_clip_have_right_x
+ 0001:5135       quick_clip_have_y_ext
+ 0001:511E       quick_clip_y_fits_on_top
+ 0001:085E       read_modify_write_needed
+ 0007:00C2       read_modify_write_needed_sl
+ 0001:3EB6       RealizeObject
+ 0001:3F28       realize_brush
+ 0001:40A3       realize_hatch
+ 0001:4037       realize_pattern
+ 0001:3F71       realize_solid
+ 0001:2016       real_build_string
+ 0001:084E       remap_rop
+ 0007:00B2       remap_slrop
+ 0002:0317       restore_int_2Fh
+ 0001:53B1       return_null_interval
+ 0001:3E20       rgb_to_ipc
+ 0008:19DE       RleBlt
+ 0001:0000       roptable
+ 0001:4132       rotate_brush_x
+ 0009:1E3C       rscan
+ 0005:05FB       save_vars
+ 0007:0000       ScanlineSeg_check_stack
+ 0008:1518       scanline_encode_bitmap
+ 0003:015E       ScanLR
+ 0001:220E       scc_bad_char
+ 0001:2272       scc_been_clipped
+ 0001:22C2       scc_char_is_clipped
+ 0001:2266       scc_clip_enters_here
+ 0001:221C       scc_good_char
+ 0001:2213       scc_next_char
+ 0001:22D0       scc_restart
+ 0001:22B7       scc_see_if_next
+ 0001:227B       scc_still_wide
+ 0001:22A0       scc_width_ok
+ 0009:1EC8       ScratchSel
+ 0009:1EC6       ScreenSelector
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0009:0002       screen_busy
+ 0001:2209       sc_no_left_clipping
+ 0001:50FB       see_if_opaque_is_filled
+ 0003:0055       SetAttribute
+ 0005:0BFE       SetCurrentBankDL
+ 0001:2DDA       SetCursor
+ 0008:0008       SetDeviceBitmapBits
+ 0002:064A       setmode
+ 0002:0726       SetMode320x240x8
+ 0004:027E       SetPalette
+ 0004:0000       SetPaletteTranslate
+ 0004:025B       setramdac
+ 0001:6026       set_bank
+ 0001:18DE       set_banko
+ 0001:5FD2       set_bank_select
+ 0002:04F1       set_board_flags
+ 0001:1936       set_both_banko
+ 0001:1903       set_both_pages
+ 0002:062B       set_cursor_addr
+ 0001:2FAF       Set_Cursor_Type
+ 0002:059B       set_dacsize
+ 0001:1810       set_fglatches
+ 0001:1A18       set_memory_address
+ 0001:18AB       set_page
+ 0001:2165       sfcl_current_is_visible
+ 0001:2159       sfcl_next_char
+ 0001:2162       sfcl_no_chars_visible
+ 0009:1ECA       shadow_mem_status
+ 0007:02AA       sl216_main_draw_loop
+ 0001:43D6       SmartPro
+ 0001:392D       SortColorCntTable
+ 0001:21A1       spcl_current_is_visible
+ 0001:2173       spcl_good_character
+ 0001:21F2       spcl_have_vis_start
+ 0001:2167       spcl_next_char
+ 0001:2207       spcl_save_first
+ 0001:219C       spcl_see_if_next
+ 0001:21CF       spcl_step_clipped_char
+ 0009:1ECB       ssb_mask
+ 0000:000E  Abs  stack_bot
+ 0000:000C  Abs  stack_min
+ 0000:000A  Abs  stack_top
+ 0005:0EE5       StBm8_Diagonal_1Q
+ 0005:0E81       StBm8_Diagonal_4Q
+ 0005:0DCC       StBm8_Negative_Y
+ 0005:0E4C       StBm8_Positive_X
+ 0005:0E30       StBm8_Positive_Y
+ 0005:0DB0       StBm_Diagonal_1Q
+ 0005:0D57       StBm_Diagonal_4Q
+ 0005:0CA1       StBm_Negative_Y
+ 0005:0D12       StBm_Positive_X
+ 0005:0CF6       StBm_Positive_Y
+ 0001:4DC7       StrBlt
+ 0001:4F04       strblt_clean_up
+ 0001:5822       StretchBlt
+ 0008:1424       StretchDIBits
+ 0005:0758       style_advance
+ 0005:0722       style_draw_pass
+ 0001:3F5F       sum_RGB_alt_far
+ 0001:3F68       sum_RGB_colors_alt
+ 0001:321F       swcursor_check
+ 0001:3335       swcursor_draw
+ 0001:321F       swcursor_exclude
+ 0001:3283       swcursor_exclude_test
+ 0001:321B       swcursor_move
+ 0001:3236       swcursor_off
+ 0001:32FD       swcursor_restore_screen
+ 0001:32C1       swcursor_save_screen
+ 0001:3236       swcursor_sequence
+ 0001:31EC       swcursor_set
+ 0001:3382       swcursor_setaddr
+ 0001:321E       swcursor_unexclude
+ 0001:64C4       t216omc_left_edge
+ 0005:0503       tests_done
+ 0001:6411       text216_mono_to_color
+ 0009:2122       TextColorXlated
+ 0001:6357       textv7_mono_to_color
+ 0001:4E86       text_completely_clipped
+ 0007:0413       the216_begin
+ 0007:01E1       the216_start
+ 0001:45D2       three_char_setup
+ 0004:00A1       TranslateBrush
+ 0004:01AD       TranslateColor
+ 0004:0165       TranslatePen
+ 0004:0101       TranslateTextColor
+ 0001:459F       two_char_setup
+ 0001:2F86       unexclude
+ 0001:2F82       unexclude_far
+ 0004:01CE       UpdateColors
+ 0001:4CDC       UserRepaintDisable
+ 0001:1855       vga_set_features
+ 0009:1EBF       Video_Board_Flags
+ 0009:1EBC       Video_Board_Id
+ 0009:1EBE       Video_Memory_Banks
+ 0009:1EC4       Vmode
+ 0009:1EC2       VScreen_Height
+ 0009:1EC0       VScreen_Width
+ 0001:5296       v_comp_ext_peg_right
+ 0001:55E6       v_gdd_dev_is_bitmap
+ 0000:0008  Abs  V_HATCH_BR_0
+ 0000:0008  Abs  V_HATCH_BR_1
+ 0000:0008  Abs  V_HATCH_BR_2
+ 0000:0008  Abs  V_HATCH_BR_3
+ 0000:0008  Abs  V_HATCH_BR_4
+ 0000:0008  Abs  V_HATCH_BR_5
+ 0000:0008  Abs  V_HATCH_BR_6
+ 0000:0008  Abs  V_HATCH_BR_7
+ 0001:2653       wccl_adjustment_ok
+ 0001:26DC       wccl_all_done
+ 0001:25C4       wccl_bad_character
+ 0001:2671       wccl_current_is_visible
+ 0001:266A       wccl_dummy_is_visible
+ 0001:2637       wccl_get_user_width
+ 0001:2605       wccl_good_character
+ 0001:25C9       wccl_have_break_char
+ 0001:260D       wccl_have_tot_extra
+ 0001:26C6       wccl_have_vis_start
+ 0001:2647       wccl_have_width
+ 0001:25EE       wccl_neg_dda
+ 0001:25FC       wccl_next_char
+ 0001:26DB       wccl_save_first
+ 0001:2665       wccl_see_if_next
+ 0001:26A3       wccl_step_clipped_char
+ 0001:2786       wcc_adj_is_ok
+ 0001:285F       wcc_all_done
+ 0001:26DF       wcc_bad_char
+ 0001:27B6       wcc_been_clipped
+ 0001:2872       wcc_char_is_clipped
+ 0001:27F9       wcc_check_dummy
+ 0001:287A       wcc_clipped_no_restart
+ 0001:2787       wcc_clip_enters_here
+ 0001:2821       wcc_dummys_been_clipped
+ 0001:2864       wcc_dummy_is_clipped
+ 0001:282A       wcc_dummy_still_wide
+ 0001:2842       wcc_dummy_width_ok
+ 0001:276A       wcc_get_users_width
+ 0001:28A9       wcc_going_back
+ 0001:2720       wcc_good_character
+ 0001:27A4       wcc_have_adj_width
+ 0001:26E4       wcc_have_break_char
+ 0001:27A1       wcc_have_entire_width
+ 0001:2728       wcc_have_tot_extra
+ 0001:279F       wcc_have_what_fits
+ 0001:277A       wcc_have_width
+ 0001:288D       wcc_might_need_restart
+ 0001:2709       wcc_neg_dda
+ 0001:2717       wcc_next_char
+ 0001:28AF       wcc_restart
+ 0001:2854       wcc_see_if_next
+ 0001:27BF       wcc_still_wide
+ 0001:27E4       wcc_width_ok
+ 0001:52A6       wce_bad_char
+ 0001:534A       wce_char_not_new_rhs
+ 0001:5354       wce_extra_not_new_rhs
+ 0001:531A       wce_get_users_width
+ 0001:52E7       wce_good_character
+ 0001:52AB       wce_have_break_char
+ 0001:52EF       wce_have_tot_extra
+ 0001:5329       wce_have_width
+ 0001:52D0       wce_neg_dda
+ 0001:52DE       wce_next_char
+ 0001:535D       wce_peg_out
+ 0001:5357       wce_see_if_next
+ 0009:0000       windowsVersion
+ 0001:25B3       worst_case
+ 0001:5299       worst_case_ext
+ 0001:39ED       WritePBrush
+ 0000:0024  Abs  X_MAJOR_DIST
+ 0000:000F  Abs  X_MINOR_DIST
+ 0000:0024  Abs  Y_MAJOR_DIST
+ 0000:000F  Abs  Y_MINOR_DIST
+ 0001:069A       zero_alignment
+ 0001:2DDB       _cstods
+ 0000:0000  Imp  __A000               (KERNEL.174)
+ 0000:0000  Imp  __AHINCR             (KERNEL.114)
+ 0000:0000  Imp  __AHSHIFT            (KERNEL.113)
+ 0000:0000  Imp  __NEXTSEG            (KERNEL.114)
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+
+  Address         Publics by Value
+
+ 0000:0000  Imp  AllocSelector        (KERNEL.175)
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+ 0000:0000  Imp  FreeSelector         (KERNEL.176)
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSToCSAlias     (KERNEL.171)
+ 0000:0000  Imp  PrestoChangeoSelector (KERNEL.177)
+ 0000:0000  Imp  GetPrivateProfileString (KERNEL.128)
+ 0000:0000  Imp  __A000               (KERNEL.174)
+ 0000:0000  Abs  H_HATCH_BR_0
+ 0000:0000  Abs  H_HATCH_BR_1
+ 0000:0000  Abs  H_HATCH_BR_2
+ 0000:0000  Abs  H_HATCH_BR_3
+ 0000:0000  Imp  __NEXTSEG            (KERNEL.114)
+ 0000:0000  Abs  H_HATCH_BR_5
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0000:0000  Abs  H_HATCH_BR_6
+ 0000:0000  Abs  H_HATCH_BR_7
+ 0000:0000  Imp  GetModuleHandle      (KERNEL.47)
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0000:0000  Imp  __AHINCR             (KERNEL.114)
+ 0000:0000  Imp  GetProfileInt        (KERNEL.57)
+ 0000:0000  Imp  OutputDebugString    (KERNEL.115)
+ 0000:0000  Imp  __AHSHIFT            (KERNEL.113)
+ 0000:0001  Abs  D2_HATCH_BR_0
+ 0000:0001  Abs  D1_HATCH_BR_7
+ 0000:0001  Abs  PaletteSupported
+ 0000:0002  Abs  D1_HATCH_BR_6
+ 0000:0002  Abs  D2_HATCH_BR_1
+ 0000:0004  Abs  D1_HATCH_BR_5
+ 0000:0004  Abs  D2_HATCH_BR_2
+ 0000:0008  Abs  D1_HATCH_BR_4
+ 0000:0008  Abs  CR_HATCH_BR_3
+ 0000:0008  Abs  CR_HATCH_BR_2
+ 0000:0008  Abs  CR_HATCH_BR_6
+ 0000:0008  Abs  CR_HATCH_BR_5
+ 0000:0008  Abs  CR_HATCH_BR_0
+ 0000:0008  Abs  V_HATCH_BR_7
+ 0000:0008  Abs  V_HATCH_BR_6
+ 0000:0008  Abs  V_HATCH_BR_5
+ 0000:0008  Abs  V_HATCH_BR_4
+ 0000:0008  Abs  CR_HATCH_BR_7
+ 0000:0008  Abs  V_HATCH_BR_3
+ 0000:0008  Abs  CR_HATCH_BR_1
+ 0000:0008  Abs  D2_HATCH_BR_3
+ 0000:0008  Abs  V_HATCH_BR_2
+ 0000:0008  Abs  V_HATCH_BR_1
+ 0000:0008  Abs  V_HATCH_BR_0
+ 0000:000A  Abs  stack_top
+ 0000:000C  Abs  stack_min
+ 0000:000E  Abs  stack_bot
+ 0000:000F  Abs  X_MINOR_DIST
+ 0000:000F  Abs  Y_MINOR_DIST
+ 0000:0010  Abs  D2_HATCH_BR_4
+ 0000:0010  Abs  D1_HATCH_BR_3
+ 0000:0014  Abs  NbrofColours
+ 0000:0018  Abs  DC_HATCH_BR_3
+ 0000:0018  Abs  DC_HATCH_BR_4
+ 0000:0020  Abs  D1_HATCH_BR_2
+ 0000:0020  Abs  PHYS_DEVICE_SIZE
+ 0000:0020  Abs  D2_HATCH_BR_5
+ 0000:0024  Abs  Y_MAJOR_DIST
+ 0000:0024  Abs  X_MAJOR_DIST
+ 0000:0024  Abs  DC_HATCH_BR_5
+ 0000:0024  Abs  DC_HATCH_BR_2
+ 0000:0033  Abs  HYPOTENUSE
+ 0000:0040  Abs  D2_HATCH_BR_6
+ 0000:0040  Abs  D1_HATCH_BR_1
+ 0000:0042  Abs  DC_HATCH_BR_1
+ 0000:0042  Abs  DC_HATCH_BR_6
+ 0000:0066  Abs  MAX_STYLE_ERR
+ 0000:0080  Abs  D1_HATCH_BR_0
+ 0000:0080  Abs  D2_HATCH_BR_7
+ 0000:0081  Abs  DC_HATCH_BR_0
+ 0000:0081  Abs  DC_HATCH_BR_7
+ 0000:00FF  Abs  CR_HATCH_BR_4
+ 0000:00FF  Abs  H_HATCH_BR_4
+ 0000:0100  Abs  NUM_PALETTES
+ 0000:017E  Abs  BW_THRESHOLD
+ 0000:0801  Abs  COLOR_FORMAT
+ 0001:0000       roptable
+ 0001:038A       BitBlt
+ 0001:045B       bitblt_prep_rop_etal
+ 0001:0535       bitblt_prep_pattern
+ 0001:05F2       bitblt_prep_src
+ 0001:0644       bitblt_prep_dst
+ 0001:069A       zero_alignment
+ 0001:06B8       bitblt_prep_final
+ 0001:075C       bitblt_dispatch
+ 0001:0820       bitblt_execute
+ 0001:084E       remap_rop
+ 0001:085E       read_modify_write_needed
+ 0001:086E       blt216_src_dst
+ 0001:08F8       blt216_src_dst_prep
+ 0001:0A0D       blt216_src_dst_cleanup
+ 0001:0AB9       blt216_pat_dst
+ 0001:0B32       blt216_pat_dst_prep
+ 0001:0C41       blt216_pat_dst_cleanup
+ 0001:0CD4       blt11
+ 0001:0D01       compile_mtom_first_edge
+ 0001:0D40       compile_mtom_loop
+ 0001:0DCB       compile_mtom_last_edge
+ 0001:0E70       blt18
+ 0001:0EB0       blt_mtoc_prep
+ 0001:0EDE       compile_mtoc_src1
+ 0001:0F1E       compile_mtoc_loop
+ 0001:0F44       blt81
+ 0001:0FBA       blt_ctom_prep
+ 0001:0FE5       compile_ctom
+ 0001:1016       compile_ctom_last_edge
+ 0001:103E       blt88
+ 0001:1095       blt88_repmovsb
+ 0001:10D4       blt_ctoc_prep
+ 0001:1171       bltstos
+ 0001:1242       bltstos_prep
+ 0001:1267       bltstos_srccopy
+ 0001:1301       bltstos_srccopy_prep
+ 0001:137D       bltstos_splitbank
+ 0001:13BD       bltstos_repmovsb
+ 0001:13DD       bltstos_splitbank_prep
+ 0001:1432       blt_pat_dst_prep
+ 0001:14CD       blt_pat_dst
+ 0001:154D       blt_pat_dst_pattern_row_loop
+ 0001:1596       blt_pat_dst_nibble_loop
+ 0001:15CE       blt_pat_dst_same_pattern_row_lo
+ 0001:15EF       blt_pat_dst_even_nibbles
+ 0001:161F       blt_pat_dst_odd_nibbles
+ 0001:1648       blt_dst_pattern_row_loop
+ 0001:168C       blt_dst_nibble_loop
+ 0001:16E1       blt_dst_even_nibbles
+ 0001:170D       blt_dst_odd_nibbles
+ 0001:1733       blt_pat_dst_loop
+ 0001:1771       blt_pat_dst_nibbles
+ 0001:1790       blt_dst_loop
+ 0001:17C7       blt_dst_nibbles
+ 0001:17E6       load_fglatches
+ 0001:1810       set_fglatches
+ 0001:1828       get_edge_masks_nibbles
+ 0001:1855       vga_set_features
+ 0001:18A7       far_set_page
+ 0001:18AB       set_page
+ 0001:18DA       far_set_banko
+ 0001:18DE       set_banko
+ 0001:18FF       far_set_both_pages
+ 0001:1903       set_both_pages
+ 0001:1932       far_set_both_banko
+ 0001:1936       set_both_banko
+ 0001:1950       blt_clip
+ 0001:19A2       blt_set_directions
+ 0001:1A18       set_memory_address
+ 0001:1A63       get_edge_masks_bytes
+ 0001:1A9A       brush_convert_mono_to_mono
+ 0001:1AC3       brush_convert_mono_to_color
+ 0001:1ADF       brush_convert_color_to_mono
+ 0001:1B04       brush_convert_color_to_color
+ 0001:1B0A       pattern_rotate
+ 0001:1B59       get_exclusion_region
+ 0001:1B94       compile_mono_pattern_fetch
+ 0001:1BC9       compile_color_pattern_fetch
+ 0001:1C0A       compile_pattern_yupdate
+ 0001:1C2F       compile_rop
+ 0001:1C61       compile_edge_mask
+ 0001:1C70       compile_inner_loop_start
+ 0001:1C7E       compile_inner_loop_end
+ 0001:1C9D       compile_outer_loop
+ 0001:1CDF       compile_src_memory_yupdate
+ 0001:1D64       compile_src_screen_yupdate
+ 0001:1DEC       compile_dst_memory_yupdate
+ 0001:1E71       compile_dst_screen_yupdate
+ 0001:1EF7       compile_screen_yupdate
+ 0001:1F4F       compile_jmp_back_to_start
+ 0001:1F75       compile_src_splitbank_yupdate
+ 0001:1FBF       compile_dst_splitbank_yupdate
+ 0001:1FF9       compile_color_stosb
+ 0001:2016       build_string
+ 0001:2016       real_build_string
+ 0001:2054       build_worst_ok
+ 0001:205D       build_have_proc
+ 0001:2063       build_restart
+ 0001:2082       build_ret_addr
+ 0001:20AA       build_ret_oem
+ 0001:20D9       build_no_o_rect
+ 0001:20F4       build_clip_next_time
+ 0001:2106       build_no_clip_next_time
+ 0001:210F       build_all_done
+ 0001:2112       build_restore_opaque
+ 0001:2125       build_really_done
+ 0001:212B       non_justified_text
+ 0001:2159       sfcl_next_char
+ 0001:2162       sfcl_no_chars_visible
+ 0001:2165       sfcl_current_is_visible
+ 0001:2167       spcl_next_char
+ 0001:2173       spcl_good_character
+ 0001:219C       spcl_see_if_next
+ 0001:21A1       spcl_current_is_visible
+ 0001:21CF       spcl_step_clipped_char
+ 0001:21F2       spcl_have_vis_start
+ 0001:2207       spcl_save_first
+ 0001:2209       sc_no_left_clipping
+ 0001:220E       scc_bad_char
+ 0001:2213       scc_next_char
+ 0001:221C       scc_good_char
+ 0001:2266       scc_clip_enters_here
+ 0001:2272       scc_been_clipped
+ 0001:227B       scc_still_wide
+ 0001:22A0       scc_width_ok
+ 0001:22B7       scc_see_if_next
+ 0001:22C2       scc_char_is_clipped
+ 0001:22D0       scc_restart
+ 0001:22D6       justified_text
+ 0001:22E7       jcl_bad_character
+ 0001:22EC       jcl_have_break_char
+ 0001:2308       jcl_dont_distribute
+ 0001:230D       jcl_extra_pixels
+ 0001:232F       jcl_have_what_fits
+ 0001:2331       jcl_have_entire_width
+ 0001:2348       jcl_next_char
+ 0001:2351       jcl_good_character
+ 0001:2359       jcl_have_tot_extra
+ 0001:238B       jcl_have_width
+ 0001:2399       jcl_see_if_next
+ 0001:239E       jcl_dummy_is_visible
+ 0001:23A9       jcl_current_is_visible
+ 0001:23DB       jcl_step_clipped_char
+ 0001:23FE       jcl_have_vis_start
+ 0001:2413       jcl_save_first
+ 0001:2414       jcl_all_done
+ 0001:2417       jc_bad_char
+ 0001:241C       jc_have_break_char
+ 0001:2438       jc_dont_distribute
+ 0001:243D       jc_extra_pixels
+ 0001:244A       jc_have_what_fits
+ 0001:244C       jc_have_entire_width
+ 0001:2463       jc_next_char
+ 0001:246C       jc_good_character
+ 0001:2474       jc_have_tot_extra
+ 0001:249B       jc_have_width
+ 0001:24C5       jc_clip_enters_here
+ 0001:24D7       jc_been_clipped
+ 0001:24E0       jc_still_wide
+ 0001:2512       jc_width_ok
+ 0001:2527       jc_check_dummy
+ 0001:254A       jc_dummys_been_clipped
+ 0001:2553       jc_dummy_still_wide
+ 0001:256B       jc_dummy_width_ok
+ 0001:257D       jc_see_if_next
+ 0001:2588       jc_all_done
+ 0001:258D       jc_char_is_clipped
+ 0001:259F       jc_dummy_is_clipped
+ 0001:25AD       jc_restart
+ 0001:25B3       worst_case
+ 0001:25C4       wccl_bad_character
+ 0001:25C9       wccl_have_break_char
+ 0001:25EE       wccl_neg_dda
+ 0001:25FC       wccl_next_char
+ 0001:2605       wccl_good_character
+ 0001:260D       wccl_have_tot_extra
+ 0001:2637       wccl_get_user_width
+ 0001:2647       wccl_have_width
+ 0001:2653       wccl_adjustment_ok
+ 0001:2665       wccl_see_if_next
+ 0001:266A       wccl_dummy_is_visible
+ 0001:2671       wccl_current_is_visible
+ 0001:26A3       wccl_step_clipped_char
+ 0001:26C6       wccl_have_vis_start
+ 0001:26DB       wccl_save_first
+ 0001:26DC       wccl_all_done
+ 0001:26DF       wcc_bad_char
+ 0001:26E4       wcc_have_break_char
+ 0001:2709       wcc_neg_dda
+ 0001:2717       wcc_next_char
+ 0001:2720       wcc_good_character
+ 0001:2728       wcc_have_tot_extra
+ 0001:276A       wcc_get_users_width
+ 0001:277A       wcc_have_width
+ 0001:2786       wcc_adj_is_ok
+ 0001:2787       wcc_clip_enters_here
+ 0001:279F       wcc_have_what_fits
+ 0001:27A1       wcc_have_entire_width
+ 0001:27A4       wcc_have_adj_width
+ 0001:27B6       wcc_been_clipped
+ 0001:27BF       wcc_still_wide
+ 0001:27E4       wcc_width_ok
+ 0001:27F9       wcc_check_dummy
+ 0001:2821       wcc_dummys_been_clipped
+ 0001:282A       wcc_dummy_still_wide
+ 0001:2842       wcc_dummy_width_ok
+ 0001:2854       wcc_see_if_next
+ 0001:285F       wcc_all_done
+ 0001:2864       wcc_dummy_is_clipped
+ 0001:2872       wcc_char_is_clipped
+ 0001:287A       wcc_clipped_no_restart
+ 0001:288D       wcc_might_need_restart
+ 0001:28A9       wcc_going_back
+ 0001:28AF       wcc_restart
+ 0001:28B5       pad_left_hand_side
+ 0001:28DB       plhs_add_padding
+ 0001:28F1       plhs_all_done
+ 0001:28F2       pad_right_hand_side
+ 0001:2927       prhs_new_rhs
+ 0001:2929       prhs_have_rhs
+ 0001:292A       process_stack_data
+ 0001:2992       psd_not_clipped
+ 0001:29A2       psd_collect_chars
+ 0001:29D2       psd_have_exact_fit
+ 0001:2A01       psd_have_more_than_enough
+ 0001:2A2F       psd_unlikely_cases
+ 0001:2A58       psd_see_about_last
+ 0001:2A6E       psd_exit
+ 0001:2A6F       psd_color
+ 0001:2B0D       ppsd_color
+ 0001:2BAC       prepare_for_overlap
+ 0001:2BE1       pfo_have_rhs
+ 0001:2C37       pfo_exit
+ 0001:2C38       pfo_exit_nothing_shows
+ 0001:2C3C       GetCharWidth
+ 0001:2D12       my_check_stack
+ 0001:2D2B       not_smaller
+ 0001:2D30       no_room
+ 0001:2D40       ColorInfo
+ 0001:2DDA       SetCursor
+ 0001:2DDB       _cstods
+ 0001:2E79       MoveCursor
+ 0001:2F05       CheckCursor
+ 0001:2F47       exclude_far
+ 0001:2F4B       exclude
+ 0001:2F82       unexclude_far
+ 0001:2F86       unexclude
+ 0001:2FAF       Set_Cursor_Type
+ 0001:3026       Get_Cursor_Width_Mask
+ 0001:3071       Bit_Double_Cursor
+ 0001:30AC       cursor_save_state
+ 0001:319C       cursor_restore_state
+ 0001:31D1       cursor_kludge
+ 0001:31EC       swcursor_set
+ 0001:321B       swcursor_move
+ 0001:321E       swcursor_unexclude
+ 0001:321F       swcursor_check
+ 0001:321F       swcursor_exclude
+ 0001:3236       swcursor_sequence
+ 0001:3236       swcursor_off
+ 0001:3283       swcursor_exclude_test
+ 0001:32C1       swcursor_save_screen
+ 0001:32FD       swcursor_restore_screen
+ 0001:3335       swcursor_draw
+ 0001:3382       swcursor_setaddr
+ 0001:33F0       hwcursor_set
+ 0001:3409       hwcursor_move
+ 0001:3464       hwcursor_off
+ 0001:3477       hwcursor_on
+ 0001:3494       hwcursor_copy_data_rotated
+ 0001:34D0       hwcursor_rotate_column
+ 0001:354B       hwcursor_setaddr
+ 0001:3574       hwcursor_check
+ 0001:3574       hwcursor_unexclude
+ 0001:3574       hwcursor_exclude
+ 0001:3574       hwcursor_dummy_ret
+ 0001:3575       hwcursor_kludge
+ 0001:3580       FarDeviceSelectDIB
+ 0001:35A3       DeviceSelectDIB
+ 0001:367E       dither
+ 0001:3811       Compute256Indices
+ 0001:3829       ComputeSymmetry
+ 0001:3846       ComputeSubSpace
+ 0001:3873       ComputeTransform
+ 0001:38AB       ComputePColor
+ 0001:38EC       MakeColorCntTable
+ 0001:392D       SortColorCntTable
+ 0001:398C       MakeDitherBitmap
+ 0001:39ED       WritePBrush
+ 0001:39F4       ColorDither
+ 0001:3A9C       dev_initialization
+ 0001:3AC6       FastBorder
+ 0001:3DEC       Output
+ 0001:3E20       rgb_to_ipc
+ 0001:3EB6       RealizeObject
+ 0001:3F28       realize_brush
+ 0001:3F5F       sum_RGB_alt_far
+ 0001:3F68       sum_RGB_colors_alt
+ 0001:3F71       realize_solid
+ 0001:4037       realize_pattern
+ 0001:40A3       realize_hatch
+ 0001:4132       rotate_brush_x
+ 0001:4306       ega_oc
+ 0001:43D6       SmartPro
+ 0001:4427       bm_trans_color_fix
+ 0001:4428       bm_trans_color
+ 0001:445C       bm_opaque_color_fix
+ 0001:445D       bm_opaque_color
+ 0001:448E       preset_pro_text
+ 0001:4501       pfour_char_setup
+ 0001:4535       pthree_char_setup
+ 0001:455A       ptwo_char_setup
+ 0001:4571       pone_char_setup
+ 0001:457E       one_char_setup
+ 0001:458A       gen386_nc_one_char
+ 0001:459F       two_char_setup
+ 0001:45B3       gen386_nc_two_char
+ 0001:45D2       three_char_setup
+ 0001:45F2       gen386_nc_three_char
+ 0001:461E       four_char_setup
+ 0001:464B       gen386_nc_four_char
+ 0001:468F       n_char_setup
+ 0001:46A1       gen386_nc_n_char
+ 0001:46E3       gen386_cl_one_char
+ 0001:46F8       gen386_cl_two_char
+ 0001:4717       gen386_cl_three_char
+ 0001:4743       gen386_cl_four_char
+ 0001:4787       gen386_cl_n_char
+ 0001:47C9       bm386_obwnc_one_char
+ 0001:47E2       bm386_obwnc_two_char
+ 0001:4805       bm386_obwnc_three_char
+ 0001:4835       bm386_obwnc_four_char
+ 0001:487D       gen_nc_one_char
+ 0001:488F       gen_nc_two_char
+ 0001:48A9       gen_nc_three_char
+ 0001:48CF       gen_nc_four_char
+ 0001:4909       gen_nc_n_char
+ 0001:4943       gen_cl_one_char
+ 0001:4955       gen_cl_two_char
+ 0001:496F       gen_cl_three_char
+ 0001:4995       gen_cl_four_char
+ 0001:49CF       gen_cl_n_char
+ 0001:4A09       bm_obwnc_one_char
+ 0001:4A1F       bm_obwnc_two_char
+ 0001:4A3D       bm_obwnc_three_char
+ 0001:4A67       bm_obwnc_four_char
+ 0001:4AA5       color_output_table_286
+ 0001:4AAD       color_output_table_386
+ 0001:4AB5       color_opaque_output_286
+ 0001:4AB5       pcolor_opaque_output_286
+ 0001:4B46       pcolor_opaque_output_386
+ 0001:4B46       color_opaque_output_386
+ 0001:4BDA       color_transp_output_286
+ 0001:4BDA       pcolor_transp_output_286
+ 0001:4C57       color_transp_output_386
+ 0001:4C57       pcolor_transp_output_386
+ 0001:4CDC       UserRepaintDisable
+ 0001:4D93       disable_switching
+ 0001:4DAE       enable_switching
+ 0001:4DC6       ??BigFontFlags
+ 0001:4DC7       StrBlt
+ 0001:4DD2       ExtTextOut
+ 0001:4E78       exit_strblt_error
+ 0001:4E83       only_draw_o_rect
+ 0001:4E86       text_completely_clipped
+ 0001:4E97       draw_char_string
+ 0001:4EC8       draw_dispatch
+ 0001:4EF9       maybe_output_o_rect
+ 0001:4F04       strblt_clean_up
+ 0001:4F0D       exit_strblt_null
+ 0001:4F10       exit_strblt
+ 0001:4F2C       get_mode
+ 0001:4F76       get_mode_check_for_dda
+ 0001:4F8D       get_mode_char_extra
+ 0001:4F97       get_mode_finish_char_extra
+ 0001:4F9B       get_mode_get_background
+ 0001:4FA6       get_mode_neg_spacing
+ 0001:4FAB       get_font
+ 0001:5029       get_font_abort
+ 0001:502D       get_clip
+ 0001:5045       null_clip_rect
+ 0001:5053       opaque_rect_given
+ 0001:50AA       opaque_isnt_clip
+ 0001:50FB       see_if_opaque_is_filled
+ 0001:5105       null_opaque_rect
+ 0001:5106       quick_clip
+ 0001:511E       quick_clip_y_fits_on_top
+ 0001:5135       quick_clip_have_y_ext
+ 0001:514E       quick_clip_do_x
+ 0001:5174       quick_clip_have_right_x
+ 0001:517B       quick_clip_case_1_or_2
+ 0001:5185       quick_clip_case_3_or_4
+ 0001:518C       quick_clip_exit
+ 0001:5192       quick_clip_doesnt_show
+ 0001:5193       peg_out_at_max_int
+ 0001:5198       comp_extent
+ 0001:51AE       comp_ext_check_for_just
+ 0001:51B3       comp_ext_have_ext
+ 0001:51B7       comp_ext_peg_right
+ 0001:51BE       comp_ext_hard_way
+ 0001:51C8       comp_ext_proportional
+ 0001:51D7       comp_ext_no_char_extra
+ 0001:51E3       comp_ext_prop_loop
+ 0001:51EC       comp_ext_prop_add_width
+ 0001:5219       comp_ext_prop_default
+ 0001:521E       comp_ext_check_dda
+ 0001:5232       comp_ext_scan_break
+ 0001:523A       comp_ext_done_scanning
+ 0001:524F       comp_ext_slow_scan
+ 0001:525A       comp_ext_invalid_char
+ 0001:525D       comp_ext_done_slow_scan
+ 0001:525F       comp_ext_have_breaks
+ 0001:527B       comp_ext_run_dda
+ 0001:5284       comp_ext_dont_distribute
+ 0001:5286       comp_ext_save_err_term
+ 0001:528D       comp_ext_done_dda
+ 0001:5291       comp_ext_peg_and_save
+ 0001:5296       v_comp_ext_peg_right
+ 0001:5299       worst_case_ext
+ 0001:52A6       wce_bad_char
+ 0001:52AB       wce_have_break_char
+ 0001:52D0       wce_neg_dda
+ 0001:52DE       wce_next_char
+ 0001:52E7       wce_good_character
+ 0001:52EF       wce_have_tot_extra
+ 0001:531A       wce_get_users_width
+ 0001:5329       wce_have_width
+ 0001:534A       wce_char_not_new_rhs
+ 0001:5354       wce_extra_not_new_rhs
+ 0001:5357       wce_see_if_next
+ 0001:535D       wce_peg_out
+ 0001:5361       comp_byte_interval
+ 0001:539E       comp_byte_dont_combine
+ 0001:53B1       return_null_interval
+ 0001:53B3       mono_bitmap_opaque
+ 0001:53B8       bitmap_opaque
+ 0001:53D1       bo1_first_and_last
+ 0001:53D4       bo1_both_loop
+ 0001:53E1       bo1_last_only
+ 0001:53E5       bo1_first_only
+ 0001:53EB       bo1_restore_start_addr
+ 0001:53EC       bo1_inner_start
+ 0001:53EF       bo_start_inner_loop
+ 0001:53F5       bo_inner_loop
+ 0001:5406       bo_done
+ 0001:5407       bitmap_opaque_0s
+ 0001:541D       bo0_first_and_last
+ 0001:5422       bo0_both_loop
+ 0001:5431       bo0_last_only
+ 0001:5435       bo0_first_only
+ 0001:5437       bo0_one_only_loop
+ 0001:543D       bo0_restore_start_addr
+ 0001:5441       color_bitmap_opaque
+ 0001:5478       output_o_rect
+ 0001:548E       oor_check_y_bounds
+ 0001:549F       oor_check_x_bounds
+ 0001:54B0       oor_exclusive_rects
+ 0001:54DB       oor_inclusive_rects
+ 0001:54F9       oor_comp_bottom
+ 0001:5510       oor_comp_middle_y
+ 0001:5516       oor_see_if_top_or_bottom
+ 0001:554A       oor_see_about_bottom
+ 0001:555A       oor_no_bottom_area
+ 0001:555B       oor_see_about_middle
+ 0001:559A       oor_process_rhs
+ 0001:559D       oor_output_one_rect
+ 0001:55AE       oor_check_lhs_only
+ 0001:55B5       oor_a_return
+ 0001:55B6       oor_output_both_sides
+ 0001:55C6       oor_overlapping_middle
+ 0001:55D9       oor_combine_with_lhs
+ 0001:55E1       oor_output_both_anyway
+ 0001:55E6       v_gdd_dev_is_bitmap
+ 0001:55ED       get_device_data
+ 0001:5612       gdd_exclude_is_opaque
+ 0001:5623       gdd_exclude_text_or_both
+ 0001:5680       gdd_exclude_have_rect
+ 0001:56B0       gdd_dev_is_bitmap
+ 0001:56B5       gdd_small_bitmap
+ 0001:56CE       gdd_finish_bitmap
+ 0001:56EF       gdd_is_color_bitmap
+ 0001:56F9       gdd_huge_bitmap
+ 0001:5723       gdd_dont_do_union
+ 0001:572C       gdd_have_y_ext
+ 0001:5765       gdd_have_segment
+ 0001:577E       gdd_have_our_color
+ 0001:5788       gdd_different_segments
+ 0001:5792       gdd_do_next_whole_segment
+ 0001:5795       gdd_do_last_segment
+ 0001:5822       StretchBlt
+ 0001:5F7E       far_set_bank_select
+ 0001:5FD2       set_bank_select
+ 0001:6026       set_bank
+ 0001:6069       init_hw_regs
+ 0001:608C       dev_to_foreground
+ 0001:60BC       dev_to_background
+ 0001:60CA       jak_build_string
+ 0001:60CA       jak_non_justified_text
+ 0001:6222       jak_change
+ 0001:6257       jak_386_scc_build
+ 0001:62DE       jak_286_scc_build
+ 0001:6357       textv7_mono_to_color
+ 0001:6411       text216_mono_to_color
+ 0001:64C4       t216omc_left_edge
+ 0002:0000       Disable
+ 0002:002A       Enable
+ 0002:0068       inquire_gdi_info
+ 0002:00BE       enable_read_profile
+ 0002:022B       enable_find_substring
+ 0002:0252       GetDriverResourceID
+ 0002:0288       hook_int_2Fh
+ 0002:0317       restore_int_2Fh
+ 0002:0349       driver_initialization
+ 0002:0380       physical_device
+ 0002:03A0       info_table_base
+ 0002:040E       physical_enable
+ 0002:0491       physical_disable
+ 0002:04F1       set_board_flags
+ 0002:0597       far_set_dacsize
+ 0002:059B       set_dacsize
+ 0002:0627       far_set_cursor_addr
+ 0002:062B       set_cursor_addr
+ 0002:064A       setmode
+ 0002:06B4       farsetmode
+ 0002:0726       SetMode320x240x8
+ 0003:0000       Control
+ 0003:0050       DeviceBitmap
+ 0003:0055       SetAttribute
+ 0003:005A       inquire_data
+ 0003:005E       EnumDFonts
+ 0003:0064       EnumObj
+ 0003:00D8       do_color
+ 0003:012C       Inquire
+ 0003:015E       ScanLR
+ 0003:0300       DeviceMode
+ 0004:0000       SetPaletteTranslate
+ 0004:006D       GetPaletteTranslate
+ 0004:00A1       TranslateBrush
+ 0004:0101       TranslateTextColor
+ 0004:0165       TranslatePen
+ 0004:01AD       TranslateColor
+ 0004:01CE       UpdateColors
+ 0004:025B       setramdac
+ 0004:027E       SetPalette
+ 0004:02CF       GetPalette
+ 0005:0000       LineSeg_check_stack
+ 0005:0019       not_smaller_ls
+ 0005:001E       no_room_ls
+ 0005:0100       do_polylines
+ 0005:02A7       ega_line_dispatch
+ 0005:02CB       Draw_Line
+ 0005:034A       mask_needed
+ 0005:0397       calculate_mask
+ 0005:03F9       Draw_Engine
+ 0005:04AA       find_out_dda
+ 0005:0503       tests_done
+ 0005:05FB       save_vars
+ 0005:061F       do_another_pass
+ 0005:06EC       draw_loop
+ 0005:0710       do_the_last_scan
+ 0005:0716       all_passes_done
+ 0005:0722       style_draw_pass
+ 0005:0758       style_advance
+ 0005:0789       Clip_Line
+ 0005:0843       Bm_Negative_Y
+ 0005:086C       Bm_Positive_Y
+ 0005:0888       Bm_Positive_X
+ 0005:08D5       Bm_Diagonal_4Q
+ 0005:0904       Bm_Diagonal_1Q
+ 0005:096A       Bm8_Negative_Y
+ 0005:09E3       Bm8_Positive_Y
+ 0005:0A5C       Bm8_Positive_X
+ 0005:0ABE       Bm8_Diagonal_4Q
+ 0005:0B39       Bm8_Diagonal_1Q
+ 0005:0BB7       Bm8_Move_Negative_Y
+ 0005:0BDB       Bm8_Move_Positive_Y
+ 0005:0BFE       SetCurrentBankDL
+ 0005:0CA1       StBm_Negative_Y
+ 0005:0CF6       StBm_Positive_Y
+ 0005:0D12       StBm_Positive_X
+ 0005:0D57       StBm_Diagonal_4Q
+ 0005:0DB0       StBm_Diagonal_1Q
+ 0005:0DCC       StBm8_Negative_Y
+ 0005:0E30       StBm8_Positive_Y
+ 0005:0E4C       StBm8_Positive_X
+ 0005:0E81       StBm8_Diagonal_4Q
+ 0005:0EE5       StBm8_Diagonal_1Q
+ 0006:0048       Pixel
+ 0007:0000       ScanlineSeg_check_stack
+ 0007:0019       not_smaller_sl
+ 0007:001E       no_room_sl
+ 0007:00B2       remap_slrop
+ 0007:00C2       read_modify_write_needed_sl
+ 0007:00D2       do_scanlines
+ 0007:0109       mono_main_loop
+ 0007:013F       mono_main_draw_loop
+ 0007:0197       color_main_loop
+ 0007:01E1       the216_start
+ 0007:02AA       sl216_main_draw_loop
+ 0007:035D       color_main_draw_loop
+ 0007:03A5       begin_scanline
+ 0007:03E3       begin_scanline_mono
+ 0007:040C       begin_scanline_color
+ 0007:0413       the216_begin
+ 0007:045B       end_scanline
+ 0007:0479       get_fill_data
+ 0007:0B29       pattern_preprocessing
+ 0008:0008       SetDeviceBitmapBits
+ 0008:0075       eti_next_scan
+ 0008:00ED       eti_1
+ 0008:015D       eti_4
+ 0008:018D       eti_4_have_proc
+ 0008:01DA       eti_8
+ 0008:025D       eti_24
+ 0008:02F0       create_color_table
+ 0008:0311       copy_e1i1
+ 0008:0388       copy_e4i1
+ 0008:03EB       copy_e8i1
+ 0008:0429       copy_e24i1
+ 0008:04CA       copy_e1i8
+ 0008:0515       copy_e4i8
+ 0008:0551       copy_e8i8
+ 0008:056D       copy_e8i8_partial
+ 0008:0587       copy_e24i8
+ 0008:05C1       copy_e24i8_partial
+ 0008:0634       GetDeviceBitmapBits
+ 0008:0773       ite_4
+ 0008:08BE       copy_i1e1
+ 0008:094B       copy_i1e4
+ 0008:09C7       copy_i1e8
+ 0008:0A1D       copy_i1e24
+ 0008:0AE5       copy_i8e1
+ 0008:0B21       copy_i8e4
+ 0008:0B79       copy_i8e8
+ 0008:0BAB       copy_i8e24
+ 0008:0C1A       DeviceBitmapBits
+ 0008:0CD9       CreateBitmap
+ 0008:0CEC       do_bitmap_computations
+ 0008:0D6E       james_bmc_main
+ 0008:0DC0       DIBtoDevice
+ 0008:0E23       DibBlt
+ 0008:135A       diScreen386
+ 0008:1424       StretchDIBits
+ 0008:1518       scanline_encode_bitmap
+ 0008:16AD       block_encode
+ 0008:1716       encode_scanline_I1
+ 0008:175D       encode_scanline_I8
+ 0008:17E9       copyrle_i1e8
+ 0008:17E9       copyrle_i1e4
+ 0008:180A       copyrle_i8e4
+ 0008:1829       copyrle_i8e8
+ 0008:1841       copyabs_i1e4
+ 0008:1877       copyabs_i1e8
+ 0008:18B6       copyabs_i8e4
+ 0008:1945       copyabs_i8e8
+ 0008:19A0       copyabs_i8e8_done
+ 0008:19A6       copyabs_i8e8_fini
+ 0008:19DE       RleBlt
+ 0008:1BD3       init_clip
+ 0008:1C31       next_scan
+ 0008:1C57       decode_abs8
+ 0008:1D2A       decode_abs4
+ 0008:1DB9       decode_rle8
+ 0008:1DEE       decode_rle4
+ 0008:1E27       clip_rle
+ 0008:1E6C       copyrle_exi1
+ 0008:1ECF       copyrle_e4i1
+ 0008:1EFD       copyrle_e8i1
+ 0008:1F11       copyrle_exi8
+ 0008:1F26       copyrle_e4i8
+ 0008:1F47       copyrle_e8i8
+ 0008:1F58       copyabs_e4i1
+ 0008:1FE5       copyabs_e8i1
+ 0008:2043       copyabs_e4i8
+ 0008:2084       copyabs_e8i8
+ 0008:20A8       encode_rle_table
+ 0008:20B0       encode_absolute_table
+ 0008:20B8       decode_rle_table
+ 0008:20C0       decode_absolute_table
+ 0009:0000       windowsVersion
+ 0009:0002       screen_busy
+ 0009:0004       cursor_xcoord
+ 0009:0006       cursor_ycoord
+ 0009:0008       cursor_xdraw
+ 0009:000A       cursor_ydraw
+ 0009:000C       cursor_flags
+ 0009:000E       exclude_global
+ 0009:0010       exclude_rect_valid
+ 0009:0012       exclude_rect_left
+ 0009:0014       exclude_rect_right
+ 0009:0016       exclude_rect_top
+ 0009:0018       exclude_rect_bottom
+ 0009:0370       cursor_funcs
+ 0009:1BB4       hwcursor_rotated
+ 0009:1BB6       hwcursor_newdata
+ 0009:1BB8       hwcursor
+ 0009:1BC4       hwcursor_data
+ 0009:1D13       enable_216
+ 0009:1DD6       fborder_count
+ 0009:1DD8       Palette
+ 0009:1E3C       rscan
+ 0009:1EAF       GetColor_addr
+ 0009:1EB8       dac_size
+ 0009:1EBA       bank_select
+ 0009:1EBA       bank_select_byte
+ 0009:1EBC       Video_Board_Id
+ 0009:1EBE       Video_Memory_Banks
+ 0009:1EBF       Video_Board_Flags
+ 0009:1EC0       VScreen_Width
+ 0009:1EC2       VScreen_Height
+ 0009:1EC4       Vmode
+ 0009:1EC6       ScreenSelector
+ 0009:1EC8       ScratchSel
+ 0009:1ECA       shadow_mem_status
+ 0009:1ECB       ssb_mask
+ 0009:1ECD       enabled_flag
+ 0009:1ECE       device_local_brush
+ 0009:1F21       PaletteTranslationTable
+ 0009:2021       PaletteIndexTable
+ 0009:2121       PaletteModified
+ 0009:2122       TextColorXlated
+ 0009:2123       device_local_drawmode
+ 0009:2143       device_local_pen
+ 0009:2149       is_protected
+ 0009:214B       adPalette
+ 0009:254B       abPaletteAccl
+
+Program entry point at 0002:0349

@@ -1,0 +1,45 @@
+
+ VPOSTD
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000146H _LTEXT                 CODE 32-bit
+ 0001:00000148 000000050H _LDATA                 CODE 32-bit
+ 0002:00000000 000000020H _ITEXT                 ICODE 32-bit
+ 0002:00000020 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000148 VPOSTD_DDB              VPOSTD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000016       VPOSTD_API_Proc
+ 0001:00000065       VPOSTD_Call_PostHost
+ 0001:000000D2       VPOSTD_Call_PostHost_Now
+ 0001:00000000       VPOSTD_Control
+ 0001:00000148       VPOSTD_DDB
+ 0002:00000002       VPOSTD_Device_Init
+ 0001:00000038       VPOSTD_Get_Version
+ 0001:00000040       VPOSTD_Register_Callback
+ 0002:00000000       VPOSTD_Sys_Crit_Init
+
+  Address         Publics by Value
+
+ 0001:00000000       VPOSTD_Control
+ 0001:00000016       VPOSTD_API_Proc
+ 0001:00000038       VPOSTD_Get_Version
+ 0001:00000040       VPOSTD_Register_Callback
+ 0001:00000065       VPOSTD_Call_PostHost
+ 0001:000000D2       VPOSTD_Call_PostHost_Now
+ 0001:00000148       VPOSTD_DDB
+ 0002:00000000       VPOSTD_Sys_Crit_Init
+ 0002:00000002       VPOSTD_Device_Init

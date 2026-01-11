@@ -1,0 +1,77 @@
+
+ VwatchD
+
+ Start         Length     Name                   Class
+ 0001:00000000 0000002DCH _LTEXT                 CODE 32-bit
+ 0001:000002DC 000000357H _LDATA                 CODE 32-bit
+ 0002:00000000 000000085H _ITEXT                 ICODE 32-bit
+ 0002:00000088 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 00000000BH _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:000002DC VwatchD_DDB             VwatchD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000247       @VwatchD_Get_Version
+ 0001:00000314       VwatchD_CB_Offset
+ 0001:00000000       VwatchD_Control
+ 0001:000000C6       VwatchD_Create_VM
+ 0001:000002DC       VwatchD_DDB
+ 0001:000002C5       VwatchD_Debug_Query
+ 0001:000001BC       VwatchD_Destroy_VM
+ 0002:00000057       VwatchD_Device_Init
+ 0002:0000006E       VwatchD_Init_Complete
+ 0001:0000029D       VwatchD_PM_API
+ 0001:000001FC       VwatchD_Power_Event
+ 0001:000001A5       VwatchD_Query_Destroy
+ 0001:000001E3       VwatchD_Set_Focus
+ 0001:00000213       VwatchD_System_Exit
+ 0001:0000022A       VwatchD_Sys_Critical_Exit
+ 0002:00000000       VwatchD_Sys_Crit_Init
+ 0001:000000ED       VwatchD_SYS_VM_Init
+ 0001:00000177       VwatchD_Sys_VM_Terminate
+ 0001:00000271       VwatchD_V86_API
+ 0001:00000149       VwatchD_VM_Critical_Init
+ 0001:00000104       VwatchD_VM_Init
+ 0001:0000018E       VwatchD_VM_Not_Executeable
+ 0001:00000132       VwatchD_VM_Resume
+ 0001:0000011B       VwatchD_VM_Suspend
+ 0001:00000160       VwatchD_VM_Terminate
+
+  Address         Publics by Value
+
+ 0001:00000000       VwatchD_Control
+ 0001:000000C6       VwatchD_Create_VM
+ 0001:000000ED       VwatchD_SYS_VM_Init
+ 0001:00000104       VwatchD_VM_Init
+ 0001:0000011B       VwatchD_VM_Suspend
+ 0001:00000132       VwatchD_VM_Resume
+ 0001:00000149       VwatchD_VM_Critical_Init
+ 0001:00000160       VwatchD_VM_Terminate
+ 0001:00000177       VwatchD_Sys_VM_Terminate
+ 0001:0000018E       VwatchD_VM_Not_Executeable
+ 0001:000001A5       VwatchD_Query_Destroy
+ 0001:000001BC       VwatchD_Destroy_VM
+ 0001:000001E3       VwatchD_Set_Focus
+ 0001:000001FC       VwatchD_Power_Event
+ 0001:00000213       VwatchD_System_Exit
+ 0001:0000022A       VwatchD_Sys_Critical_Exit
+ 0001:00000247       @VwatchD_Get_Version
+ 0001:00000271       VwatchD_V86_API
+ 0001:0000029D       VwatchD_PM_API
+ 0001:000002C5       VwatchD_Debug_Query
+ 0001:000002DC       VwatchD_DDB
+ 0001:00000314       VwatchD_CB_Offset
+ 0002:00000000       VwatchD_Sys_Crit_Init
+ 0002:00000057       VwatchD_Device_Init
+ 0002:0000006E       VwatchD_Init_Complete

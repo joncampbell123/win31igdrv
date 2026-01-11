@@ -1,0 +1,111 @@
+
+ MOUSE
+
+ Start     Length     Name                   Class
+ 0001:0000 00CD7H     _TEXT                  CODE
+ 0002:0000 000F4H     _DATA                  DATA
+
+ Origin   Group
+ 0002:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:006C Disable                 Disable
+ 0001:0035 Enable                  Enable
+ 0001:0000 Inquire                 Inquire
+ 0001:0097 MouseGetIntVect         MouseGetIntVect
+ 0001:0091 WEP                     WEP
+
+  Address         Publics by Name
+
+ 0000:0000  Imp  AllocDStoCSAlias     (KERNEL.171)
+ 0002:000E       bios_proc
+ 0001:0A38       bus_disable
+ 0001:09F4       bus_enable
+ 0001:0897       bus_search
+ 0001:0903       check_bus_irq
+ 0002:001A       device_int
+ 0001:006C       Disable
+ 0002:0014       disable_proc
+ 0001:0035       Enable
+ 0001:00E7       enable_our_int
+ 0002:0012       enable_proc
+ 0002:000A       event_proc
+ 0001:09D5       GetChangeInState
+ 0001:00AC       hook_us_in
+ 0001:0CC4       I33_init
+ 0001:0134       Initialize
+ 0001:077F       inport_disable
+ 0001:072B       inport_enable
+ 0001:05FC       inport_find_int
+ 0001:05A8       inport_search
+ 0001:0000       Inquire
+ 0002:0018       IntCS
+ 0002:0016       interrupt_rate
+ 0002:0008       io_base
+ 0002:0003       mask_8259
+ 0001:0097       MouseGetIntVect
+ 0002:0005       mouse_flags
+ 0002:0006       mouse_type
+ 0002:0004       old_8259_mask
+ 0001:0B5C       ps2_enable
+ 0001:0B14       ps2_search
+ 0001:02DE       serial_disable
+ 0001:028F       serial_enable
+ 0001:033A       serial_search
+ 0001:0374       test_card
+ 0001:0440       test_loop
+ 0001:00F4       unhook_us
+ 0002:0002       vector
+ 0001:0091       WEP
+ 0002:0000       WinFlags
+ 0000:0000  Imp  __ROMBIOS            (KERNEL.173)
+ 0000:0000  Imp  __WINFLAGS           (KERNEL.178)
+
+  Address         Publics by Value
+
+ 0000:0000  Imp  __ROMBIOS            (KERNEL.173)
+ 0000:0000  Imp  __WINFLAGS           (KERNEL.178)
+ 0000:0000  Imp  AllocDStoCSAlias     (KERNEL.171)
+ 0001:0000       Inquire
+ 0001:0035       Enable
+ 0001:006C       Disable
+ 0001:0091       WEP
+ 0001:0097       MouseGetIntVect
+ 0001:00AC       hook_us_in
+ 0001:00E7       enable_our_int
+ 0001:00F4       unhook_us
+ 0001:0134       Initialize
+ 0001:028F       serial_enable
+ 0001:02DE       serial_disable
+ 0001:033A       serial_search
+ 0001:0374       test_card
+ 0001:0440       test_loop
+ 0001:05A8       inport_search
+ 0001:05FC       inport_find_int
+ 0001:072B       inport_enable
+ 0001:077F       inport_disable
+ 0001:0897       bus_search
+ 0001:0903       check_bus_irq
+ 0001:09D5       GetChangeInState
+ 0001:09F4       bus_enable
+ 0001:0A38       bus_disable
+ 0001:0B14       ps2_search
+ 0001:0B5C       ps2_enable
+ 0001:0CC4       I33_init
+ 0002:0000       WinFlags
+ 0002:0002       vector
+ 0002:0003       mask_8259
+ 0002:0004       old_8259_mask
+ 0002:0005       mouse_flags
+ 0002:0006       mouse_type
+ 0002:0008       io_base
+ 0002:000A       event_proc
+ 0002:000E       bios_proc
+ 0002:0012       enable_proc
+ 0002:0014       disable_proc
+ 0002:0016       interrupt_rate
+ 0002:0018       IntCS
+ 0002:001A       device_int
+
+Program entry point at 0001:0134

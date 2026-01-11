@@ -1,0 +1,1266 @@
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-1
+
+
+					page	,132
+				;-----------------------------Module-Header-----------------------------;
+				; Module Name:	BUS8255.ASM
+				;
+				; Windows mouse driver data and initialization routines for using an
+				; 8255 Bus Mouse for Windows
+				;
+				; Created: 21-Aug-1987
+				; Author:  Mr. Mouse [mickeym], Walt Moore [waltm], and a supporting
+				;	   cast of thousands
+				;
+				; 10-Jan-1989 -by- Amit Chatterjee [amitc]
+				; Modified the 'check_bus_irq' routine to get the IRQ using the INT 33
+				; driver if one was loaded.
+				;
+				; 18-Oct-1989 -by- Amit Chatterjee [amitc]
+				; In the 'check_bus_irq' routine added a loop with the mouse interrupts
+				; disabled to look for stray interrupts coming in (like network ones)
+				; in the actual loop which follows (with the mouse interrupts enabled)
+				; these stray interrupts if they come in again are ignored. This fixes
+				; the old green-eyed mouse problems (windows would not detect them)
+				;
+				; Copyright (c) 1986,1987  Microsoft Corporation
+				;
+				; Exported Functions:
+				;	None
+				; Public Functions:
+				;	bus_enable
+				;	bus_disable
+				;	bus_search
+				; Public Data:
+				;	None
+				; General Description:
+				;	This module contains the functions to find, enable, disable,
+				;	and process interrupts for an 8255 Bus Mouse.
+				;-----------------------------------------------------------------------;
+				
+					title	8255 Bus Mouse Hardware Dependent Code
+				
+					.list
+				
+					??_out	bus8255
+				
+				
+					externNP hook_us_in		;Hook us into our interrupt
+					externNP unhook_us		;Hook us out of our interrupt
+					externNP enable_our_int 	;Enable us at the 8259
+				
+				
+				
+				;	Definitions for the 8255A, as it is used for the Bus Mouse.
+				;
+				;	Port A of the 8255 will be used to read the motion deltas
+				;	and button state of the mouse.	It will be configured as
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-2
+
+
+				;	an input device.
+				;
+				;	Port B will not be used, except as a test register to
+				;	determine if there really is an 8255 out there.
+				;
+				;	Port C will be used be split.  The upper half of port C
+				;	will be configured as output.  This port will control
+				;	the mouse (see CTRL_PORT below for bit definitions).
+				;	The lower half of port C will be configured as input.
+				;	The state of IRQs 2,3,4 and 5 can be read at this port.
+				
+				
+ = 0000				PORT_8255_A	equ	0		;8-bit I/O port A
+ = 0001				PORT_8255_B	equ	1		;8-bit I/O port B
+ = 0002				PORT_8255_C	equ	2		;8-bit I/O port C or 2 4-bit ports
+ = 0002				PORT_8255_C_LOW equ	2		;8-bit I/O port C or 2 4-bit ports
+ = 0002				PORT_8255_C_HI	equ	2		;8-bit I/O port C or 2 4-bit ports
+ = 0003				PORT_8255_CTRL	equ	3		;Control register
+				
+				
+				;	Definitions for the 8255 control port
+				
+ = 0080				MODE_SET_CMD	equ	10000000b	;Mode set command
+									;  Group B definitions
+ = 0001				PORT_C_LOW_IN	equ	00000001b	;    Port C[D3:D0] is input
+ = 0000				PORT_C_LOW_OUT	equ	00000000b	;    Port C[D3:D0] is output
+ = 0002				PORT_B_IN	equ	00000010b	;    Port B is input
+ = 0000				PORT_B_OUT	equ	00000000b	;    Port B is output
+ = 0000				GROUP_B_MODE_0	equ	00000000b	;    Group B is mode 0
+ = 0004				GROUP_B_MODE_1	equ	00000100b	;    Group B is mode 1
+									;  Group A definitions
+ = 0008				PORT_C_HI_IN	equ	00001000b	;    Port C[D7:D4] is input
+ = 0000				PORT_C_HI_OUT	equ	00000000b	;    Port C[D7:D4] is output
+ = 0010				PORT_A_IN	equ	00010000b	;    Port A is input
+ = 0000				PORT_A_OUT	equ	00000000b	;    Port A is output
+ = 0000				GROUP_A_MODE_0	equ	00000000b	;    Group B is mode 0
+ = 0020				GROUP_A_MODE_1	equ	00100000b	;    Group B is mode 1
+ = 0060				GROUP_A_MODE_2	equ	01100000b	;    Group B is mode 2
+				
+ = 0000				BIT_SET_CMD	equ	00000000b	;Bit set command
+ = 0001				SET_C_BIT	equ	00000001b	;  Set	 a bit in port C
+ = 0000				RESET_C_BIT	equ	00000000b	;  Reset a bit in port C
+ = 000E				C_BIT_INDEX	equ	00001110b	;  Index of bit goes here
+				
+				
+ = 0081				MOUSE_MODE	=	MODE_SET_CMD+PORT_C_LOW_IN+PORT_B_OUT+GROUP_B_MODE_0
+ = 0091				MOUSE_MODE	=	MOUSE_MODE+PORT_C_HI_OUT+PORT_A_IN+GROUP_A_MODE_0
+				
+				
+				
+				;	Definitions for the bus mouse control and data ports
+				
+ =				MOUSE_CTRL_PORT equ	PORT_8255_C_HI	;Control port
+ = 0010				CMD_DISABLE_INT equ	0001b shl 4	;  Disable interrupts
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-3
+
+
+ = 0000				CMD_ENABLE_INT	equ	0000b shl 4	;  Enable interrupts
+ = 0020				CMD_SELECT_HIGH equ	0010b shl 4	;  Select high nibble of count
+ = 0000				CMD_SELECT_LOW	equ	0000b shl 4	;  Select low nibble of count
+ = 0040				CMD_SELECT_Y	equ	0100b shl 4	;  Select Y counter
+ = 0000				CMD_SELECT_X	equ	0000b shl 4	;  Select X counter
+ = 0080				CMD_HOLD	equ	1000b shl 4	;  Hold counter for reading
+ = 0000				CMD_CLEAR_N_CNT equ	0000b shl 4	;  Clear counters and start counting
+				
+ = 0090				CTRL_GET_LOW_X	equ	CMD_HOLD+CMD_SELECT_X+CMD_SELECT_LOW+CMD_DISABLE_INT
+ = 00B0				CTRL_GET_HIGH_X equ	CMD_HOLD+CMD_SELECT_X+CMD_SELECT_HIGH+CMD_DISABLE_INT
+ = 00D0				CTRL_GET_LOW_Y	equ	CMD_HOLD+CMD_SELECT_Y+CMD_SELECT_LOW+CMD_DISABLE_INT
+ = 00F0				CTRL_GET_HIGH_Y equ	CMD_HOLD+CMD_SELECT_Y+CMD_SELECT_HIGH+CMD_DISABLE_INT
+ = 0000				CTRL_RUN	equ	CMD_CLEAR_N_CNT+CMD_ENABLE_INT
+				
+ =				MOUSE_DATA_PORT equ	PORT_8255_A	;Mouse Data Port
+ = 000F				MOTION_DELTA	equ	00001111b	;  Deltas are lower nibble
+ = 0020				BUS_B3_UP	equ	00100000b	;  Button 3 is up (right)
+ = 0040				BUS_B2_UP	equ	01000000b	;  Button 2 is up (middle button)
+ = 0080				BUS_B1_UP	equ	10000000b	;  Button 1 is up (left)
+				
+ =				MOUSE_IRQ_PORT	equ	PORT_8255_C_LOW ;IRQs can be read from this port
+ = 0001				BUS_IRQ_5	equ	0001b		;  IRQ 5 state
+ = 0002				BUS_IRQ_4	equ	0010b		;  IRQ 4 state
+ = 0004				BUS_IRQ_3	equ	0100b		;  IRQ 3 state
+ = 0008				BUS_IRQ_2	equ	1000b		;  IRQ 2 state
+				
+				
+ = 003C				IRQ_8259_BITS	equ	00111100b	;8259 IRQs 5,4,3,2
+ = 000F				IRQ_MASK_BITS	equ	BUS_IRQ_5+BUS_IRQ_4+BUS_IRQ_3+BUS_IRQ_2
+				
+				
+				
+				;	Address of port to search for the mouse.  We'll search
+				;	from lower address to higher address.
+				
+ = 023C				FIRST_BUS_MOUSE_ADDR	equ	23Ch	;Addr of first port to search
+ = 023C				LAST_BUS_MOUSE_ADDR	equ	23Ch	;Addr of last port to search
+ = 0004				ADDR_INCREMENT		equ	4	;Increment to next port
+				
+				
+				
+				sBegin	Data
+ 0000                        2	_DATA segment 
+				
+				externW WinFlags			;Windows exported flags
+				externB vector				;Vector # of mouse interrupt
+				externB mask_8259			;8259 interrupt enable mask
+				externB mouse_flags			;Various flags as follows
+				externW io_base 			;Mouse port base address
+				externW enable_proc			;Address of routine to	enable mouse
+				externW disable_proc			;Address of routine to disable mouse
+				externB device_int			;Start of mouse specific int handler
+				externW interrupt_rate			;Maximum interrupt rate of mouse
+				externD event_proc			;Mouse event procedure when enabled
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-4
+
+
+				
+ 0000  0000			OriginalCommPortAddr	dw	0	;addr of port whose int we will use
+ 0002  0000			OriginalCommAddrLoc	dw	0	;location in 40: for above address
+				
+				sEnd	Data
+ 0004                        1	_DATA ends 
+				
+				
+				sBegin	Code
+ 0000                        2	_TEXT segment 
+				assumes cs,Code
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-5
+
+
+				page
+				
+				;	This is the start of the data which will be copied into
+				;	the device_int area reserved in the data segment.
+				
+ = 0000				BUS_START	equ	this word
+				
+				
+				;--------------------------Interrupt-Routine----------------------------;
+				; bus_int - Mouse Interrupt Handler for the 8255 Bus Mouse
+				;
+				; This is the handler for the interrupt generated by the 8255 Bus
+				; mouse.  It will reside in the Data segment.
+				;
+				; Entry:
+				;	DS = Data
+				; Returns:
+				;	AX = status
+				;	BX = delta X
+				;	CX = delta Y
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	SI,DS,ES,BP
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,DI,FLAGS
+				; Calls:
+				;	None
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes cs,Code
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+				
+ = 0000				BUS_PROC_START	equ	$-BUS_START	;Delta to this procedure
+						.errnz	BUS_PROC_START	;Must be first
+				
+ 0000				bus_int proc	far
+				
+ 0000  50				push	ax
+ 0001  53				push	bx
+ 0002  51				push	cx
+ 0003  52				push	dx
+ 0004  56				push	si
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-6
+
+
+ 0005  57				push	di
+ 0006  55				push	bp
+ 0007  1E				push	ds
+ 0008  06				push	es
+ 0009  B8 ---- R			mov	ax,_DATA
+ 000C  8E D8				mov	ds,ax
+					assumes ds,Data
+				
+ 000E  8B 3E 0000 E			mov	di,io_base
+ 0012  8D 55 02				lea	dx,[di].MOUSE_CTRL_PORT ;DX = command port
+				;	lea	di,[di].MOUSE_DATA_PORT ;DI = data port
+					.errnz	MOUSE_DATA_PORT
+ 0015  B1 04				mov	cl,4			;Will be shifting nibbles a lot
+				
+ 0017  B0 90				mov	al,CTRL_GET_LOW_X	;Ask for low X
+ 0019  EE				out	dx,al
+					io_delay
+ 001A  EB 00                 1		jmp	short $+2 
+ 001C  EB 00                 1		jmp	short $+2 
+ 001E  EB 00                 1		jmp	short $+2 
+ 0020  87 D7				xchg	dx,di			;DX = Data port
+ 0022  EC				in	al,dx			;D3:D0 = low X delta
+ 0023  D3 C8				ror	ax,cl			;Save low X delta in AX[D15:D12]
+				
+ 0025  87 D7				xchg	dx,di			;DX = command port
+ 0027  B0 B0				mov	al,CTRL_GET_HIGH_X	;Ask for high X
+ 0029  EE				out	dx,al
+					io_delay
+ 002A  EB 00                 1		jmp	short $+2 
+ 002C  EB 00                 1		jmp	short $+2 
+ 002E  EB 00                 1		jmp	short $+2 
+ 0030  87 D7				xchg	dx,di			;DX = Data port
+ 0032  EC				in	al,dx			;D3:D0 = high X delta
+ 0033  D3 C0				rol	ax,cl			;AL is delta X
+ 0035  98				cbw				;AX is delta X
+ 0036  93				xchg	bx,ax			;Save delta X in BX
+				
+ 0037  87 D7				xchg	dx,di			;DX = command port
+ 0039  B0 D0				mov	al,CTRL_GET_LOW_Y	;Ask for low Y
+ 003B  EE				out	dx,al
+					io_delay
+ 003C  EB 00                 1		jmp	short $+2 
+ 003E  EB 00                 1		jmp	short $+2 
+ 0040  EB 00                 1		jmp	short $+2 
+ 0042  87 D7				xchg	dx,di			;DX = Data port
+ 0044  EC				in	al,dx			;D3:D0 = low Y delta
+ 0045  D3 C8				ror	ax,cl			;Save low Y delta in AX[D15:D12]
+				
+ 0047  87 D7				xchg	dx,di			;DX = command port
+ 0049  B0 F0				mov	al,CTRL_GET_HIGH_Y	;Ask for high Y and button info
+ 004B  EE				out	dx,al
+					io_delay
+ 004C  EB 00                 1		jmp	short $+2 
+ 004E  EB 00                 1		jmp	short $+2 
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-7
+
+
+ 0050  EB 00                 1		jmp	short $+2 
+ 0052  87 D7				xchg	dx,di			;DX = Data port
+ 0054  EC				in	al,dx			;D3:D0 = high Y delta
+ 0055  D3 C0				rol	ax,cl			;AL is delta Y, AH has button info
+ 0057  8B C8				mov	cx,ax			;Save button info
+ 0059  98				cbw				;AX is delta Y
+ 005A  91				xchg	cx,ax			;Save delta Y in CX, AH has button info
+				
+					.errnz	MOTION_DELTA-00001111b	;The above code assumes this
+				
+ 005B  87 D7				xchg	dx,di			;DX = command port
+ 005D  B0 00				mov	al,CTRL_RUN		;Clear counters, turn on interrupts
+ 005F  EE				out	dx,al
+					io_delay
+ 0060  EB 00                 1		jmp	short $+2 
+ 0062  EB 00                 1		jmp	short $+2 
+ 0064  EB 00                 1		jmp	short $+2 
+ 0066  B0 20				mov	al,EOI			;Acknowledge 8259 interrupt
+ 0068  F6 06 0000 E 40			test	mouse_flags,MF_ON_SLAVEPIC
+ 006D  74 02				jz	no_slave		;mouse not on slave PIC
+ 006F  E6 A0				out	ACK_SLAVE_PORT,al
+ 0071				no_slave:
+ 0071  E6 20				out	ACK_PORT,al
+				
+ 0073  80 E4 0A				and	ah,(BUS_B3_UP+BUS_B1_UP) shr 4	;Isolate the button states
+ 0076  8A C4				mov	al,ah
+ 0078  D0 E8				shr	al,1			;Place current status in D2 and D0
+ 007A  86 06 00A8 E			xchg	al,device_int[BUTTON_STATE]
+ 007E  0A C4				or	al,ah			;Combine previous and current to give
+ 0080  32 E4				xor	ah,ah			;  an index into the state table
+ 0082  93				xchg	ax,bx
+ 0083  8A 9F 00A9 E			mov	bl,device_int[bx][STATE_XLATE]
+ 0087  93				xchg	ax,bx
+ 0088  8B D3				mov	dx,bx			;Set 'C' if motion
+ 008A  0B D1				or	dx,cx
+ 008C  F7 DA				neg	dx
+ 008E  13 C0				adc	ax,ax			;Move in movement flag, set 'Z' if 0
+					.errnz	SF_MOVEMENT-00000001b
+				
+ 0090  74 0C				jz	bus8255_no_data 	;Only call out if something happened
+ 0092  BA 0002				mov	dx,NUMBER_BUTTONS
+ 0095  33 F6			        xor     si,si		; 0 ExtraMessageInfo for 3.1
+ 0097  33 FF			        xor     di,di		; 0 ExtraMessageInfo for 3.1
+				
+ 0099  FB				sti
+ 009A  FF 1E 0000 E			call	event_proc
+				
+ 009E				bus8255_no_data:
+ 009E  07				pop	es
+ 009F  1F				pop	ds
+ 00A0  5D				pop	bp
+ 00A1  5F				pop	di
+ 00A2  5E				pop	si
+ 00A3  5A				pop	dx
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-8
+
+
+ 00A4  59				pop	cx
+ 00A5  5B				pop	bx
+ 00A6  58				pop	ax
+ 00A7  CF				iret
+				
+ 00A8				bus_int endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-9
+
+
+				page
+				
+				;	old_status contains the state of the mouse the last time we
+				;	were called to process an interrupt.
+				
+ = 00A8				BUTTON_STATE	equ	$-BUS_START	;Delta to this byte
+ 00A8  00					db	0		;Old status will go here
+				
+				
+				;-----------------------------------------------------------------------;
+				; state_xlate
+				;
+				;	state_xlate is used to translate the current and previous
+				;	button state information into the values required by
+				;	Windows.  It is indexed as follows:
+				;
+				;	    cB1 pB1 cB3 pB3
+				;
+				;	     |	 |   |	 |
+				;	     |	 |   |	  --- 0 if button 3 was down, 1 if button 3 was up
+				;	     |	 |   |
+				;	     |	 |    ------- 0 if button 3 is	down, 1 if button 3 is	up
+				;	     |	 |
+				;	     |	  ----------- 0 if button 1 was down, 1 if button 1 was up
+				;	     |
+				;	      --------------- 0 if button 1 is	down, 1 if button 1 is	up
+				;
+				;	This table must be copied to the data segment along with the
+				;	interrupt handler.
+				;
+				;-----------------------------------------------------------------------;
+				
+ = 00A9				STATE_XLATE	equ	$-BUS_START	;delta to this table
+				
+ 00A9  00				db	0			shr 1
+ 00AA  04				db	(SF_B2_DOWN)		shr 1
+ 00AB  08				db	(SF_B2_UP)		shr 1
+ 00AC  00				db	0			shr 1
+				
+ 00AD  01				db	 SF_B1_DOWN		shr 1
+ 00AE  05				db	(SF_B1_DOWN+SF_B2_DOWN) shr 1
+ 00AF  09				db	(SF_B1_DOWN+SF_B2_UP)	shr 1
+ 00B0  01				db	 SF_B1_DOWN		shr 1
+				
+ 00B1  02				db	 SF_B1_UP		shr 1
+ 00B2  06				db	(SF_B1_UP+SF_B2_DOWN)	shr 1
+ 00B3  0A				db	(SF_B1_UP+SF_B2_UP)	shr 1
+ 00B4  02				db	 SF_B1_UP		shr 1
+				
+ 00B5  00				db	0			shr 1
+ 00B6  04				db	(SF_B2_DOWN)		shr 1
+ 00B7  08				db	(SF_B2_UP)		shr 1
+ 00B8  00				db	0			shr 1
+				
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-10
+
+
+					.errnz	NUMBER_BUTTONS-2	;Won't work unless a two button mouse
+				
+ = 00B9				BUS_INT_LENGTH	= $-BUS_START		;Length of code to copy
+					.errnz	BUS_INT_LENGTH gt MAX_INT_SIZE
+				
+				display_int_size  %BUS_INT_LENGTH
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-11
+
+
+				page
+				
+ 00B9				irq_mappings	label	word
+				
+ 00B9  00 00				db	0,0			;No IRQ found
+ 00BB  0D DF				db	5+8,11011111b		;IRQ 5 was only IRQ found
+ 00BD  0C EF				db	4+8,11101111b		;IRQ 4 was only IRQ found
+ 00BF  00 00				db	0,0			;4 and 5 responded
+ 00C1  0B F7				db	3+8,11110111b		;IRQ 3 was only IRQ found
+ 00C3  00 00				db	0,0			;3 and 5 responded
+ 00C5  00 00				db	0,0			;3 and 4 responded
+ 00C7  00 00				db	0,0			;3,4 and 5 all responded
+ 00C9  0A FB				db	2+8,11111011b		;IRQ 2 was only IRQ found
+				
+					.errnz	BUS_IRQ_5-0001b
+					.errnz	BUS_IRQ_4-0010b
+					.errnz	BUS_IRQ_3-0100b
+					.errnz	BUS_IRQ_2-1000b
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-12
+
+
+				page
+				
+				;---------------------------Public-Routine------------------------------;
+				; bus_search - Search for a 8255 Bus Mouse
+				;
+				; A search will be made for a 8255 based mouse.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	'C' set if found
+				;	  AX = address of interrupt routine if interrupt vector found
+				;	  SI = offset within the Code segment of the handler
+				; Error Returns:
+				;	'C' clear if not found
+				; Registers Preserved:
+				;	DS,BP
+				; Registers Destroyed:
+				;	AX,BX,DX,DI,SI,ES,FLAGS
+				; Calls:
+				;	check_bus_irq
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes cs,Code
+					assumes ds,Data
+				
+						public	bus_search
+ 00CB				bus_search	proc	near
+				
+ 00CB  BF 023C				mov	di,FIRST_BUS_MOUSE_ADDR
+				
+ 00CE				next_bus_card:
+ 00CE  8D 55 03				lea	dx,[di].PORT_8255_CTRL	;Initialize possible 8255
+ 00D1  B0 91				mov	al,MOUSE_MODE
+ 00D3  EE				out	dx,al
+					io_delay
+ 00D4  EB 00                 1		jmp	short $+2 
+ 00D6  EB 00                 1		jmp	short $+2 
+ 00D8  EB 00                 1		jmp	short $+2 
+				
+				;	To determine if we have found an 8255, we'll write a
+				;	signature byte to the B port and read it back.	Because
+				;	of ringing problems with the PS/2's I/O bus, we must
+				;	output something else on the I/O bus before reading the
+				;	signature back.
+				
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-13
+
+
+ 00DA  B0 A5				mov	al,0A5h 		;Keep signaure in a register so it
+ 00DC  8A E0				mov	ah,al			;  isn't on the bus when we do the
+ 00DE  8D 55 01				lea	dx,[di].PORT_8255_B	; IN
+					io_delay
+ 00E1  EB 00                 1		jmp	short $+2 
+ 00E3  EB 00                 1		jmp	short $+2 
+ 00E5  EB 00                 1		jmp	short $+2 
+ 00E7  EE				out	dx,al
+				
+ 00E8  8D 55 02				lea	dx,[di].MOUSE_CTRL_PORT ;This is to flush the PS2 I/O bus
+ 00EB  B0 10				mov	al,CMD_CLEAR_N_CNT+CMD_DISABLE_INT
+					io_delay
+ 00ED  EB 00                 1		jmp	short $+2 
+ 00EF  EB 00                 1		jmp	short $+2 
+ 00F1  EB 00                 1		jmp	short $+2 
+ 00F3  EE				out	dx,al
+				
+ 00F4  8D 55 01				lea	dx,[di].PORT_8255_B	;Read signature byte
+					io_delay
+ 00F7  EB 00                 1		jmp	short $+2 
+ 00F9  EB 00                 1		jmp	short $+2 
+ 00FB  EB 00                 1		jmp	short $+2 
+ 00FD  EC				in	al,dx
+ 00FE  3A C4				cmp	al,ah
+ 0100  75 2B				jne	see_if_next_card
+					cCall	check_bus_irq		;Try to find IRQ for bus mouse
+ 0102  E8 0137 R             1		call	check_bus_irq 
+ 0105  E3 26				jcxz	see_if_next_card	;None or too many IRQs
+					assumes es,nothing
+				
+				;	Looks like we found ourselves a mouse.	Maybe it would
+				;	like some cheese?
+				
+ 0107  89 3E 0000 E			mov	io_base,di		;Save base address
+ 010B  88 0E 0000 E			mov	vector,cl		;Save vector number
+ 010F  88 2E 0000 E			mov	mask_8259,ch		;Save 8259 enable mask
+ 0113  C7 06 0000 E 0022		mov	interrupt_rate,34
+ 0119  C7 06 0000 E 0228 R		mov	enable_proc,CodeOFFSET bus_enable
+ 011F  C7 06 0000 E 026C R		mov	disable_proc,CodeOFFSET bus_disable
+ 0125  BE 0000 R			mov	si,CodeOFFSET bus_int
+ 0128  B9 00B9				mov	cx,BUS_INT_LENGTH
+ 012B  F9				stc				;Show we found a card
+ 012C  C3				ret
+				
+ 012D				see_if_next_card:
+ 012D  83 C7 04				add	di,ADDR_INCREMENT
+ 0130  81 FF 023C			cmp	di,LAST_BUS_MOUSE_ADDR
+ 0134  72 98				jb	next_bus_card		;More cards exist
+ 0136  C3				ret				;'C' is clear to show no card
+				
+ 0137				bus_search	endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-14
+
+
+				page
+				
+				;---------------------------Public-Routine------------------------------;
+				; check_bus_irq - check which irq the bus mouse is on
+				;
+				; For all practical purposes, a bus mouse adapter has been
+				; found.  We'll now attempt to determine which interrupt
+				; vector it is on.  If more than one interrupt vector or
+				; no interrupt vector is found, the card will be rejected.
+				;
+				; Entry:
+				;	DI = io_base
+				;	Bus mouse interrupts disabled
+				; Returns:
+				;	CL = vector number    if IRQ found
+				;	CH = 8259 enable mask if IRQ found
+				; Error Returns:
+				;	CX = 0 if no IRQ or too many
+				; Registers Preserved:
+				;	DI,DS,BP
+				; Registers Destroyed:
+				;	AX,BX,DX,ES,FLAGS
+				; Calls:
+				;	None
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes cs,Code
+					assumes ds,Data
+				
+				cProc	check_bus_irq,<NEAR,PUBLIC,PASCAL> 
+				
+					localB	ByPassNoiseTest		;noise test needed or not
+				
+				cBegin	
+ 0137                        1	check_bus_irq proc near 
+ 0137  55                    1		push	bp 
+ 0138  8B EC                 1		mov	bp,sp 
+ 013A  83 EC 02              1		sub	sp,??? 
+				
+ 013D  F6 06 0000 E 02			test	mouse_flags,MF_INT33H
+ 0142  74 1B				jz	int33_not_present	;it is not present
+				
+ 0144  B8 0024				mov	ax,INT33H_GETINFO	;get info about mouse
+ 0147  CD 33				int	MOUSE_SYS_VEC		;CH has type & CL has IRQ
+ 0149  80 FD 01				cmp	ch,INT33H_BUS		;make sure it is bus
+ 014C  75 11				jne	int33_not_present	;may be old driver
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-15
+
+
+ 014E  0A C9				or	cl,cl			;do not deal with IRQ = 0
+ 0150  74 0D				jz	int33_not_present	;do alternate search
+ 0152  B5 01				mov	ch,1			;initial position for IRQ mask
+ 0154  D2 E5				shl	ch,cl			;get inverse of the mask
+ 0156  F6 D5				not	ch			;get the correct mak
+ 0158  80 C1 08				add	cl,08h			;convert IRQ to INT number
+ 015B  56				push	si			;setup stack for exit code
+ 015C  E9 01F0 R			jmp	bus_irq_found
+				
+ 015F				int33_not_present:
+				
+ 015F  56				push	si			;Will try the entire procedure
+ 0160  BE 0004				mov	si,4			;  this many time if we have to
+ 0163  C6 46 FF 00			mov	ByPassNoiseTest,0	;first have noise test enabled.
+				
+ 0167				check_bus_try_again:
+ 0167  4E				dec	si			;Another retry?
+ 0168  75 10				jnz	check_bus_retry		;yes.
+ 016A  80 7E FF FF			cmp	ByPassNoiseTest,0ffh	;was the test done w/o moisetest ?
+ 016E  75 03				jnz	noise_bypass_cycle	;no,search once more bypassing noise
+ 0170  E9 0204 R			jmp	check_bus_exit		;all done trying
+				
+ 0173				noise_bypass_cycle:
+				
+ 0173  C6 46 FF FF			mov	ByPassNoiseTest,0ffh	;retry again with noise test disabled
+ 0177  BE 0003				mov	si,3			;3 more attemts
+				
+ 017A				check_bus_retry:
+				
+ 017A  BB ---- R			mov	bx,BIOSDataSeg
+ 017D  8E C3				mov	es,bx
+					assumes es,BIOSDataSeg
+ 017F  33 DB				xor	bx,bx
+				
+ 0181  FA				cli				;Save the current IRQ mask
+ 0182  E4 21				in	al,MASK_PORT		;  and disable those IRQs that
+ 0184  8A F8				mov	bh,al			;  the mouse may be on
+ 0186  0C 3C				or	al,IRQ_8259_BITS
+ 0188  E6 21				out	MASK_PORT,al
+ 018A  FB				sti
+				
+ 018B  8D 55 03				lea	dx,[di].PORT_8255_CTRL	;The only way I've ever gotton this
+ 018E  B0 91				mov	al,MOUSE_MODE		;  to work is by reinitializing the
+ 0190  EE				out	dx,al			;  stupid thing
+					io_delay
+ 0191  EB 00                 1		jmp	short $+2 
+ 0193  EB 00                 1		jmp	short $+2 
+ 0195  EB 00                 1		jmp	short $+2 
+				
+				; first disable the mouse interrupts and look for other noise in the line.
+				
+ 0197  53				push	bx			;save PIC mask in BL
+ 0198  B7 FF				mov	bh,0ffh			;no known noise at this point
+ 019A  80 7E FF FF			cmp	ByPassNoiseTest,0ffh	;bypass the noise test ?
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-16
+
+
+ 019E  74 0F				jz	NoiseTestDone		;yes
+				
+				;----------------------------------------------------------------------------;
+				; The inboard bus mouse on commodore machines fail the mouse noise test. The ;
+				; mouse interrupts are registered even when mouse activity is disabled. To   ;
+				; take care of this we will first search the mouse with the irq noise test   ;
+				; enabled and then with the IRQ noise test disabled.			     ;
+				;----------------------------------------------------------------------------;
+				
+ 01A0  8D 55 02				lea	dx,[di].MOUSE_CTRL_PORT	;mouse control port
+ 01A3  B0 10				mov	al,CMD_DISABLE_INT	;disable mouse activity
+ 01A5  EE				out	dx,al
+				
+				; get the activity code on the line
+				
+ 01A6  B5 05				mov	ch,5			;watch 5 ticks go by
+ 01A8  E8 0209 R			call	GetChangeInState	;BL has code
+ 01AB  8A FB				mov	bh,bl			;get the state
+ 01AD  F6 D7				not	bh			;prepare the mask to mask them out
+				
+ 01AF				NoiseTestDone:
+				
+				; now enable mouse ints and get the activity on the line
+				
+ 01AF  8D 55 02				lea	dx,[di].MOUSE_CTRL_PORT
+ 01B2  B0 00				mov	al,CMD_CLEAR_N_CNT+CMD_ENABLE_INT
+ 01B4  EE				out	dx,al
+					io_delay
+ 01B5  EB 00                 1		jmp	short $+2 
+ 01B7  EB 00                 1		jmp	short $+2 
+ 01B9  EB 00                 1		jmp	short $+2 
+				
+ 01BB  32 DB				xor	bl,bl			;clear out for change of state
+ 01BD  B5 03				mov	ch,3			;watch 3 ticks go by
+ 01BF  E8 0209 R			call	GetChangeInState	;see what interrupts are coming in
+ 01C2  5A				pop	dx			;get pushed bx into dx
+ 01C3  8A FE				mov	bh,dh			;get the initial PIC state
+				
+				;	OK, we now have BL = IRQs which interrupted when they should have.
+				
+				;	Disable interrupts at the card until we get the real enable call.
+				;	This is also a good idea incase we detect multiple interrupts.
+				
+ 01C5  8D 55 02				lea	dx,[di].MOUSE_CTRL_PORT
+ 01C8  B0 10				mov	al,CMD_DISABLE_INT
+ 01CA  EE				out	dx,al
+				
+ 01CB  FA				cli				;Restore the 8259 IRQ mask
+ 01CC  E4 21				in	al,MASK_PORT
+ 01CE  24 C3				and	al,not IRQ_8259_BITS	;Save current state of unaltered bits
+ 01D0  80 E7 3C				and	bh,IRQ_8259_BITS	;Get old state of altered bits
+ 01D3  0A C7				or	al,bh			;Combine into new IRQ mask
+ 01D5  E6 21				out	MASK_PORT,al
+ 01D7  FB				sti
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-17
+
+
+				
+ 01D8  83 E3 0F				and	bx,IRQ_MASK_BITS	;IRQs we want to support
+ 01DB  33 C9				xor	cx,cx			;Assume not found
+ 01DD  80 FB 08				cmp	bl,8			;If greater than 8, more than
+ 01E0  77 07				ja	check_bus_irq_done	;  one IRQ responded
+ 01E2  D1 E3				shl	bx,1			;Indexing into words
+ 01E4  2E: 8B 8F 00B9 R			mov	cx,irq_mappings[bx]	;Get IRQ mask and vector number
+				
+ 01E9				check_bus_irq_done:
+				
+ 01E9  0B C9				or	cx,cx			;bus IRQ found ?
+ 01EB  75 03				jnz	bus_irq_found		;yes
+ 01ED  E9 0167 R			jmp	check_bus_try_again	;try again
+				
+ 01F0				bus_irq_found:
+				
+ 01F0  80 F9 0A				cmp	cl,0ah			;IRQ 2 ?
+ 01F3  75 0F				jnz	check_bus_exit		;no.
+ 01F5  F7 06 0000 E 0001		test	WinFlags,WF_PMODE	;in pmode ?
+ 01FB  74 07				jz	check_bus_exit		;no
+ 01FD  B1 71				mov	cl,71h			;we need to hook IRQ 9.
+ 01FF  80 0E 0000 E 40			or	mouse_flags,MF_ON_SLAVEPIC;mouse is on slave PIC
+				
+ 0204				check_bus_exit:
+ 0204  5E				pop	si
+				
+ 0205				check_bus_ret:
+				
+				cEnd
+ 0205  8B E5                 1		mov	sp,bp 
+ 0207  5D                    1		pop	bp 
+ 0208  C3                    1		ret	0 
+ 0209                        1	check_bus_irq endp 
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-18
+
+
+				page
+				
+				;----------------------------------------------------------------------------;
+				; GetChangeInState:							     ;
+				;									     ;
+				; This routine tests to see what interrupt activity is on the bus and rets   ;
+				; a coded value in BL. To understand what BL means, look into irq_mapping    ;
+				; table which is indexed by 2*BL.					     ;
+				;									     ;
+				; On entry DX must have the MOUSE_CTRL_PORT address and CX,AX,BL are destroy-;
+				; -ed. On entry BH has a value of which bits are to be ignored in the line.  ;
+				; BH will be used to ignore known line noise.				     ;
+				; Also on entry BL should be 0 and CH has the no of iterations.		     ;
+				;----------------------------------------------------------------------------;
+				
+					public	GetChangeInState
+				
+ 0209				GetChangeInState  proc near
+				
+				; ch has no of tics to let go 
+				
+ 0209  EC				in	al,dx
+ 020A  8A E0				mov	ah,al			
+ 020C  22 E7				and	ah,bh			;ignore known noise
+				
+ 020E				bus_irq_loop_2:
+				
+ 020E  EC				in	al,dx			;Get current states of irq 2-5
+ 020F  22 C7				and	al,bh			;ignore known noise
+ 0211  32 E0				xor	ah,al			;AH = 1 where changed
+ 0213  0A DC				or	bl,ah			;Mark any changes
+ 0215  8A E0				mov	ah,al			;Previous := current
+ 0217  26: 3A 0E 006C R			cmp	cl,bios_time		;Wait specified milliseconds
+ 021C  74 F0				je	bus_irq_loop_2
+ 021E  26: 8A 0E 006C R			mov	cl,bios_time
+ 0223  FE CD				dec	ch
+ 0225  75 E7				jnz	bus_irq_loop_2
+ 0227  C3				ret
+				
+ 0228				GetChangeInState endp
+				;---------------------------Private-Routine-----------------------------;
+				; bus_enable - Enable Bus Mouse
+				;
+				; The Bus mouse will be initialized, the interrupt vector hooked,
+				; the old interrupt mask saved, and our interrupt enabled at the 8259.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	None
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	SI,DI,DS,ES,BP
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-19
+
+
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,FLAGS
+				; Calls:
+				;	hook_us_in
+				;	enable_our_int
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+						public	bus_enable	;Public for debugging
+ 0228				bus_enable	proc	near
+				
+ 0228  E8 0000 E			call	hook_us_in		;Hook us into the interrupt
+				
+				; if the vector that we are using for the Mouse INT matches either of the 
+				; serial int vectors 0bh or 0ch, we will then have to NULL out the 
+				; corresponding serial port address in the BIOS data area so that no one
+				; will try to use those ports.
+				
+ 022B  06				push	es			;save
+ 022C  BB ---- R			mov	bx,BIOSDataSeg		;segment for BIOS data
+ 022F  8E C3				mov	es,bx			;es: points to BIOS data
+					assumes es,BIOSDataSeg
+ 0231  33 C0				xor	ax,ax			;will put in zero there
+ 0233  BB 0000 R			mov	bx,offset rs232_data	;Start of serial ports
+ 0236  80 3E 0000 E 0C			cmp	vector,0ch		;using COMM 1's int ?
+ 023B  74 0A				jz	zero_out_comm_port_addr	;yes
+ 023D  83 C3 02				add	bx,2			;may be comm 2
+ 0240  80 3E 0000 E 0B			cmp	vector,0bh		;COMM 2's int ?
+ 0245  75 03				jnz	save_comm_port_addr	;do not do anything
+				
+ 0247				zero_out_comm_port_addr:
+				
+ 0247  26: 87 07			xchg	es:[bx],ax		;get previous port addr too.
+				
+ 024A				save_comm_port_addr:
+				
+ 024A  A3 0000 R			mov	OriginalCommPortAddr,ax	;if zero then was not swapped
+ 024D  89 1E 0002 R			mov	OriginalCommAddrLoc,bx	;also save the location in 40:
+ 0251  07				pop	es			;restore
+					assumes	es,nothing
+				
+ 0252  8B 1E 0000 E			mov	bx,io_base		;Restart the mouse, with
+ 0256  8D 57 03				lea	dx,[bx].PORT_8255_CTRL	;  interrupts enabled and
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-20
+
+
+ 0259  B0 91				mov	al,MOUSE_MODE		;  counters cleared
+ 025B  EE				out	dx,al
+					io_delay
+ 025C  EB 00                 1		jmp	short $+2 
+ 025E  EB 00                 1		jmp	short $+2 
+ 0260  EB 00                 1		jmp	short $+2 
+ 0262  8D 57 02				lea	dx,[bx].MOUSE_CTRL_PORT
+ 0265  B0 00				mov	al,CMD_CLEAR_N_CNT+CMD_ENABLE_INT
+ 0267  EE				out	dx,al
+ 0268  E8 0000 E			call	enable_our_int
+ 026B  C3				ret
+				
+ 026C				bus_enable	endp
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-21
+
+
+				page
+				
+				;---------------------------Private-Routine-----------------------------;
+				; bus_disable - Disable Bus Mouse
+				;
+				; The interrupt vector will be restored, the old interrupt mask
+				; restored at the 8259.  If the old mask shows that the mouse was
+				; previously enabled, it will remain enabled, else we will disable
+				; interrupts at the mouse itself.
+				;
+				; Entry:
+				;	None
+				; Returns:
+				;	None
+				; Error Returns:
+				;	None
+				; Registers Preserved:
+				;	SI,DI,DS,ES,BP
+				; Registers Destroyed:
+				;	AX,BX,CX,DX,FLAGS
+				; Calls:
+				;	unhook_us
+				; History:
+				;	Fri 21-Aug-1987 11:43:42 -by-  Walt Moore [waltm] & Mr. Mouse
+				;	Initial version
+				;-----------------------------------------------------------------------;
+				
+				;------------------------------Pseudo-Code------------------------------;
+				; {
+				; }
+				;-----------------------------------------------------------------------;
+				
+					assumes ds,Data
+					assumes es,nothing
+					assumes ss,nothing
+				
+						public	bus_disable	;Public for debugging
+ 026C				bus_disable	proc	near
+				
+				;	Disable interrupts first so no interrupt will hit if
+				;	only the BIOS default handler is around.
+				
+ 026C  8B 16 0000 E			mov	dx,io_base		;Disable IRQs at the mouse
+ 0270  80 C2 02				add	dl,MOUSE_CTRL_PORT
+ 0273  B0 10				mov	al,CMD_DISABLE_INT
+ 0275  EE				out	dx,al
+				
+				; now if we had zeroed out one of the comm port addresses in the bios data
+				; area, restore it.
+				
+ 0276  A1 0000 R			mov	ax,OriginalCommPortAddr	;get the original address ?
+ 0279  0B C0				or	ax,ax			;was it zero or not put at all ?
+ 027B  74 0E				jz	@f			;yes,no need to put it back
+ 027D  06				push	es			;save
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Page     1-22
+
+
+ 027E  BB ---- R			mov	bx,BIOSDataSeg		;seg value for BIOS data area
+ 0281  8E C3				mov	es,bx			;es: points to BIOS data area
+					assumes es,BIOSDataSeg
+ 0283  8B 1E 0002 R			mov	bx,OriginalCommAddrLoc	;location of the address
+ 0287  26: 89 07			mov	es:[bx],ax		;restore it
+ 028A  07				pop	es			;restore
+					assumes	es,nothing
+ 028B				@@:
+				
+ 028B  E8 0000 E			call	unhook_us		;Restore everything to what it was
+ 028E  75 16				jnz	bus_disable_exit	;IRQ was previously disabled
+				
+ 0290  8B 1E 0000 E			mov	bx,io_base		;Restart the mouse, with
+ 0294  8D 57 03				lea	dx,[bx].PORT_8255_CTRL	;  interrupts enabled and
+ 0297  B0 91				mov	al,MOUSE_MODE		;  counters cleared
+ 0299  EE				out	dx,al
+					io_delay
+ 029A  EB 00                 1		jmp	short $+2 
+ 029C  EB 00                 1		jmp	short $+2 
+ 029E  EB 00                 1		jmp	short $+2 
+ 02A0  8D 57 02				lea	dx,[bx].MOUSE_CTRL_PORT
+ 02A3  B0 00				mov	al,CMD_CLEAR_N_CNT+CMD_ENABLE_INT
+ 02A5  EE				out	dx,al
+				
+ 02A6				bus_disable_exit:
+ 02A6  C3				ret
+				
+ 02A7				bus_disable  endp
+				
+				
+				sEnd	Code
+ 02A7                        1	_TEXT ends 
+				end
+
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Symbols-1
+
+
+Macros:
+
+		N a m e			Lines
+
+display_int_size . . . . . . . .  	   3
+io_delay . . . . . . . . . . . .  	   3
+
+Segments and Groups:
+
+                N a m e         	Length	 Align	Combine Class
+
+BIOSDataSeg  . . . . . . . . . .  	006D	AT	0040	
+DGROUP . . . . . . . . . . . . .  	GROUP
+  _DATA  . . . . . . . . . . . .  	0004	WORD	PUBLIC	'DATA'
+_TEXT  . . . . . . . . . . . . .  	02A7	WORD	PUBLIC	'CODE'
+
+Symbols:            
+
+                N a m e         	Type	 Value	 Attr
+
+ACK_PORT . . . . . . . . . . . .  	NUMBER	0020	
+ACK_SLAVE_PORT . . . . . . . . .  	NUMBER	00A0	
+ADDR_INCREMENT . . . . . . . . .  	NUMBER	0004	
+
+BASH_INT_PROC  . . . . . . . . .  	NUMBER	000C	
+BIT_SET_CMD  . . . . . . . . . .  	NUMBER	0000	
+BUS_B1_UP  . . . . . . . . . . .  	NUMBER	0080	
+BUS_B2_UP  . . . . . . . . . . .  	NUMBER	0040	
+BUS_B3_UP  . . . . . . . . . . .  	NUMBER	0020	
+BUS_INT_LENGTH . . . . . . . . .  	NUMBER	00B9	
+BUS_IRQ_2  . . . . . . . . . . .  	NUMBER	0008	
+BUS_IRQ_3  . . . . . . . . . . .  	NUMBER	0004	
+BUS_IRQ_4  . . . . . . . . . . .  	NUMBER	0002	
+BUS_IRQ_5  . . . . . . . . . . .  	NUMBER	0001	
+BUS_PROC_START . . . . . . . . .  	NUMBER	0000	
+BUS_START  . . . . . . . . . . .  	WORD	0000	_TEXT
+BUTTON_STATE . . . . . . . . . .  	NUMBER	00A8	
+ByPassNoiseTest  . . . . . . . .  	TEXT  (byte ptr [bp-1])		
+bios_time  . . . . . . . . . . .  	L BYTE	006C	BIOSDataSeg
+bptr . . . . . . . . . . . . . .  	TEXT  byte ptr		
+bus8255_no_data  . . . . . . . .  	L NEAR	009E	_TEXT
+bus_disable  . . . . . . . . . .  	N PROC	026C	_TEXT	Global	Length = 003B
+bus_disable_exit . . . . . . . .  	L NEAR	02A6	_TEXT
+bus_enable . . . . . . . . . . .  	N PROC	0228	_TEXT	Global	Length = 0044
+bus_int  . . . . . . . . . . . .  	F PROC	0000	_TEXT	Length = 00A8
+bus_irq_found  . . . . . . . . .  	L NEAR	01F0	_TEXT
+bus_irq_loop_2 . . . . . . . . .  	L NEAR	020E	_TEXT
+bus_search . . . . . . . . . . .  	N PROC	00CB	_TEXT	Global	Length = 006C
+
+CALL_ON_ANY_INT  . . . . . . . .  	NUMBER	001F	
+CLEAR_COUNTERS . . . . . . . . .  	NUMBER	000B	
+CMD_CLEAR_N_CNT  . . . . . . . .  	NUMBER	0000	
+CMD_DISABLE_INT  . . . . . . . .  	NUMBER	0010	
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Symbols-2
+
+
+CMD_ENABLE_INT . . . . . . . . .  	NUMBER	0000	
+CMD_HOLD . . . . . . . . . . . .  	NUMBER	0080	
+CMD_SELECT_HIGH  . . . . . . . .  	NUMBER	0020	
+CMD_SELECT_LOW . . . . . . . . .  	NUMBER	0000	
+CMD_SELECT_X . . . . . . . . . .  	NUMBER	0000	
+CMD_SELECT_Y . . . . . . . . . .  	NUMBER	0040	
+CTRL_GET_HIGH_X  . . . . . . . .  	NUMBER	00B0	
+CTRL_GET_HIGH_Y  . . . . . . . .  	NUMBER	00F0	
+CTRL_GET_LOW_X . . . . . . . . .  	NUMBER	0090	
+CTRL_GET_LOW_Y . . . . . . . . .  	NUMBER	00D0	
+CTRL_RUN . . . . . . . . . . . .  	NUMBER	0000	
+C_BIT_INDEX  . . . . . . . . . .  	NUMBER	000E	
+CodeBASE . . . . . . . . . . . .  	ALIAS	 _TEXT		
+CodeOFFSET . . . . . . . . . . .  	TEXT  offset _TEXT:		
+check_bus_exit . . . . . . . . .  	L NEAR	0204	_TEXT
+check_bus_irq  . . . . . . . . .  	N PROC	0137	_TEXT	Global	Length = 00D2
+check_bus_irq_done . . . . . . .  	L NEAR	01E9	_TEXT
+check_bus_ret  . . . . . . . . .  	L NEAR	0205	_TEXT
+check_bus_retry  . . . . . . . .  	L NEAR	017A	_TEXT
+check_bus_try_again  . . . . . .  	L NEAR	0167	_TEXT
+
+DataBASE . . . . . . . . . . . .  	ALIAS	 DGROUP		
+DataOFFSET . . . . . . . . . . .  	TEXT  offset DGROUP:		
+device_int . . . . . . . . . . .  	V BYTE	0000	_DATA	External
+disable_proc . . . . . . . . . .  	V WORD	0000	_DATA	External
+dptr . . . . . . . . . . . . . .  	TEXT  dword ptr		
+
+EOI  . . . . . . . . . . . . . .  	NUMBER	0020	
+enable_our_int . . . . . . . . .  	L NEAR	0000		External
+enable_proc  . . . . . . . . . .  	V WORD	0000	_DATA	External
+event_proc . . . . . . . . . . .  	V DWORD	0000	_DATA	External
+
+FIRST_BUS_MOUSE_ADDR . . . . . .  	NUMBER	023C	
+
+GROUP_A_MODE_0 . . . . . . . . .  	NUMBER	0000	
+GROUP_A_MODE_1 . . . . . . . . .  	NUMBER	0020	
+GROUP_A_MODE_2 . . . . . . . . .  	NUMBER	0060	
+GROUP_B_MODE_0 . . . . . . . . .  	NUMBER	0000	
+GROUP_B_MODE_1 . . . . . . . . .  	NUMBER	0004	
+GetChangeInState . . . . . . . .  	N PROC	0209	_TEXT	Global	Length = 001F
+
+hook_us_in . . . . . . . . . . .  	L NEAR	0000		External
+
+INT33H_BUS . . . . . . . . . . .  	NUMBER	0001	
+INT33H_ENABLE  . . . . . . . . .  	NUMBER	0020	
+INT33H_GETINFO . . . . . . . . .  	NUMBER	0024	
+INT33H_HP  . . . . . . . . . . .  	NUMBER	0005	
+INT33H_INPORT  . . . . . . . . .  	NUMBER	0003	
+INT33H_PS_2  . . . . . . . . . .  	NUMBER	0004	
+INT33H_RESET . . . . . . . . . .  	NUMBER	0000	
+INT33H_SERIAL  . . . . . . . . .  	NUMBER	0002	
+INT_REQUEST  . . . . . . . . . .  	NUMBER	000A	
+IN_SERVICE . . . . . . . . . . .  	NUMBER	000B	
+IRQ_8259_BITS  . . . . . . . . .  	NUMBER	003C	
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Symbols-3
+
+
+IRQ_MASK_BITS  . . . . . . . . .  	NUMBER	000F	
+int33_not_present  . . . . . . .  	L NEAR	015F	_TEXT
+interrupt_rate . . . . . . . . .  	V WORD	0000	_DATA	External
+io_base  . . . . . . . . . . . .  	V WORD	0000	_DATA	External
+irq_mappings . . . . . . . . . .  	L WORD	00B9	_TEXT
+
+LAST_BUS_MOUSE_ADDR  . . . . . .  	NUMBER	023C	
+
+MASK_PORT  . . . . . . . . . . .  	NUMBER	0021	
+MASK_SLAVE_PORT  . . . . . . . .  	NUMBER	00A1	
+MAX_INT_SIZE . . . . . . . . . .  	NUMBER	00D2	
+MF_ENABLED . . . . . . . . . . .  	NUMBER	0001	
+MF_INT33H  . . . . . . . . . . .  	NUMBER	0002	
+MF_MOUSE_EXISTS  . . . . . . . .  	NUMBER	0080	
+MF_ON_SLAVEPIC . . . . . . . . .  	NUMBER	0040	
+MODE_SET_CMD . . . . . . . . . .  	NUMBER	0080	
+MOTION_DELTA . . . . . . . . . .  	NUMBER	000F	
+MOUSE_CTRL_PORT  . . . . . . . .  	ALIAS	 PORT_8255_C_HI		
+MOUSE_DATA_PORT  . . . . . . . .  	ALIAS	 PORT_8255_A		
+MOUSE_IRQ_PORT . . . . . . . . .  	ALIAS	 PORT_8255_C_LOW		
+MOUSE_MODE . . . . . . . . . . .  	NUMBER	0091	
+MOUSE_SYS_VEC  . . . . . . . . .  	NUMBER	0033	
+MT_BUS . . . . . . . . . . . . .  	NUMBER	0001	
+MT_HP  . . . . . . . . . . . . .  	NUMBER	0005	
+MT_INPORT  . . . . . . . . . . .  	NUMBER	0003	
+MT_NO_MOUSE  . . . . . . . . . .  	NUMBER	0000	
+MT_PS2 . . . . . . . . . . . . .  	NUMBER	0004	
+MT_SERIAL  . . . . . . . . . . .  	NUMBER	0002	
+mask_8259  . . . . . . . . . . .  	V BYTE	0000	_DATA	External
+mouse_flags  . . . . . . . . . .  	V BYTE	0000	_DATA	External
+
+NUMBER_BUTTONS . . . . . . . . .  	NUMBER	0002	
+NoiseTestDone  . . . . . . . . .  	L NEAR	01AF	_TEXT
+next_bus_card  . . . . . . . . .  	L NEAR	00CE	_TEXT
+no_slave . . . . . . . . . . . .  	L NEAR	0071	_TEXT
+noise_bypass_cycle . . . . . . .  	L NEAR	0173	_TEXT
+
+OriginalCommAddrLoc  . . . . . .  	L WORD	0002	_DATA
+OriginalCommPortAddr . . . . . .  	L WORD	0000	_DATA
+
+PORT_8255_A  . . . . . . . . . .  	NUMBER	0000	
+PORT_8255_B  . . . . . . . . . .  	NUMBER	0001	
+PORT_8255_C  . . . . . . . . . .  	NUMBER	0002	
+PORT_8255_CTRL . . . . . . . . .  	NUMBER	0003	
+PORT_8255_C_HI . . . . . . . . .  	NUMBER	0002	
+PORT_8255_C_LOW  . . . . . . . .  	NUMBER	0002	
+PORT_A_IN  . . . . . . . . . . .  	NUMBER	0010	
+PORT_A_OUT . . . . . . . . . . .  	NUMBER	0000	
+PORT_B_IN  . . . . . . . . . . .  	NUMBER	0002	
+PORT_B_OUT . . . . . . . . . . .  	NUMBER	0000	
+PORT_C_HI_IN . . . . . . . . . .  	NUMBER	0008	
+PORT_C_HI_OUT  . . . . . . . . .  	NUMBER	0000	
+PORT_C_LOW_IN  . . . . . . . . .  	NUMBER	0001	
+PORT_C_LOW_OUT . . . . . . . . .  	NUMBER	0000	
+Microsoft (R) Macro Assembler Version 5.10A                 1/7/26 00:09:11
+
+8255 Bus Mouse Hardware Dependent Code                      Symbols-4
+
+
+
+RESET_C_BIT  . . . . . . . . . .  	NUMBER	0000	
+rs232_data . . . . . . . . . . .  	L WORD	0000	BIOSDataSeg	Length = 0004
+
+SET_C_BIT  . . . . . . . . . . .  	NUMBER	0001	
+SF_ABSOLUTE  . . . . . . . . . .  	NUMBER	8000	
+SF_B1_DOWN . . . . . . . . . . .  	NUMBER	0002	
+SF_B1_UP . . . . . . . . . . . .  	NUMBER	0004	
+SF_B2_DOWN . . . . . . . . . . .  	NUMBER	0008	
+SF_B2_UP . . . . . . . . . . . .  	NUMBER	0010	
+SF_MOVEMENT  . . . . . . . . . .  	NUMBER	0001	
+STATE_XLATE  . . . . . . . . . .  	NUMBER	00A9	
+SWAP_INT_PROC  . . . . . . . . .  	NUMBER	0014	
+save_comm_port_addr  . . . . . .  	L NEAR	024A	_TEXT
+see_if_next_card . . . . . . . .  	L NEAR	012D	_TEXT
+
+unhook_us  . . . . . . . . . . .  	L NEAR	0000		External
+
+VMD_DEVICE_ID  . . . . . . . . .  	NUMBER	000C	
+vector . . . . . . . . . . . . .  	V BYTE	0000	_DATA	External
+
+WF_PMODE . . . . . . . . . . . .  	NUMBER	0001	
+WinFlags . . . . . . . . . . . .  	V WORD	0000	_DATA	External
+wptr . . . . . . . . . . . . . .  	TEXT  word ptr		
+
+X_SPEED  . . . . . . . . . . . .  	NUMBER	0002	
+
+Y_SPEED  . . . . . . . . . . . .  	NUMBER	0002	
+
+zero_out_comm_port_addr  . . . .  	L NEAR	0247	_TEXT
+
+?386regs . . . . . . . . . . . .  	NUMBER	0000	
+@0 . . . . . . . . . . . . . . .  	L NEAR	028B	_TEXT
+@Cpu . . . . . . . . . . . . . .  	TEXT  1415		
+@FileName  . . . . . . . . . . .  	TEXT  bus8255		
+@Version . . . . . . . . . . . .  	TEXT  510		
+__ROMBIOS  . . . . . . . . . . .  	NUMBER	0000		Communal
+
+
+   2421 Source  Lines
+   4380 Total   Lines
+    363 Symbols
+
+  46028 Bytes symbol space free
+
+      0 Warning Errors
+      0 Severe  Errors

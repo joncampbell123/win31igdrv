@@ -1,0 +1,131 @@
+
+ VNETBIOS
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000FE2H _LTEXT                 CODE 32-bit
+ 0001:00000FE4 000000FADH _LDATA                 CODE 32-bit
+ 0002:00000000 000000427H _ITEXT                 ICODE 32-bit
+ 0002:00000428 0000000E4H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 00000007BH _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00001908 VNETBIOS_DDB            VNETBIOS_DDB
+
+  Address         Publics by Name
+
+ 0001:00001904       $VNETBIOS_Get_Version
+ 0001:00000462       @VNETBIOS_Get_Version
+ 0002:00000428       DMA_Net_String
+ 0001:00000419       Dump_Seg_Off
+ 0001:00000FE8       HCB_Segment
+ 0002:00000450       Map_Non_Buff_Str
+ 0002:00000433       Min_Net_Buf_Str
+ 0001:00000000       NetBuff_Alloc_HCB
+ 0002:0000049B       NetBuff_Error_Text
+ 0002:0000047E       NetBuff_Error_Title
+ 0001:00000037       NetBuff_Free_HCB
+ 0002:00000000       NetBuff_Init_Complete
+ 0001:0000004C       NetBuff_Map_Buffer
+ 0001:000000D1       NetBuff_Release_Buffer
+ 0002:00000472       Poll_Sync_Cmds_String
+ 0001:00000436       Print_String
+ 0002:00000462       Redir_Time_Out_String
+ 0002:0000043F       Time_Out_Str
+ 0001:00000ECF       Update_NCB
+ 0001:00001679       VNETBIOS_Big_Huge_Error
+ 0001:00000AE4       VNETBIOS_Buffer_In_Out
+ 0001:00000BF1       VNETBIOS_Cancel
+ 0001:000014FC       VNETBIOS_Cant_Nuke_VM
+ 0001:00000BC0       VNETBIOS_Chain_Send
+ 0001:00000E18       VNETBIOS_Clear_Post_Crit
+ 0001:00000482       VNETBIOS_Control
+ 0001:00001908       VNETBIOS_DDB
+ 0002:000001B6       VNETBIOS_Device_Init
+ 0001:000000E4       VNETBIOS_Dump_Debug
+ 0001:0000094E       VNETBIOS_End_Critical
+ 0001:00000F2F       VNETBIOS_Free_HCB
+ 0001:00000E44       VNETBIOS_Hang_Error
+ 0001:000018BB       VNETBIOS_Hang_Err_Msg
+ 0001:000006C8       VNETBIOS_Hook_NCB
+ 0002:000003AC       VNETBIOS_Init_Complete
+ 0001:0000171E       VNETBIOS_Insuff_Buff_Msg
+ 0001:000006B4       VNETBIOS_Int_2Ah
+ 0001:00000A76       VNETBIOS_Map_In_Out
+ 0001:00001843       VNETBIOS_Min_Buff_Size
+ 0001:00000965       VNETBIOS_No_Map
+ 0001:0000064E       VNETBIOS_PM_Int_2Ah
+ 0001:0000069C       VNETBIOS_PM_Int_5Ch
+ 0001:00000D05       VNETBIOS_POST_Event
+ 0001:00000C8F       VNETBIOS_Post_Hook
+ 0001:00000624       VNETBIOS_Query_Destroy
+ 0001:0000159C       VNETBIOS_Stupid_User
+ 0002:000000DC       VNETBIOS_Sys_Critical_Init
+ 0001:00000A08       VNETBIOS_Unknown
+ 0001:00000F8C       VNETBIOS_Update_Lin_Addr
+ 0001:000004D8       VNETBIOS_VM_Terminate
+ 0001:00001940       VN_CB_Offset
+
+  Address         Publics by Value
+
+ 0001:00000000       NetBuff_Alloc_HCB
+ 0001:00000037       NetBuff_Free_HCB
+ 0001:0000004C       NetBuff_Map_Buffer
+ 0001:000000D1       NetBuff_Release_Buffer
+ 0001:000000E4       VNETBIOS_Dump_Debug
+ 0001:00000419       Dump_Seg_Off
+ 0001:00000436       Print_String
+ 0001:00000462       @VNETBIOS_Get_Version
+ 0001:00000482       VNETBIOS_Control
+ 0001:000004D8       VNETBIOS_VM_Terminate
+ 0001:00000624       VNETBIOS_Query_Destroy
+ 0001:0000064E       VNETBIOS_PM_Int_2Ah
+ 0001:0000069C       VNETBIOS_PM_Int_5Ch
+ 0001:000006B4       VNETBIOS_Int_2Ah
+ 0001:000006C8       VNETBIOS_Hook_NCB
+ 0001:0000094E       VNETBIOS_End_Critical
+ 0001:00000965       VNETBIOS_No_Map
+ 0001:00000A08       VNETBIOS_Unknown
+ 0001:00000A76       VNETBIOS_Map_In_Out
+ 0001:00000AE4       VNETBIOS_Buffer_In_Out
+ 0001:00000BC0       VNETBIOS_Chain_Send
+ 0001:00000BF1       VNETBIOS_Cancel
+ 0001:00000C8F       VNETBIOS_Post_Hook
+ 0001:00000D05       VNETBIOS_POST_Event
+ 0001:00000E18       VNETBIOS_Clear_Post_Crit
+ 0001:00000E44       VNETBIOS_Hang_Error
+ 0001:00000ECF       Update_NCB
+ 0001:00000F2F       VNETBIOS_Free_HCB
+ 0001:00000F8C       VNETBIOS_Update_Lin_Addr
+ 0001:00000FE8       HCB_Segment
+ 0001:000014FC       VNETBIOS_Cant_Nuke_VM
+ 0001:0000159C       VNETBIOS_Stupid_User
+ 0001:00001679       VNETBIOS_Big_Huge_Error
+ 0001:0000171E       VNETBIOS_Insuff_Buff_Msg
+ 0001:00001843       VNETBIOS_Min_Buff_Size
+ 0001:000018BB       VNETBIOS_Hang_Err_Msg
+ 0001:00001904       $VNETBIOS_Get_Version
+ 0001:00001908       VNETBIOS_DDB
+ 0001:00001940       VN_CB_Offset
+ 0002:00000000       NetBuff_Init_Complete
+ 0002:000000DC       VNETBIOS_Sys_Critical_Init
+ 0002:000001B6       VNETBIOS_Device_Init
+ 0002:000003AC       VNETBIOS_Init_Complete
+ 0002:00000428       DMA_Net_String
+ 0002:00000433       Min_Net_Buf_Str
+ 0002:0000043F       Time_Out_Str
+ 0002:00000450       Map_Non_Buff_Str
+ 0002:00000462       Redir_Time_Out_String
+ 0002:00000472       Poll_Sync_Cmds_String
+ 0002:0000047E       NetBuff_Error_Title
+ 0002:0000049B       NetBuff_Error_Text
+
+Program entry point at 0003:0040

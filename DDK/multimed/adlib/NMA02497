@@ -1,0 +1,7 @@
+    libinit.obj+
+    adliba.obj adlib.obj midimain.obj midic.obj+
+    init.obj drvproc.obj,
+    msadlib.drv,
+    msadlib.map,
+    libw mmsystem mdllcew,
+    adlib.def

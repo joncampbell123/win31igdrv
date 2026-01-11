@@ -1,0 +1,117 @@
+
+ PageFile
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000BC0H _LTEXT                 CODE 32-bit
+ 0001:00000BC0 000000A50H _LDATA                 CODE 32-bit
+ 0002:00000000 0000009A0H _ITEXT                 ICODE 32-bit
+ 0002:000009A0 000000226H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 0000000AAH _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000BDC PageFile_DDB            PageFile_DDB
+
+  Address         Publics by Name
+
+ 0001:00000BD4       $PageFile_Cancel
+ 0001:00000BC8       $PageFile_Clean_Up
+ 0001:00000BC0       $PageFile_Get_Version
+ 0001:00000BCC       $PageFile_Grow_File
+ 0001:00000BC4       $PageFile_Init_File
+ 0001:00000BD0       $PageFile_Read_Or_Write
+ 0001:00000BD8       $PageFile_Test_IO_Valid
+ 0001:00000604       @PageFile_Cancel
+ 0001:0000002C       @PageFile_Clean_Up
+ 0001:00000048       @PageFile_Get_Version
+ 0001:000000BE       @PageFile_Grow_File
+ 0002:00000147       @PageFile_Init_File
+ 0001:000002C0       @PageFile_Read_Or_Write
+ 0001:00000081       @PageFile_Test_IO_Valid
+ 0001:00000717       PageFile_Call_Back
+ 0001:00000894       PageFile_Call_DOS
+ 0001:00000767       PageFile_Cancel_Call_Back
+ 0001:00000000       PageFile_Control
+ 0001:00000BDC       PageFile_DDB
+ 0001:000008E6       PageFile_Debug_Query
+ 0002:00000019       PageFile_Init_Complete
+ 0001:000006C4       PageFile_Int_23h
+ 0001:0000066D       PageFile_Int_24h
+ 0001:00000793       PageFile_Map_Null
+ 0002:0000094E       PageFile_Nuke_Swap_File
+ 0002:00000603       PageFile_OEM_Cache_Flush
+ 0002:0000064F       PageFile_Open_DOS_Swap_File
+ 0002:00000299       PageFile_Open_Partition
+ 0001:00000842       PageFile_Set_Client_PSP
+ 0001:000007E4       PageFile_Set_Our_PSP
+ 0001:000009FC       PageFile_Svc_Call
+ 0002:00000000       PageFile_Sys_Critical_Init
+ 0002:0000051F       PageFile_Test_Correct_Sector
+ 0002:00000BAC       PF_Caption_Title_Msg
+ 0002:00000A48       PF_Enable_Ini
+ 0002:00000A89       PF_Invalid_Part_Msg
+ 0002:00000A77       PF_Max_Size_Ini
+ 0002:00000A66       PF_Min_Free_Ini
+ 0002:00000A5A       PF_Swap_Drive_Ini
+ 0002:00000A4F       PF_Swap_File_Ini
+ 0001:00000B88       PSC_Get_Cur_Tmp_Sz
+ 0001:00000A6D       PSC_Get_Paging_Info
+ 0001:00000A5E       PSC_Get_Version
+ 0001:00000B18       PSC_Paging_Info_Change
+
+  Address         Publics by Value
+
+ 0001:00000000       PageFile_Control
+ 0001:0000002C       @PageFile_Clean_Up
+ 0001:00000048       @PageFile_Get_Version
+ 0001:00000081       @PageFile_Test_IO_Valid
+ 0001:000000BE       @PageFile_Grow_File
+ 0001:000002C0       @PageFile_Read_Or_Write
+ 0001:00000604       @PageFile_Cancel
+ 0001:0000066D       PageFile_Int_24h
+ 0001:000006C4       PageFile_Int_23h
+ 0001:00000717       PageFile_Call_Back
+ 0001:00000767       PageFile_Cancel_Call_Back
+ 0001:00000793       PageFile_Map_Null
+ 0001:000007E4       PageFile_Set_Our_PSP
+ 0001:00000842       PageFile_Set_Client_PSP
+ 0001:00000894       PageFile_Call_DOS
+ 0001:000008E6       PageFile_Debug_Query
+ 0001:000009FC       PageFile_Svc_Call
+ 0001:00000A5E       PSC_Get_Version
+ 0001:00000A6D       PSC_Get_Paging_Info
+ 0001:00000B18       PSC_Paging_Info_Change
+ 0001:00000B88       PSC_Get_Cur_Tmp_Sz
+ 0001:00000BC0       $PageFile_Get_Version
+ 0001:00000BC4       $PageFile_Init_File
+ 0001:00000BC8       $PageFile_Clean_Up
+ 0001:00000BCC       $PageFile_Grow_File
+ 0001:00000BD0       $PageFile_Read_Or_Write
+ 0001:00000BD4       $PageFile_Cancel
+ 0001:00000BD8       $PageFile_Test_IO_Valid
+ 0001:00000BDC       PageFile_DDB
+ 0002:00000000       PageFile_Sys_Critical_Init
+ 0002:00000019       PageFile_Init_Complete
+ 0002:00000147       @PageFile_Init_File
+ 0002:00000299       PageFile_Open_Partition
+ 0002:0000051F       PageFile_Test_Correct_Sector
+ 0002:00000603       PageFile_OEM_Cache_Flush
+ 0002:0000064F       PageFile_Open_DOS_Swap_File
+ 0002:0000094E       PageFile_Nuke_Swap_File
+ 0002:00000A48       PF_Enable_Ini
+ 0002:00000A4F       PF_Swap_File_Ini
+ 0002:00000A5A       PF_Swap_Drive_Ini
+ 0002:00000A66       PF_Min_Free_Ini
+ 0002:00000A77       PF_Max_Size_Ini
+ 0002:00000A89       PF_Invalid_Part_Msg
+ 0002:00000BAC       PF_Caption_Title_Msg
+
+Program entry point at 0003:0035

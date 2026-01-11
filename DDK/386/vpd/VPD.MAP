@@ -1,0 +1,83 @@
+
+ VPD
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000450H _LTEXT                 CODE 32-bit
+ 0001:00000450 000000209H _LDATA                 CODE 32-bit
+ 0002:00000000 0000001BFH _ITEXT                 ICODE 32-bit
+ 0002:000001C0 000000050H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000019H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000450 VPD_DDB                 VPD_DDB
+
+  Address         Publics by Name
+
+ 0001:000002E6       VPD_Attach
+ 0001:000001D0       VPD_Common_IO_Trap
+ 0001:00000000       VPD_Control
+ 0001:00000450       VPD_DDB
+ 0001:000003AF       VPD_Debug_Query
+ 0001:000002B6       VPD_Detach
+ 0002:00000000       VPD_Device_Init
+ 0001:00000290       VPD_Hw_Int
+ 0002:00000196       VPD_Init_Complete
+ 0001:00000220       VPD_Int_17h
+ 0001:000001A0       VPD_LPT1_Trap
+ 0001:000001B0       VPD_LPT2_Trap
+ 0001:000001C0       VPD_LPT3_Trap
+ 0001:000001F8       VPD_Out_Owner_Only
+ 0001:000000AA       VPD_PM_API_Get_Port_Array
+ 0001:0000009C       VPD_PM_API_Get_Ver
+ 0001:00000073       VPD_PM_API_Handler
+ 0001:00000124       VPD_PM_Aquire_Port
+ 0001:000000D1       VPD_PM_Get_Port_Behavior
+ 0001:0000016E       VPD_PM_Release_Port
+ 0001:000000F9       VPD_PM_Set_Port_Behavior
+ 0001:000001EF       VPD_Read_Phys_Port
+ 0001:00000207       VPD_Read_Status
+ 0001:00000034       VPD_Set_Focus
+ 0001:00000330       VPD_Test_And_Set_Owner
+ 0001:000002A3       VPD_Virt_EOI
+ 0001:00000053       VPD_VM_Not_Executeable
+
+  Address         Publics by Value
+
+ 0001:00000000       VPD_Control
+ 0001:00000034       VPD_Set_Focus
+ 0001:00000053       VPD_VM_Not_Executeable
+ 0001:00000073       VPD_PM_API_Handler
+ 0001:0000009C       VPD_PM_API_Get_Ver
+ 0001:000000AA       VPD_PM_API_Get_Port_Array
+ 0001:000000D1       VPD_PM_Get_Port_Behavior
+ 0001:000000F9       VPD_PM_Set_Port_Behavior
+ 0001:00000124       VPD_PM_Aquire_Port
+ 0001:0000016E       VPD_PM_Release_Port
+ 0001:000001A0       VPD_LPT1_Trap
+ 0001:000001B0       VPD_LPT2_Trap
+ 0001:000001C0       VPD_LPT3_Trap
+ 0001:000001D0       VPD_Common_IO_Trap
+ 0001:000001EF       VPD_Read_Phys_Port
+ 0001:000001F8       VPD_Out_Owner_Only
+ 0001:00000207       VPD_Read_Status
+ 0001:00000220       VPD_Int_17h
+ 0001:00000290       VPD_Hw_Int
+ 0001:000002A3       VPD_Virt_EOI
+ 0001:000002B6       VPD_Detach
+ 0001:000002E6       VPD_Attach
+ 0001:00000330       VPD_Test_And_Set_Owner
+ 0001:000003AF       VPD_Debug_Query
+ 0001:00000450       VPD_DDB
+ 0002:00000000       VPD_Device_Init
+ 0002:00000196       VPD_Init_Complete
+
+Program entry point at 0003:0000

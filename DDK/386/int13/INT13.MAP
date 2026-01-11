@@ -1,0 +1,75 @@
+
+ INT13
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000796H _LTEXT                 CODE 32-bit
+ 0001:00000798 0000009E7H _LDATA                 CODE 32-bit
+ 0002:00000000 00000011DH _ITEXT                 ICODE 32-bit
+ 0002:00000120 000000020H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000BFC INT13_DDB               INT13_DDB
+
+  Address         Publics by Name
+
+ 0001:00000BEC       $Int13_Device_Registered
+ 0001:00000BE8       $Int13_Get_Version
+ 0001:00000BF4       $Int13_Hooking_BIOS_Int
+ 0001:00000BF0       $Int13_Translate_VM_Int
+ 0001:00000BF8       $Int13_Unhooking_BIOS_Int
+ 0002:0000007B       @Int13_Device_Registered
+ 0001:0000035E       @Int13_Get_Version
+ 0001:0000037F       @Int13_Hooking_BIOS_Int
+ 0001:000003B6       @Int13_Translate_VM_Int
+ 0001:0000039A       @Int13_Unhooking_BIOS_Int
+ 0002:00000120       INIIndosPoll
+ 0002:0000012D       INIOverlappedIO
+ 0001:0000072F       Int13_Calc_Sector_Params
+ 0001:00000784       Int13_Command_Call_Back
+ 0001:00000328       Int13_Control
+ 0001:00000BFC       INT13_DDB
+ 0001:000002C6       Int13_Debug_End_IO
+ 0002:00000000       Int13_Debug_Init
+ 0001:00000000       Int13_Debug_Int21_Hook
+ 0001:00000020       Int13_Debug_Query
+ 0001:000001DE       Int13_Debug_Start_IO
+ 0001:00000765       Int13_Send_Command
+ 0002:00000018       Int13_Sys_Critical_Init
+ 0002:000000D2       OEM_Specific_Hack
+
+  Address         Publics by Value
+
+ 0001:00000000       Int13_Debug_Int21_Hook
+ 0001:00000020       Int13_Debug_Query
+ 0001:000001DE       Int13_Debug_Start_IO
+ 0001:000002C6       Int13_Debug_End_IO
+ 0001:00000328       Int13_Control
+ 0001:0000035E       @Int13_Get_Version
+ 0001:0000037F       @Int13_Hooking_BIOS_Int
+ 0001:0000039A       @Int13_Unhooking_BIOS_Int
+ 0001:000003B6       @Int13_Translate_VM_Int
+ 0001:0000072F       Int13_Calc_Sector_Params
+ 0001:00000765       Int13_Send_Command
+ 0001:00000784       Int13_Command_Call_Back
+ 0001:00000BE8       $Int13_Get_Version
+ 0001:00000BEC       $Int13_Device_Registered
+ 0001:00000BF0       $Int13_Translate_VM_Int
+ 0001:00000BF4       $Int13_Hooking_BIOS_Int
+ 0001:00000BF8       $Int13_Unhooking_BIOS_Int
+ 0001:00000BFC       INT13_DDB
+ 0002:00000000       Int13_Debug_Init
+ 0002:00000018       Int13_Sys_Critical_Init
+ 0002:0000007B       @Int13_Device_Registered
+ 0002:000000D2       OEM_Specific_Hack
+ 0002:00000120       INIIndosPoll
+ 0002:0000012D       INIOverlappedIO

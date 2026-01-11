@@ -1,0 +1,217 @@
+
+ VCD
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000118CH _LTEXT                 CODE 32-bit
+ 0001:0000118C 000000993H _LDATA                 CODE 32-bit
+ 0002:00000000 000000AD4H _ITEXT                 ICODE 32-bit
+ 0002:00000AD4 0000000D2H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:0000119C VCD_DDB                 VCD_DDB
+
+  Address         Publics by Name
+
+ 0001:00001194       $VCD_Get_Focus
+ 0001:0000118C       $VCD_Get_Version
+ 0001:00001190       $VCD_Set_Port_Global
+ 0001:00001198       $VCD_Virtualize_Port
+ 0001:000000BB       @VCD_Get_Focus
+ 0001:0000002D       @VCD_Get_Version
+ 0001:0000004E       @VCD_Set_Port_Global
+ 0002:0000059E       @VCD_Virtualize_Port
+ 0002:00000B88       COM_30_Support
+ 0002:00000B3C       Com_Boost_Time
+ 0002:00000B9D       COM_Device_Name_Base
+ 0002:00000BA5       COM_Device_Name_Num_Off
+ 0002:00000B7A       COM_IRQs_Sharable
+ 0002:00000B92       Com_Ports_Ini
+ 0001:00001A76       VCD_30_Comm_Driver_Msg
+ 0002:00000058       VCD_add_portnum
+ 0001:00000A2D       VCD_Assign
+ 0002:00000B51       VCD_assign_Ini
+ 0001:00000661       VCD_Attach
+ 0002:00000B48       VCD_Base_Ini
+ 0001:00000BF4       VCD_Cant_Virtualize
+ 0001:0000063B       VCD_Clear_Int
+ 0001:00000D00       VCD_COMMDRV_Int
+ 0002:000007D4       VCD_COMM_Int
+ 0002:00000B38       VCD_COMM_Int_Addr
+ 0001:000000F1       VCD_Control
+ 0002:00000079       VCD_copy_ini_string
+ 0001:000005CE       VCD_Create_VM
+ 0002:00000830       VCD_DataAvail
+ 0001:0000119C       VCD_DDB
+ 0001:00000DAC       VCD_Debug_Dump
+ 0001:000009F2       VCD_Destroy_VM
+ 0001:0000078A       VCD_Detach
+ 0001:00000A14       VCD_Detach_If_Owner
+ 0002:00000276       VCD_Device_Init
+ 0001:0000059F       VCD_Disable_Trapping
+ 0001:00000AB9       VCD_Dispatch_IO
+ 0001:00000E0D       VCD_Dump2
+ 0001:00001154       VCD_Eat_Interrupt
+ 0002:000007A3       VCD_Enable_THRE
+ 0001:00000585       VCD_Enable_Trapping
+ 0001:00000D48       VCD_EOI
+ 0001:00000C0C       VCD_handler
+ 0002:0000037E       VCD_Init_Complete
+ 0002:000003D4       VCD_Init_Port
+ 0001:000005F0       VCD_Init_VM_CB
+ 0002:00000B5C       VCD_INI_Buf
+ 0002:00000B5F       VCD_INI_Num
+ 0001:00000C5D       VCD_Int
+ 0001:000019AC       VCD_IRQ_Conflict_Msg
+ 0002:00000B4D       VCD_IRQ_Ini
+ 0002:0000080F       VCD_LineStat
+ 0001:00000D75       VCD_Mask
+ 0002:00000A64       VCD_ModemStatus
+ 0001:00000554       VCD_Notify_VxD
+ 0001:00000000       VCD_not_idle
+ 0001:00000256       VCD_PM_Acquire_Port
+ 0001:000003E1       VCD_PM_Free_Port
+ 0001:000001F7       VCD_PM_Get_Data_Ptr
+ 0001:000001C1       VCD_PM_Get_Port_Array
+ 0001:0000021A       VCD_PM_Get_Port_Behavior
+ 0001:000001B0       VCD_PM_Get_Version
+ 0001:00000236       VCD_PM_Set_Port_Behavior
+ 0001:00000413       VCD_PM_Steal_Port
+ 0001:00000149       VCD_PM_Svc_Call
+ 0001:0000074E       VCD_Read_State
+ 0002:00000654       VCD_Relocate_COMM_Int
+ 0002:00000704       VCD_Setup_Ptrs
+ 0001:00001934       VCD_Setup_Ptrs_Addr
+ 0001:0000043C       VCD_Set_Focus
+ 0001:000004E6       VCD_Set_IRQ_Procs
+ 0001:000008D8       VCD_Set_Owner
+ 0001:000008C0       VCD_Set_Owner_Event
+ 0002:000007C8       VCD_Sharable_COMM_Int
+ 0002:00000B34       VCD_Sharable_COMM_Int_Addr
+ 0001:00000D18       VCD_Sharable_EOI
+ 0001:00000C38       VCD_Sharable_Int
+ 0001:00000D84       VCD_Soft_Int_14h
+ 0001:000004B0       VCD_Suspend_VM
+ 0002:0000008B       VCD_Sys_Crit_Init
+ 0002:00000000       VCD_verify_base
+ 0001:000007EE       VCD_Virtualize_IRQ
+ 0001:00000B93       VCD_Virt_In_IIR
+ 0001:00000B9C       VCD_Virt_In_LCR
+ 0001:00000BCC       VCD_Virt_In_LSR
+ 0001:00000BB4       VCD_Virt_In_MCR
+ 0001:00000BE0       VCD_Virt_In_MSR
+ 0001:00000B77       VCD_Virt_In_Out_IER
+ 0001:00000B5F       VCD_Virt_In_Out_RxTxB
+ 0001:00000BA6       VCD_Virt_Out_LCR
+ 0001:00000BBE       VCD_Virt_Out_MCR
+ 0002:00000952       VCD_XmitEmpty
+ 0002:00000753       VCD_Xmit_CallBack
+ 0001:00001938       VCD_Xmit_CallBack_Addr
+ 0002:00000B6C       verify_base_ini
+
+  Address         Publics by Value
+
+ 0001:00000000       VCD_not_idle
+ 0001:0000002D       @VCD_Get_Version
+ 0001:0000004E       @VCD_Set_Port_Global
+ 0001:000000BB       @VCD_Get_Focus
+ 0001:000000F1       VCD_Control
+ 0001:00000149       VCD_PM_Svc_Call
+ 0001:000001B0       VCD_PM_Get_Version
+ 0001:000001C1       VCD_PM_Get_Port_Array
+ 0001:000001F7       VCD_PM_Get_Data_Ptr
+ 0001:0000021A       VCD_PM_Get_Port_Behavior
+ 0001:00000236       VCD_PM_Set_Port_Behavior
+ 0001:00000256       VCD_PM_Acquire_Port
+ 0001:000003E1       VCD_PM_Free_Port
+ 0001:00000413       VCD_PM_Steal_Port
+ 0001:0000043C       VCD_Set_Focus
+ 0001:000004B0       VCD_Suspend_VM
+ 0001:000004E6       VCD_Set_IRQ_Procs
+ 0001:00000554       VCD_Notify_VxD
+ 0001:00000585       VCD_Enable_Trapping
+ 0001:0000059F       VCD_Disable_Trapping
+ 0001:000005CE       VCD_Create_VM
+ 0001:000005F0       VCD_Init_VM_CB
+ 0001:0000063B       VCD_Clear_Int
+ 0001:00000661       VCD_Attach
+ 0001:0000074E       VCD_Read_State
+ 0001:0000078A       VCD_Detach
+ 0001:000007EE       VCD_Virtualize_IRQ
+ 0001:000008C0       VCD_Set_Owner_Event
+ 0001:000008D8       VCD_Set_Owner
+ 0001:000009F2       VCD_Destroy_VM
+ 0001:00000A14       VCD_Detach_If_Owner
+ 0001:00000A2D       VCD_Assign
+ 0001:00000AB9       VCD_Dispatch_IO
+ 0001:00000B5F       VCD_Virt_In_Out_RxTxB
+ 0001:00000B77       VCD_Virt_In_Out_IER
+ 0001:00000B93       VCD_Virt_In_IIR
+ 0001:00000B9C       VCD_Virt_In_LCR
+ 0001:00000BA6       VCD_Virt_Out_LCR
+ 0001:00000BB4       VCD_Virt_In_MCR
+ 0001:00000BBE       VCD_Virt_Out_MCR
+ 0001:00000BCC       VCD_Virt_In_LSR
+ 0001:00000BE0       VCD_Virt_In_MSR
+ 0001:00000BF4       VCD_Cant_Virtualize
+ 0001:00000C0C       VCD_handler
+ 0001:00000C38       VCD_Sharable_Int
+ 0001:00000C5D       VCD_Int
+ 0001:00000D00       VCD_COMMDRV_Int
+ 0001:00000D18       VCD_Sharable_EOI
+ 0001:00000D48       VCD_EOI
+ 0001:00000D75       VCD_Mask
+ 0001:00000D84       VCD_Soft_Int_14h
+ 0001:00000DAC       VCD_Debug_Dump
+ 0001:00000E0D       VCD_Dump2
+ 0001:00001154       VCD_Eat_Interrupt
+ 0001:0000118C       $VCD_Get_Version
+ 0001:00001190       $VCD_Set_Port_Global
+ 0001:00001194       $VCD_Get_Focus
+ 0001:00001198       $VCD_Virtualize_Port
+ 0001:0000119C       VCD_DDB
+ 0001:00001934       VCD_Setup_Ptrs_Addr
+ 0001:00001938       VCD_Xmit_CallBack_Addr
+ 0001:000019AC       VCD_IRQ_Conflict_Msg
+ 0001:00001A76       VCD_30_Comm_Driver_Msg
+ 0002:00000000       VCD_verify_base
+ 0002:00000058       VCD_add_portnum
+ 0002:00000079       VCD_copy_ini_string
+ 0002:0000008B       VCD_Sys_Crit_Init
+ 0002:00000276       VCD_Device_Init
+ 0002:0000037E       VCD_Init_Complete
+ 0002:000003D4       VCD_Init_Port
+ 0002:0000059E       @VCD_Virtualize_Port
+ 0002:00000654       VCD_Relocate_COMM_Int
+ 0002:00000704       VCD_Setup_Ptrs
+ 0002:00000753       VCD_Xmit_CallBack
+ 0002:000007A3       VCD_Enable_THRE
+ 0002:000007C8       VCD_Sharable_COMM_Int
+ 0002:000007D4       VCD_COMM_Int
+ 0002:0000080F       VCD_LineStat
+ 0002:00000830       VCD_DataAvail
+ 0002:00000952       VCD_XmitEmpty
+ 0002:00000A64       VCD_ModemStatus
+ 0002:00000B34       VCD_Sharable_COMM_Int_Addr
+ 0002:00000B38       VCD_COMM_Int_Addr
+ 0002:00000B3C       Com_Boost_Time
+ 0002:00000B48       VCD_Base_Ini
+ 0002:00000B4D       VCD_IRQ_Ini
+ 0002:00000B51       VCD_assign_Ini
+ 0002:00000B5C       VCD_INI_Buf
+ 0002:00000B5F       VCD_INI_Num
+ 0002:00000B6C       verify_base_ini
+ 0002:00000B7A       COM_IRQs_Sharable
+ 0002:00000B88       COM_30_Support
+ 0002:00000B92       Com_Ports_Ini
+ 0002:00000B9D       COM_Device_Name_Base
+ 0002:00000BA5       COM_Device_Name_Num_Off

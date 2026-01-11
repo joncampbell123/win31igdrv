@@ -1,0 +1,119 @@
+;	Static Name Aliases
+;
+	TITLE   midiout.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+MIDI	SEGMENT  WORD PUBLIC 'CODE'
+MIDI	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+EXTRN	LOADSTRING:FAR
+EXTRN	MEMCOPY:FAR
+EXTRN	_ghModule:WORD
+MIDI      SEGMENT
+	ASSUME	CS: MIDI
+	PUBLIC	MODGETDEVCAPS
+MODGETDEVCAPS	PROC FAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   midiout.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** /*****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | modGetDevCaps | Get the capabilities of the port.
+;|***  *
+;|***  * @parm LPBYTE | lpCaps | Far pointer to a MIDIOUTCAPS structure.
+;|***  *
+;|***  * @parm WORD | wSize | Size of the MIDIOUTCAPS structure.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ****************************************************************************/
+;|*** void FAR PASCAL modGetDevCaps(LPBYTE lpCaps, WORD wSize)
+;|*** {
+; Line 26
+	*** 000000	c8 32 00 00 		enter	50,0
+;	lpCaps = 8
+;	wSize = 6
+;	mc = -50
+;|*** MIDIOUTCAPS mc;
+;|*** 
+;|***     mc.wMid = MM_MICROSOFT;
+;|***     mc.wPid = MM_SNDBLST_MIDIOUT;
+; Line 30
+	*** 000004	c7 46 d0 03 00 		mov	WORD PTR [bp-48],3
+;|***     mc.vDriverVersion = DRIVER_VERSION;
+; Line 31
+	*** 000009	c7 46 d2 01 01 		mov	WORD PTR [bp-46],257	;0101H
+;|***     mc.wTechnology = MOD_MIDIPORT;
+; Line 32
+	*** 00000e	b8 01 00 		mov	ax,1
+	*** 000011	89 46 ce 		mov	WORD PTR [bp-50],ax	;mc
+	*** 000014	89 46 f4 		mov	WORD PTR [bp-12],ax
+;|***     mc.wVoices = 0;                   /* not used for ports */
+;|***     mc.wNotes = 0;                    /* not used for ports */
+; Line 34
+	*** 000017	33 c0 			xor	ax,ax
+	*** 000019	89 46 f6 		mov	WORD PTR [bp-10],ax
+	*** 00001c	89 46 f8 		mov	WORD PTR [bp-8],ax
+;|***     mc.wChannelMask = 0xFFFF;         /* all channels */
+; Line 35
+	*** 00001f	c7 46 fa ff ff 		mov	WORD PTR [bp-6],-1	;ffffH
+;|***     mc.dwSupport = 0L;
+; Line 36
+	*** 000024	89 46 fe 		mov	WORD PTR [bp-2],ax
+	*** 000027	89 46 fc 		mov	WORD PTR [bp-4],ax
+;|***     LoadString(ghModule, IDS_SNDBLSTMIDIOUT, mc.szPname, MAXPNAMELEN);
+; Line 37
+	*** 00002a	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 00002e	6a 20 			push	32	;0020H
+	*** 000030	8d 46 d4 		lea	ax,WORD PTR [bp-44]
+	*** 000033	16 			push	ss
+	*** 000034	50 			push	ax
+	*** 000035	6a 20 			push	32	;0020H
+	*** 000037	9a 00 00 00 00 		call	FAR PTR LOADSTRING
+;|*** 
+;|***     MemCopy(lpCaps, &mc, min(wSize,sizeof(mc)));
+; Line 39
+	*** 00003c	ff 76 0a 		push	WORD PTR [bp+10]
+	*** 00003f	ff 76 08 		push	WORD PTR [bp+8]	;lpCaps
+	*** 000042	8d 46 ce 		lea	ax,WORD PTR [bp-50]	;mc
+	*** 000045	16 			push	ss
+	*** 000046	50 			push	ax
+	*** 000047	8b 46 06 		mov	ax,WORD PTR [bp+6]	;wSize
+	*** 00004a	3d 32 00 		cmp	ax,50	;0032H
+	*** 00004d	76 03 			jbe	$L2613
+	*** 00004f	b8 32 00 		mov	ax,50	;0032H
+					$L2613:
+	*** 000052	50 			push	ax
+	*** 000053	9a 00 00 00 00 		call	FAR PTR MEMCOPY
+;|*** }
+; Line 40
+	*** 000058	c9 			leave	
+	*** 000059	ca 06 00 		ret	6
+
+MODGETDEVCAPS	ENDP
+MIDI	ENDS
+END

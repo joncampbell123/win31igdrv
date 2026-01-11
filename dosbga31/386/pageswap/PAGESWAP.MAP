@@ -1,0 +1,111 @@
+
+ PageSwap
+
+ Start         Length     Name                   Class
+ 0001:00000000 0000019D0H _LTEXT                 CODE 32-bit
+ 0001:000019D0 0000014A4H _LDATA                 CODE 32-bit
+ 0002:00000000 000000214H _ITEXT                 ICODE 32-bit
+ 0002:00000214 00000000CH _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 00000001AH _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:000019EC PageSwap_DDB            PageSwap_DDB
+
+  Address         Publics by Name
+
+ 0001:000019D8       $PageSwap_Create
+ 0001:000019DC       $PageSwap_Destroy
+ 0001:000019D0       $PageSwap_Get_Version
+ 0001:000019E0       $PageSwap_In
+ 0001:000019E4       $PageSwap_Out
+ 0001:000019D4       $PageSwap_Test_Create
+ 0001:000019E8       $PageSwap_Test_IO_Valid
+ 0001:000000F0       @PageSwap_Create
+ 0001:00000182       @PageSwap_Destroy
+ 0001:0000005E       @PageSwap_Get_Version
+ 0001:000001F0       @PageSwap_In
+ 0001:000003B1       @PageSwap_Out
+ 0001:0000008B       @PageSwap_Test_Create
+ 0001:0000066F       @PageSwap_Test_IO_Valid
+ 0001:00000E96       PageSwap_CallBack
+ 0001:00000000       PageSwap_Control
+ 0001:000019EC       PageSwap_DDB
+ 0001:000012F0       PageSwap_Debug_Query
+ 0002:00000056       PageSwap_Device_Init
+ 0001:00000D81       PageSwap_Ensure_Command_Done
+ 0001:00001120       PageSwap_Find_Buffer
+ 0001:00000539       PageSwap_Find_Free_Page
+ 0001:000012A8       PageSwap_Find_Page
+ 0001:0000107D       PageSwap_Flush_Writes
+ 0001:000001B3       PageSwap_Free_Page_Range
+ 0001:000007F7       PageSwap_Grow_File
+ 0001:0000068A       PageSwap_Idle
+ 0001:00000E4D       PageSwap_Immediate_IO
+ 0001:00001229       PageSwap_Link_CB
+ 0001:00000A43       PageSwap_Read_Ahead
+ 0001:00000905       PageSwap_Read_Now
+ 0001:0000084B       PageSwap_Read_Or_Write
+ 0001:00000041       PageSwap_System_Exit
+ 0002:00000000       PageSwap_Sys_Critical_Init
+ 0001:000007E8       PageSwap_Test_Dirty_Count
+ 0001:00000647       PageSwap_Test_Page_Present
+ 0001:0000118E       PageSwap_Unlink_CB
+ 0001:00000B6C       PageSwap_Write
+ 0001:00001A40       PS_Buff_Descr_Base
+ 0001:00001A5A       PS_Pager_Type
+ 0002:00000214       PS_Page_Buffers_Ini
+
+  Address         Publics by Value
+
+ 0001:00000000       PageSwap_Control
+ 0001:00000041       PageSwap_System_Exit
+ 0001:0000005E       @PageSwap_Get_Version
+ 0001:0000008B       @PageSwap_Test_Create
+ 0001:000000F0       @PageSwap_Create
+ 0001:00000182       @PageSwap_Destroy
+ 0001:000001B3       PageSwap_Free_Page_Range
+ 0001:000001F0       @PageSwap_In
+ 0001:000003B1       @PageSwap_Out
+ 0001:00000539       PageSwap_Find_Free_Page
+ 0001:00000647       PageSwap_Test_Page_Present
+ 0001:0000066F       @PageSwap_Test_IO_Valid
+ 0001:0000068A       PageSwap_Idle
+ 0001:000007E8       PageSwap_Test_Dirty_Count
+ 0001:000007F7       PageSwap_Grow_File
+ 0001:0000084B       PageSwap_Read_Or_Write
+ 0001:00000905       PageSwap_Read_Now
+ 0001:00000A43       PageSwap_Read_Ahead
+ 0001:00000B6C       PageSwap_Write
+ 0001:00000D81       PageSwap_Ensure_Command_Done
+ 0001:00000E4D       PageSwap_Immediate_IO
+ 0001:00000E96       PageSwap_CallBack
+ 0001:0000107D       PageSwap_Flush_Writes
+ 0001:00001120       PageSwap_Find_Buffer
+ 0001:0000118E       PageSwap_Unlink_CB
+ 0001:00001229       PageSwap_Link_CB
+ 0001:000012A8       PageSwap_Find_Page
+ 0001:000012F0       PageSwap_Debug_Query
+ 0001:000019D0       $PageSwap_Get_Version
+ 0001:000019D4       $PageSwap_Test_Create
+ 0001:000019D8       $PageSwap_Create
+ 0001:000019DC       $PageSwap_Destroy
+ 0001:000019E0       $PageSwap_In
+ 0001:000019E4       $PageSwap_Out
+ 0001:000019E8       $PageSwap_Test_IO_Valid
+ 0001:000019EC       PageSwap_DDB
+ 0001:00001A40       PS_Buff_Descr_Base
+ 0001:00001A5A       PS_Pager_Type
+ 0002:00000000       PageSwap_Sys_Critical_Init
+ 0002:00000056       PageSwap_Device_Init
+ 0002:00000214       PS_Page_Buffers_Ini
+
+Program entry point at 0003:0000

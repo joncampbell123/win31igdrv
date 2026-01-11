@@ -1,0 +1,33 @@
+
+ VMPAGES
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000033H _LTEXT                 CODE 32-bit
+ 0001:00000034 000000038H _LDATA                 CODE 32-bit
+ 0002:00000000 000000000H _ITEXT                 ICODE 32-bit
+ 0002:00000000 000000000H _IDATA                 ICODE 32-bit
+ 0002:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0002:00000000 000000000H _DATA                  PCODE 32-bit
+ 0002:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0002:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000034 VMPAGES_DDB             VMPAGES_DDB
+
+  Address         Publics by Name
+
+ 0001:00000008       VMPAGES_API_Proc
+ 0001:00000000       VMPAGES_Control
+ 0001:00000034       VMPAGES_DDB
+
+  Address         Publics by Value
+
+ 0001:00000000       VMPAGES_Control
+ 0001:00000008       VMPAGES_API_Proc
+ 0001:00000034       VMPAGES_DDB

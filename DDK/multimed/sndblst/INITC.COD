@@ -1,0 +1,913 @@
+;	Static Name Aliases
+;
+	TITLE   initc.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+INIT	SEGMENT  WORD PUBLIC 'CODE'
+INIT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _ghModule
+PUBLIC  _wDebugLevel
+PUBLIC  _STR_PORT
+PUBLIC  _STR_INT
+PUBLIC  _STR_DRIVERNAME
+PUBLIC  _STR_INIFILE
+PUBLIC  _STR_PRODUCTNAME
+PUBLIC  _STR_NULL
+PUBLIC  _STR_DMACHANNEL
+PUBLIC  _STR_PERSISTENCE
+PUBLIC  _STR_NOWARNING
+PUBLIC  _STR_VERIFYINT
+PUBLIC  _STR_EVILTWIN
+PUBLIC  _STR_SNDBLST
+PUBLIC  _STR_MMDEBUG
+PUBLIC  _STR_CRLF
+PUBLIC  _STR_SPACE
+PUBLIC  _gwErrorStringId
+PUBLIC  _gfVerifyInt
+EXTRN	__acrtused:ABS
+EXTRN	INITSETCONFIGURATION:NEAR
+EXTRN	LOADSTRING:FAR
+EXTRN	GETVERSION:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	MESSAGEBOX:FAR
+EXTRN	GETPROFILEINT:FAR
+EXTRN	INITPRELIMINARY:NEAR
+EXTRN	GETPRIVATEPROFILEINT:FAR
+EXTRN	GETPRIVATEPROFILESTRING:FAR
+EXTRN	GETMODULEHANDLE:FAR
+EXTRN	INITVERIFYCONFIGURATION:FAR
+_DATA      SEGMENT
+_STR_CRLF	DB	0dH,  0aH, 'SNDBLST: ',  00H
+_STR_SPACE	DB	' ',  00H
+_ghModule	DW	00H
+_gwErrorStringId	DW	00H
+_gfVerifyInt	DB	00H
+	ORG	$+1
+_wDebugLevel	DW	00H
+$SG2651	DB	'driver PORT not configured',  00H
+$SG2662	DB	'driver INT not configured',  00H
+$SG2697	DB	'LibMain',  00H
+$SG2700	DB	'EVIL TWIN SNDBLST1 LOCATED!!  WE WILL NOT ENABLE!!!',  00H
+_DATA      ENDS
+INIT      SEGMENT
+	ASSUME	CS: INIT
+	PUBLIC	GETPROFILEHEX
+GETPROFILEHEX	PROC NEAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   initc.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #define NOSTR  /* to avoid redefining strings */
+;|*** #include "sndblst.h"
+;|*** 
+;|*** #define DEF_MIDIINPERSISTENCE   50      /* default MIDI in persistence factor */
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** static WORD NEAR PASCAL GetProfileHex(LPSTR szApp, LPSTR szEntry, WORD wDef);
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     strings
+;|*** 
+;|***     most strings are only accessed at init time, so they will be placed
+;|***     in the _INIT code segment.
+;|*** 
+;|***  ***************************************************************************/
+;|*** 
+;|*** #define BCODE _based(_segname("_CODE"))
+;|*** #define BDATA _based(_segname("_DATA"))
+;|*** 
+;|*** /* non-localized strings */
+;|*** char BCODE STR_PORT[]           = "port";
+;|*** char BCODE STR_INT[]            = "int";
+;|*** char BCODE STR_DRIVERNAME[]     = "sndblst.drv";
+;|*** char BCODE STR_INIFILE[]        = "system.ini";
+;|*** char BCODE STR_PRODUCTNAME[]    = "Sound Blaster";
+;|*** static char BCODE STR_NULL[]        = "";
+;|*** static char BCODE STR_DMACHANNEL[]  = "dmachannel";
+;|*** static char BCODE STR_PERSISTENCE[] = "midiinpersistence";
+;|*** static char BCODE STR_NOWARNING[]   = "nowarning";
+;|*** static char BCODE STR_VERIFYINT[]   = "verifyint";
+;|*** static char BCODE STR_EVILTWIN[]    = "SNDBLST1";
+;|*** 
+;|*** #ifdef DEBUG
+;|***     static char BCODE STR_SNDBLST[] = "sndblst";
+;|***     static char BCODE STR_MMDEBUG[] = "mmdebug";
+;|*** 
+;|***     /* these strings are accessed at interrupt time, so they must be in */
+;|***     /* the fixed DS */
+;|***     char BDATA STR_CRLF[]       = "\r\nSNDBLST: ";
+;|***     char BDATA STR_SPACE[]      = " ";
+;|*** #endif
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     public data
+;|*** 
+;|***  ***************************************************************************/
+;|*** 
+;|*** HANDLE  ghModule        = NULL;         /* our module handle */
+;|*** WORD    gwErrorStringId = 0;            /* if initialization fails, string id */
+;|*** BYTE    gfVerifyInt     = FALSE;
+;|*** 
+;|*** #ifdef DEBUG
+;|*** WORD    wDebugLevel = 0;        /* debug level */
+;|*** #endif
+;|*** 
+;|*** /***************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api WORD | GetProfileHex | Get a profile hex value.
+;|***  *
+;|***  * @parm LPSTR | szAppName | The app name.
+;|***  *
+;|***  * @parm LPSTR | szEntry | The entry name.
+;|***  *
+;|***  * @parm WORD | wDefault | The default value.
+;|***  *
+;|***  * @rdesc Returns the profile value or the default if none is present.
+;|***  ***************************************************************************/
+;|*** static WORD NEAR PASCAL GetProfileHex(LPSTR szApp, LPSTR szEntry, WORD wDef)
+;|*** {
+; Line 88
+	*** 000000	c8 16 00 00 		enter	22,0
+	*** 000004	56 			push	si
+;	szApp = 10
+;	szEntry = 6
+;	wDef = 4
+;	buf = -22
+;	register cx = n
+;	b = -1
+;	register si = i
+;|*** BYTE  buf[20];
+;|*** WORD  n;
+;|*** BYTE  b;
+;|*** int   i;
+;|*** 
+;|***     n = GetPrivateProfileString(szApp, szEntry, STR_NULL, buf, sizeof(buf), STR_INIFILE);
+;|***     if (n < 1) return wDef;
+; Line 95
+	*** 000005	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 000008	ff 76 0a 		push	WORD PTR [bp+10]	;szApp
+	*** 00000b	ff 76 08 		push	WORD PTR [bp+8]
+	*** 00000e	ff 76 06 		push	WORD PTR [bp+6]	;szEntry
+	*** 000011	0e 			push	cs
+	*** 000012	68 00 00 		push	OFFSET _STR_NULL
+	*** 000015	8d 46 ea 		lea	ax,WORD PTR [bp-22]	;buf
+	*** 000018	16 			push	ss
+	*** 000019	50 			push	ax
+	*** 00001a	6a 14 			push	20	;0014H
+	*** 00001c	0e 			push	cs
+	*** 00001d	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 000020	9a 00 00 00 00 		call	FAR PTR GETPRIVATEPROFILESTRING
+	*** 000025	3d 01 00 		cmp	ax,1
+	*** 000028	73 05 			jae	$I2635
+	*** 00002a	8b 46 04 		mov	ax,WORD PTR [bp+4]	;wDef
+	*** 00002d	eb 3f 			jmp	SHORT $EX2630
+;|*** 
+;|***     for (n = 0, i = 0; b = buf[i]; i++) {
+; Line 97
+					$I2635:
+	*** 00002f	33 c9 			xor	cx,cx
+	*** 000031	33 f6 			xor	si,si
+	*** 000033	eb 2d 			jmp	SHORT $L2708
+					$F2636:
+;|***         if (b > 'Z') b -= 'a' - 'A';
+; Line 98
+	*** 000035	80 7e ff 5a 		cmp	BYTE PTR [bp-1],90	;005aH	;b
+	*** 000039	76 04 			jbe	$I2639
+	*** 00003b	80 6e ff 20 		sub	BYTE PTR [bp-1],32	;0020H	;b
+;|***         b -= '0';
+; Line 99
+					$I2639:
+;|***         if (b > 9) b -= 7;
+; Line 100
+	*** 00003f	80 6e ff 30 		sub	BYTE PTR [bp-1],48	;0030H	;b
+	*** 000043	80 7e ff 09 		cmp	BYTE PTR [bp-1],9	;b
+	*** 000047	76 04 			jbe	$I2640
+	*** 000049	80 6e ff 07 		sub	BYTE PTR [bp-1],7	;b
+;|***         if (b > 15)
+; Line 101
+					$I2640:
+	*** 00004d	80 7e ff 0f 		cmp	BYTE PTR [bp-1],15	;000fH	;b
+	*** 000051	77 19 			ja	$FB2638
+;|***             break;
+;|***         n = n * 16 + b;
+; Line 103
+	*** 000053	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;b
+	*** 000056	2a e4 			sub	ah,ah
+	*** 000058	8b d1 			mov	dx,cx
+	*** 00005a	c1 e2 04 		shl	dx,4
+	*** 00005d	03 c2 			add	ax,dx
+	*** 00005f	8b c8 			mov	cx,ax
+;|***     for (n = 0, i = 0; b = buf[i]; i++) {
+; Line 97
+	*** 000061	46 			inc	si
+					$L2708:
+	*** 000062	8a 42 ea 		mov	al,BYTE PTR [bp-22][si]
+	*** 000065	88 46 ff 		mov	BYTE PTR [bp-1],al	;b
+	*** 000068	0a c0 			or	al,al
+	*** 00006a	75 c9 			jne	$F2636
+;|***         if (b > 'Z') b -= 'a' - 'A';
+;|***         b -= '0';
+;|***         if (b > 9) b -= 7;
+;|***         if (b > 15)
+;|***             break;
+;|***         n = n * 16 + b;
+;|***     }
+; Line 104
+					$FB2638:
+;|***     return n;
+; Line 105
+	*** 00006c	8b c1 			mov	ax,cx
+;|*** }
+; Line 106
+					$EX2630:
+	*** 00006e	5e 			pop	si
+	*** 00006f	c9 			leave	
+	*** 000070	c2 0a 00 		ret	10	;000aH
+						_STR_MMDEBUG	DB	'mmdebug',  00H
+						_STR_SNDBLST	DB	'sndblst',  00H
+						_STR_EVILTWIN	DB	'SNDBLST1',  00H
+						_STR_VERIFYINT	DB	'verifyint',  00H
+						_STR_NOWARNING	DB	'nowarning',  00H
+						_STR_PERSISTENCE	DB	'midiinpersistence',  00H
+						_STR_DMACHANNEL	DB	'dmachannel',  00H
+						_STR_NULL	DB	00H
+						_STR_PRODUCTNAME	DB	'Sound Blaster',  00H
+						_STR_INIFILE	DB	'system.ini',  00H
+						_STR_DRIVERNAME	DB	'sndblst.drv',  00H
+						_STR_INT	DB	'int',  00H
+						_STR_PORT	DB	'port',  00H
+
+GETPROFILEHEX	ENDP
+	PUBLIC	CONFIGGETPORTBASE
+CONFIGGETPORTBASE	PROC NEAR
+;|*** 
+;|*** /***************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api WORD | ConfigGetPortBase |
+;|***  *
+;|***  * @rdesc Returns the port base from SYSTEM.INI
+;|***  ***************************************************************************/
+;|*** WORD NEAR PASCAL ConfigGetPortBase(void)
+;|*** {
+; Line 116
+	*** 0000ec	56 			push	si
+;	register si = wPort
+;|*** WORD    wPort;
+;|*** 
+;|***     /* read szIniFile and get the board configuration information. */
+;|*** 
+;|***     wPort = GetProfileHex(STR_DRIVERNAME, STR_PORT, -1);
+;|***     switch (wPort) {
+; Line 122
+	*** 0000ed	0e 			push	cs
+	*** 0000ee	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 0000f1	0e 			push	cs
+	*** 0000f2	68 00 00 		push	OFFSET _STR_PORT
+	*** 0000f5	6a ff 			push	-1	;ffffH
+	*** 0000f7	e8 06 ff 		call	GETPROFILEHEX
+	*** 0000fa	8b f0 			mov	si,ax
+;|***         case 0x200:
+;|***         case 0x210:
+;|***         case 0x220:
+;|***         case 0x230:
+;|***         case 0x240:
+;|***         case 0x250:
+;|***         case 0x260:
+;|***         case 0x270:
+;|***             break;
+;|*** 
+;|***         default:
+;|***             wPort = -1;
+;|***             D1("driver PORT not configured");
+;|***     }
+; Line 136
+	*** 0000fc	2d 00 02 		sub	ax,512	;0200H
+	*** 0000ff	a8 0f 			test	al,15	;000fH
+	*** 000101	75 1e 			jne	$SD2649
+	*** 000103	c1 e8 03 		shr	ax,3
+	*** 000106	3d 0e 00 		cmp	ax,14	;000eH
+	*** 000109	77 16 			ja	$SD2649
+	*** 00010b	93 			xchg	ax,bx
+	*** 00010c	2e ff a7 00 00 		jmp	WORD PTR cs:$L2706[bx]
+					$L2706:
+	*** 000111	00 00 				DW	$SB2645
+	*** 000113	00 00 				DW	$SB2645
+	*** 000115	00 00 				DW	$SB2645
+	*** 000117	00 00 				DW	$SB2645
+	*** 000119	00 00 				DW	$SB2645
+	*** 00011b	00 00 				DW	$SB2645
+	*** 00011d	00 00 				DW	$SB2645
+	*** 00011f	00 00 				DW	$SB2645
+;|***         default:
+; Line 133
+					$SD2649:
+;|***             wPort = -1;
+; Line 134
+	*** 000121	be ff ff 		mov	si,-1	;ffffH
+;|***             D1("driver PORT not configured");
+; Line 135
+	*** 000124	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000129	72 12 			jb	$SB2645
+	*** 00012b	1e 			push	ds
+	*** 00012c	68 00 00 		push	OFFSET DGROUP:_STR_CRLF
+	*** 00012f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000134	1e 			push	ds
+	*** 000135	68 00 00 		push	OFFSET DGROUP:$SG2651
+	*** 000138	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     }
+; Line 136
+					$SB2645:
+;|*** 
+;|***     return (wPort);
+; Line 138
+	*** 00013d	8b c6 			mov	ax,si
+;|*** }
+; Line 139
+	*** 00013f	5e 			pop	si
+	*** 000140	c3 			ret	
+	*** 000141	90 			nop	
+
+CONFIGGETPORTBASE	ENDP
+	PUBLIC	CONFIGGETIRQ
+CONFIGGETIRQ	PROC NEAR
+;|*** 
+;|*** 
+;|*** /***************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api WORD | ConfigGetIRQ |
+;|***  *
+;|***  * @rdesc Returns the IRQ ('int') from SYSTEM.INI
+;|***  ***************************************************************************/
+;|*** BYTE NEAR PASCAL ConfigGetIRQ(void)
+;|*** {
+; Line 150
+	*** 000142	c8 02 00 00 		enter	2,0
+;	bInt = -1
+;|*** BYTE    bInt;
+;|*** 
+;|***     bInt = (BYTE)GetPrivateProfileInt(STR_DRIVERNAME, STR_INT, -1, STR_INIFILE);
+;|*** 
+;|***     switch (bInt) {
+; Line 155
+	*** 000146	0e 			push	cs
+	*** 000147	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 00014a	0e 			push	cs
+	*** 00014b	68 00 00 		push	OFFSET _STR_INT
+	*** 00014e	6a ff 			push	-1	;ffffH
+	*** 000150	0e 			push	cs
+	*** 000151	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 000154	9a 00 00 00 00 		call	FAR PTR GETPRIVATEPROFILEINT
+	*** 000159	88 46 ff 		mov	BYTE PTR [bp-1],al	;bInt
+	*** 00015c	2a e4 			sub	ah,ah
+;|***         case 3:
+;|***         case 5:
+;|***         case 7:
+;|***         case 9:
+;|***         case 10:
+;|***             break;
+;|*** 
+;|***         case 2:
+;|***             bInt = 9;
+;|***             break;
+;|*** 
+;|***         default:
+;|***             bInt = -1;
+;|***             D1("driver INT not configured");
+;|***             break;
+;|***     }
+; Line 171
+	*** 00015e	48 			dec	ax
+	*** 00015f	48 			dec	ax
+	*** 000160	3d 08 00 		cmp	ax,8
+	*** 000163	77 1a 			ja	$SD2660
+	*** 000165	03 c0 			add	ax,ax
+	*** 000167	93 			xchg	ax,bx
+	*** 000168	2e ff a7 00 00 		jmp	WORD PTR cs:$L2707[bx]
+					$L2707:
+	*** 00016d	00 00 				DW	$SC2659
+	*** 00016f	00 00 				DW	$SB2655
+	*** 000171	00 00 				DW	$SD2660
+	*** 000173	00 00 				DW	$SB2655
+	*** 000175	00 00 				DW	$SD2660
+	*** 000177	00 00 				DW	$SB2655
+	*** 000179	00 00 				DW	$SD2660
+	*** 00017b	00 00 				DW	$SB2655
+	*** 00017d	00 00 				DW	$SB2655
+;|***         default:
+; Line 167
+					$SD2660:
+;|***             bInt = -1;
+; Line 168
+	*** 00017f	c6 46 ff ff 		mov	BYTE PTR [bp-1],255	;00ffH	;bInt
+;|***             D1("driver INT not configured");
+; Line 169
+	*** 000183	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000188	72 18 			jb	$SB2655
+	*** 00018a	1e 			push	ds
+	*** 00018b	68 00 00 		push	OFFSET DGROUP:_STR_CRLF
+	*** 00018e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000193	1e 			push	ds
+	*** 000194	68 00 00 		push	OFFSET DGROUP:$SG2662
+	*** 000197	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             break;
+; Line 170
+	*** 00019c	eb 04 			jmp	SHORT $SB2655
+;|***         case 2:
+; Line 163
+					$SC2659:
+;|***             bInt = 9;
+; Line 164
+	*** 00019e	c6 46 ff 09 		mov	BYTE PTR [bp-1],9	;bInt
+;|***             break;
+;|*** 
+;|***         default:
+;|***             bInt = -1;
+;|***             D1("driver INT not configured");
+;|***             break;
+;|***     }
+; Line 171
+					$SB2655:
+;|*** 
+;|***     return (bInt);
+; Line 173
+	*** 0001a2	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bInt
+;|*** }
+; Line 174
+	*** 0001a5	c9 			leave	
+	*** 0001a6	c3 			ret	
+	*** 0001a7	90 			nop	
+
+CONFIGGETIRQ	ENDP
+	PUBLIC	CONFIGGETDMACHANNEL
+CONFIGGETDMACHANNEL	PROC NEAR
+;|*** 
+;|*** 
+;|*** /***************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api WORD | ConfigGetDMAChannel |
+;|***  *
+;|***  * @rdesc Returns the DMA channel from SYSTEM.INI
+;|***  ***************************************************************************/
+;|*** BYTE NEAR PASCAL ConfigGetDMAChannel(void)
+;|*** {
+; Line 185
+	*** 0001a8	c8 02 00 00 		enter	2,0
+;	bDMAChannel = -1
+;|*** BYTE    bDMAChannel;
+;|*** 
+;|***     /* get the DMA channel that the card is using... */
+;|***     bDMAChannel = (BYTE)GetPrivateProfileInt(STR_DRIVERNAME, STR_DMACHANNEL,
+;|***                                 -1, STR_INIFILE);
+;|*** 
+;|***     switch (bDMAChannel) {
+; Line 192
+	*** 0001ac	0e 			push	cs
+	*** 0001ad	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 0001b0	0e 			push	cs
+	*** 0001b1	68 00 00 		push	OFFSET _STR_DMACHANNEL
+	*** 0001b4	6a ff 			push	-1	;ffffH
+	*** 0001b6	0e 			push	cs
+	*** 0001b7	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 0001ba	9a 00 00 00 00 		call	FAR PTR GETPRIVATEPROFILEINT
+	*** 0001bf	88 46 ff 		mov	BYTE PTR [bp-1],al	;bDMAChannel
+	*** 0001c2	2a e4 			sub	ah,ah
+;|***         case 0:
+;|***         case 1:
+;|***         case 3:
+;|***             break;
+;|*** 
+;|***         default:
+;|***             bDMAChannel = 1;
+;|***     }
+; Line 200
+	*** 0001c4	0b c0 			or	ax,ax
+	*** 0001c6	7c 09 			jl	$SD2670
+	*** 0001c8	70 07 			jo	$SD2670
+	*** 0001ca	48 			dec	ax
+	*** 0001cb	7e 08 			jle	$SB2666
+	*** 0001cd	48 			dec	ax
+	*** 0001ce	48 			dec	ax
+	*** 0001cf	74 04 			je	$SB2666
+;|***         default:
+; Line 198
+					$SD2670:
+;|***             bDMAChannel = 1;
+; Line 199
+	*** 0001d1	c6 46 ff 01 		mov	BYTE PTR [bp-1],1	;bDMAChannel
+;|***     }
+; Line 200
+					$SB2666:
+;|*** 
+;|***     return (bDMAChannel);
+; Line 202
+	*** 0001d5	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bDMAChannel
+;|*** }
+; Line 203
+	*** 0001d8	c9 			leave	
+	*** 0001d9	c3 			ret	
+
+CONFIGGETDMACHANNEL	ENDP
+	PUBLIC	GETWINDOWSVERSIONCORRECTLY
+GETWINDOWSVERSIONCORRECTLY	PROC NEAR
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** static WORD NEAR PASCAL GetWindowsVersionCorrectly()
+;|*** {
+; Line 208
+;	register si = w
+;|*** WORD w;
+;|*** 
+;|***     w = LOWORD(GetVersion());
+; Line 211
+	*** 0001da	9a 00 00 00 00 		call	FAR PTR GETVERSION
+;|*** 
+;|***     return (w << 8) | (w >> 8);
+; Line 213
+	*** 0001df	8b c8 			mov	cx,ax
+	*** 0001e1	8a e0 			mov	ah,al
+	*** 0001e3	8a c5 			mov	al,ch
+;|*** }
+; Line 214
+	*** 0001e5	c3 			ret	
+
+GETWINDOWSVERSIONCORRECTLY	ENDP
+	PUBLIC	HARDERRORMSGBOX
+HARDERRORMSGBOX	PROC NEAR
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** static void NEAR PASCAL HardErrorMsgBox(WORD wStringId)
+;|*** {
+; Line 219
+	*** 0001e6	c8 fa 00 00 		enter	250,0
+;	wStringId = 4
+;	szErrorBuffer = -250
+;|*** char szErrorBuffer[MAX_ERR_STRING]; /* buffer for error messages */
+;|*** 
+;|***     /*  Starting with Windows 3.1, it is ok to bring up a _hard system modal_ */
+;|***     /*  message box during LibInit.  In Windows 3.0, this will not work! */
+;|***     if (GetWindowsVersionCorrectly() >= 0x30A) {
+; Line 224
+	*** 0001ea	e8 ed ff 		call	GETWINDOWSVERSIONCORRECTLY
+	*** 0001ed	3d 0a 03 		cmp	ax,778	;030aH
+	*** 0001f0	72 29 			jb	$EX2677
+;|***         LoadString(ghModule, wStringId, szErrorBuffer, sizeof(szErrorBuffer));
+; Line 225
+	*** 0001f2	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 0001f6	ff 76 04 		push	WORD PTR [bp+4]	;wStringId
+	*** 0001f9	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 0001fd	16 			push	ss
+	*** 0001fe	50 			push	ax
+	*** 0001ff	68 fa 00 		push	250	;00faH
+	*** 000202	9a 00 00 00 00 		call	FAR PTR LOADSTRING
+;|***         MessageBox(NULL, szErrorBuffer, STR_PRODUCTNAME, MB_OK|MB_SYSTEMMODAL|MB_ICONHAND);
+; Line 226
+	*** 000207	6a 00 			push	0
+	*** 000209	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 00020d	16 			push	ss
+	*** 00020e	50 			push	ax
+	*** 00020f	0e 			push	cs
+	*** 000210	68 00 00 		push	OFFSET _STR_PRODUCTNAME
+	*** 000213	68 10 10 		push	4112	;1010H
+	*** 000216	9a 00 00 00 00 		call	FAR PTR MESSAGEBOX
+;|***     }
+;|*** }
+; Line 228
+					$EX2677:
+	*** 00021b	c9 			leave	
+	*** 00021c	c2 02 00 		ret	2
+	*** 00021f	90 			nop	
+
+HARDERRORMSGBOX	ENDP
+	PUBLIC	INITDISPLAYCONFIGERRORS
+INITDISPLAYCONFIGERRORS	PROC FAR
+;|*** 
+;|*** BOOL FAR PASCAL InitDisplayConfigErrors(void)
+;|*** {
+; Line 231
+	*** 000220	c8 fa 00 00 		enter	250,0
+;	szErrorBuffer = -250
+;|*** char szErrorBuffer[MAX_ERR_STRING]; /* buffer for error messages */
+;|*** 
+;|***     if (gwErrorStringId) {
+; Line 234
+	*** 000224	83 3e 00 00 00 		cmp	WORD PTR _gwErrorStringId,0
+	*** 000229	74 30 			je	$I2682
+;|***         LoadString(ghModule, gwErrorStringId, szErrorBuffer, sizeof(szErrorBuffer));
+; Line 235
+	*** 00022b	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 00022f	ff 36 00 00 		push	WORD PTR _gwErrorStringId
+	*** 000233	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 000237	16 			push	ss
+	*** 000238	50 			push	ax
+	*** 000239	68 fa 00 		push	250	;00faH
+	*** 00023c	9a 00 00 00 00 		call	FAR PTR LOADSTRING
+;|***         MessageBox(NULL, szErrorBuffer, STR_PRODUCTNAME, MB_OK|MB_SYSTEMMODAL|MB_ICONHAND);
+; Line 236
+	*** 000241	6a 00 			push	0
+	*** 000243	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 000247	16 			push	ss
+	*** 000248	50 			push	ax
+	*** 000249	0e 			push	cs
+	*** 00024a	68 00 00 		push	OFFSET _STR_PRODUCTNAME
+	*** 00024d	68 10 10 		push	4112	;1010H
+	*** 000250	9a 00 00 00 00 		call	FAR PTR MESSAGEBOX
+;|***         gwErrorStringId = 0;
+; Line 237
+	*** 000255	c7 06 00 00 00 00 	mov	WORD PTR _gwErrorStringId,0
+;|***     }
+;|*** 
+;|***     return TRUE;
+; Line 240
+					$I2682:
+	*** 00025b	b8 01 00 		mov	ax,1
+;|*** }
+; Line 241
+	*** 00025e	c9 			leave	
+	*** 00025f	cb 			ret	
+
+INITDISPLAYCONFIGERRORS	ENDP
+	PUBLIC	LIBMAIN
+LIBMAIN	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | LibMain | Library initialization code.
+;|***  *
+;|***  * @parm HANDLE | hModule | Our module handle.
+;|***  *
+;|***  * @parm WORD | wHeapSize | The heap size from the .def file.
+;|***  *
+;|***  * @parm LPSTR | lpCmdLine | The command line.
+;|***  *
+;|***  * @rdesc Returns 1 if the initialization was successful and 0 otherwise.
+;|***  ***************************************************************************/
+;|*** int NEAR PASCAL LibMain(HANDLE hModule, WORD wHeapSize, LPSTR lpCmdLine)
+;|*** {
+; Line 257
+	*** 000260	c8 06 00 00 		enter	6,0
+	*** 000264	56 			push	si
+;	lpCmdLine = 4
+;	register si = wPort
+;	bInt = -5
+;	bDMAChannel = -6
+;	wMidiInPersistence = -8
+;	register si = wError
+;	dw = -4
+;	hModule = 10
+;	wHeapSize = 8
+;|*** WORD    wPort;
+;|*** BYTE    bInt;
+;|*** BYTE    bDMAChannel;
+;|*** WORD    wMidiInPersistence;
+;|*** WORD    wError;
+;|*** DWORD   dw;
+;|*** 
+;|*** #ifdef DEBUG
+;|***     /* get debug level - default is 0 */
+;|***     wDebugLevel = GetProfileInt(STR_MMDEBUG, STR_SNDBLST, 0);
+; Line 267
+	*** 000265	0e 			push	cs
+	*** 000266	68 00 00 		push	OFFSET _STR_MMDEBUG
+	*** 000269	0e 			push	cs
+	*** 00026a	68 00 00 		push	OFFSET _STR_SNDBLST
+	*** 00026d	6a 00 			push	0
+	*** 00026f	9a 00 00 00 00 		call	FAR PTR GETPROFILEINT
+	*** 000274	a3 00 00 		mov	WORD PTR _wDebugLevel,ax
+;|*** #endif
+;|*** 
+;|***     D1("LibMain");
+; Line 270
+	*** 000277	3d 01 00 		cmp	ax,1
+	*** 00027a	72 12 			jb	$I2696
+	*** 00027c	1e 			push	ds
+	*** 00027d	68 00 00 		push	OFFSET DGROUP:_STR_CRLF
+	*** 000280	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000285	1e 			push	ds
+	*** 000286	68 00 00 		push	OFFSET DGROUP:$SG2697
+	*** 000289	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     /* save our module handle */
+;|***     ghModule = hModule;
+; Line 273
+					$I2696:
+	*** 00028e	8b 46 0a 		mov	ax,WORD PTR [bp+10]	;hModule
+	*** 000291	a3 00 00 		mov	WORD PTR _ghModule,ax
+;|*** 
+;|***     /* we have a good chance of hanging if two sound blaster drivers are */
+;|***     /* enabled */
+;|***     if (GetModuleHandle(STR_EVILTWIN)) {
+; Line 277
+	*** 000294	0e 			push	cs
+	*** 000295	68 00 00 		push	OFFSET _STR_EVILTWIN
+	*** 000298	9a 00 00 00 00 		call	FAR PTR GETMODULEHANDLE
+	*** 00029d	0b c0 			or	ax,ax
+	*** 00029f	74 1e 			je	$I2698
+;|***         D1("EVIL TWIN SNDBLST1 LOCATED!!  WE WILL NOT ENABLE!!!");
+; Line 278
+	*** 0002a1	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0002a6	72 12 			jb	$I2699
+	*** 0002a8	1e 			push	ds
+	*** 0002a9	68 00 00 		push	OFFSET DGROUP:_STR_CRLF
+	*** 0002ac	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0002b1	1e 			push	ds
+	*** 0002b2	68 00 00 		push	OFFSET DGROUP:$SG2700
+	*** 0002b5	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         wError = IDS_ERRTWODRIVERS;
+; Line 279
+					$I2699:
+	*** 0002ba	be 01 00 		mov	si,1
+;|***         goto libmain_Severe_Error;
+; Line 280
+	*** 0002bd	eb 7a 			jmp	SHORT $libmain_Severe_Error2701
+;|***     }
+;|*** 
+;|***     /* do preliminary stuff--and check for hardware problems... */
+;|***     if (wError = InitPreliminary())
+; Line 284
+					$I2698:
+	*** 0002bf	e8 00 00 		call	INITPRELIMINARY
+	*** 0002c2	8b f0 			mov	si,ax
+	*** 0002c4	0b f0 			or	si,ax
+	*** 0002c6	75 71 			jne	$libmain_Severe_Error2701
+;|***         goto libmain_Severe_Error;
+;|*** 
+;|*** 
+;|***     /* get the DMA channel that the card is using... */
+;|***     wPort = ConfigGetPortBase();
+; Line 289
+	*** 0002c8	e8 21 fe 		call	CONFIGGETPORTBASE
+	*** 0002cb	8b f0 			mov	si,ax
+;|***     bInt = ConfigGetIRQ();
+; Line 290
+	*** 0002cd	e8 72 fe 		call	CONFIGGETIRQ
+	*** 0002d0	88 46 fb 		mov	BYTE PTR [bp-5],al	;bInt
+;|***     bDMAChannel = ConfigGetDMAChannel();
+; Line 291
+	*** 0002d3	e8 d2 fe 		call	CONFIGGETDMACHANNEL
+	*** 0002d6	88 46 fa 		mov	BYTE PTR [bp-6],al	;bDMAChannel
+;|*** 
+;|***     /* over-ride switch in case someone has problems... */
+;|***     gfVerifyInt = (BYTE)GetPrivateProfileInt(STR_DRIVERNAME, STR_VERIFYINT, 1, STR_INIFILE);
+; Line 294
+	*** 0002d9	0e 			push	cs
+	*** 0002da	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 0002dd	0e 			push	cs
+	*** 0002de	68 00 00 		push	OFFSET _STR_VERIFYINT
+	*** 0002e1	6a 01 			push	1
+	*** 0002e3	0e 			push	cs
+	*** 0002e4	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 0002e7	9a 00 00 00 00 		call	FAR PTR GETPRIVATEPROFILEINT
+	*** 0002ec	a2 00 00 		mov	BYTE PTR _gfVerifyInt,al
+;|*** 
+;|*** 
+;|***     /* verify port, IRQ, DMA channel and DSP version
+;|***      *
+;|***      *  The return value is:
+;|***      *      LOWORD() =  error code. it is 0 if no error, otherwise it is
+;|***      *                  the IDS_xxxxxx error define (and hi-word will be
+;|***      *                  zero).
+;|***      *      HIWORD() =  DSP version.
+;|***      */
+;|***     dw = InitVerifyConfiguration(wPort, bInt, bDMAChannel);
+;|*** 
+;|***     /* was there an error? */
+;|***     if (LOWORD(dw)) {
+; Line 308
+	*** 0002ef	56 			push	si
+	*** 0002f0	8a 46 fb 		mov	al,BYTE PTR [bp-5]	;bInt
+	*** 0002f3	50 			push	ax
+	*** 0002f4	8a 46 fa 		mov	al,BYTE PTR [bp-6]	;bDMAChannel
+	*** 0002f7	50 			push	ax
+	*** 0002f8	9a 00 00 00 00 		call	FAR PTR INITVERIFYCONFIGURATION
+	*** 0002fd	0b c0 			or	ax,ax
+	*** 0002ff	74 0b 			je	$I2703
+;|***         /*  display error, but allow load to succeed.  we will NOT enable,
+;|***          *  but we need to allow someone to configure us in the drivers applet.
+;|***          */
+;|***         gwErrorStringId = IDS_ERRBADCONFIG;
+; Line 312
+	*** 000301	c7 06 00 00 10 00 	mov	WORD PTR _gwErrorStringId,16	;0010H
+;|***         return 1;
+; Line 313
+					$L2709:
+	*** 000307	b8 01 00 		mov	ax,1
+	*** 00030a	eb 33 			jmp	SHORT $EX2689
+;|***     }
+;|*** 
+;|***     /*  iff the DSP version is too old, then do NOT load driver! otherwise */
+;|***     /*  let it be loaded so it can be configured (but not enabled). */
+;|***     wError = HIWORD(dw);
+; Line 318
+					$I2703:
+;|***     if (wError < DSP_VERSION_REQD) {
+; Line 319
+	*** 00030c	81 fa 00 02 		cmp	dx,512	;0200H
+	*** 000310	73 05 			jae	$I2704
+;|***         wError = IDS_ERRBADVERSION;
+; Line 320
+	*** 000312	be 05 00 		mov	si,5
+	*** 000315	eb 22 			jmp	SHORT $libmain_Severe_Error2701
+;|*** 
+;|*** libmain_Severe_Error:
+;|*** 
+;|***         /* display error and FAIL to load... */
+;|***         HardErrorMsgBox(wError);
+;|***         return 0;
+;|***     }
+;|*** 
+;|***     /* get MIDI input persistence... */
+;|***     wMidiInPersistence = GetPrivateProfileInt(STR_DRIVERNAME, STR_PERSISTENCE,
+; Line 330
+					$I2704:
+;|***                                 DEF_MIDIINPERSISTENCE, STR_INIFILE);
+;|*** 
+;|***     /* set the configuration */
+;|***     InitSetConfiguration(wPort, bInt, bDMAChannel, wMidiInPersistence);
+; Line 334
+	*** 000317	56 			push	si
+	*** 000318	8a 46 fb 		mov	al,BYTE PTR [bp-5]	;bInt
+	*** 00031b	50 			push	ax
+	*** 00031c	8a 46 fa 		mov	al,BYTE PTR [bp-6]	;bDMAChannel
+	*** 00031f	50 			push	ax
+	*** 000320	0e 			push	cs
+	*** 000321	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 000324	0e 			push	cs
+	*** 000325	68 00 00 		push	OFFSET _STR_PERSISTENCE
+	*** 000328	6a 32 			push	50	;0032H
+	*** 00032a	0e 			push	cs
+	*** 00032b	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 00032e	9a 00 00 00 00 		call	FAR PTR GETPRIVATEPROFILEINT
+	*** 000333	50 			push	ax
+	*** 000334	e8 00 00 		call	INITSETCONFIGURATION
+	*** 000337	eb ce 			jmp	SHORT $L2709
+;|*** libmain_Severe_Error:
+; Line 322
+					$libmain_Severe_Error2701:
+;|*** 
+;|***         /* display error and FAIL to load... */
+;|***         HardErrorMsgBox(wError);
+; Line 325
+	*** 000339	56 			push	si
+	*** 00033a	e8 a9 fe 		call	HARDERRORMSGBOX
+;|***         return 0;
+; Line 326
+	*** 00033d	33 c0 			xor	ax,ax
+;|***     }
+;|*** 
+;|***     /* get MIDI input persistence... */
+;|***     wMidiInPersistence = GetPrivateProfileInt(STR_DRIVERNAME, STR_PERSISTENCE,
+;|***                                 DEF_MIDIINPERSISTENCE, STR_INIFILE);
+;|*** 
+;|***     /* set the configuration */
+;|***     InitSetConfiguration(wPort, bInt, bDMAChannel, wMidiInPersistence);
+;|*** 
+;|***     /* load driver (but maybe not enable if configuration is wrong). */
+;|***     return 1;
+;|*** }
+; Line 338
+					$EX2689:
+	*** 00033f	5e 			pop	si
+	*** 000340	c9 			leave	
+	*** 000341	c2 08 00 		ret	8
+	*** 000344	90 			nop	
+	*** 000345	90 			nop	
+
+LIBMAIN	ENDP
+INIT	ENDS
+END

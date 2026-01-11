@@ -1,0 +1,153 @@
+
+ PAINTJET
+
+ Start     Length     Name                   Class
+ 0001:0000 005A0H     _TEXT                  CODE
+ 0002:0000 0000CH     _DATA                  DATA
+ 0002:000C 00000H     CONST                  CONST
+ 0002:000C 00000H     _BSS                   BSS
+
+ Origin   Group
+ 0002:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:0408 AdvancedSetUpDialog     AdvancedSetUpDialog
+ 0001:018A ColorInfo               ColorInfo
+ 0001:0000 Control                 Control
+ 0001:0472 CreateDIBitmap          CreateDIBitmap
+ 0001:002E DevBitblt               DevBitblt
+ 0001:02B6 DevExtTextOut           DevExtTextOut
+ 0001:030A DevGetCharWidth         DevGetCharWidth
+ 0001:0432 DeviceBitmapBits        DeviceBitmapBits
+ 0001:03CA DeviceCapabilities      DeviceCapabilities
+ 0001:01B4 DeviceMode              DeviceMode
+ 0001:055E DevInstall              DevInstall
+ 0001:0298 Disable                 Disable
+ 0001:0242 Enable                  Enable
+ 0001:0212 EnumDFonts              EnumDFonts
+ 0001:015C EnumObj                 EnumObj
+ 0001:038A ExtDeviceMode           ExtDeviceMode
+ 0001:00A6 Output                  Output
+ 0001:0076 Pixel                   Pixel
+ 0001:0534 QueryDeviceNames        QueryDeviceNames
+ 0001:01DE RealizeObject           RealizeObject
+ 0001:012E ScanLR                  ScanLR
+ 0001:0488 SetDIBitsToDevice       SetDIBitsToDevice
+ 0001:00E8 StrBlt                  StrBlt
+ 0001:04D0 StretchDIB              StretchDIB
+ 0001:058C WEP                     WEP
+
+  Address         Publics by Name
+
+ 0001:0408       AdvancedSetUpDialog
+ 0001:018A       ColorInfo
+ 0001:0000       Control
+ 0001:0472       CreateDIBitmap
+ 0001:002E       DevBitblt
+ 0001:02B6       DevExtTextOut
+ 0001:030A       DevGetCharWidth
+ 0001:0348       DEVICEBITMAP
+ 0001:0432       DeviceBitmapBits
+ 0001:03CA       DeviceCapabilities
+ 0001:01B4       DeviceMode
+ 0001:055E       DevInstall
+ 0001:0298       Disable
+ 0001:0242       Enable
+ 0001:0212       EnumDFonts
+ 0001:015C       EnumObj
+ 0001:038A       ExtDeviceMode
+ 0001:035E       FASTBORDER
+ 0000:0000  Imp  GETMODULEHANDLE      (KERNEL.47)
+ 0000:0000  Imp  GlAdvancedSetUpDialog (UNIDRV.93)
+ 0000:0000  Imp  GlBitBlt             (UNIDRV.1)
+ 0000:0000  Imp  GlColorInfo          (UNIDRV.2)
+ 0000:0000  Imp  GlControl            (UNIDRV.3)
+ 0000:0000  Imp  GlCreateDIBitmap     (UNIDRV.20)
+ 0000:0000  Imp  GlDeviceBitmapBits   (UNIDRV.19)
+ 0000:0000  Imp  GlDeviceCapabilities (UNIDRV.91)
+ 0000:0000  Imp  GlDeviceMode         (UNIDRV.13)
+ 0000:0000  Imp  GlDevInstall         (UNIDRV.94)
+ 0000:0000  Imp  GlDisable            (UNIDRV.4)
+ 0000:0000  Imp  GlEnable             (UNIDRV.5)
+ 0000:0000  Imp  GlEnumDFonts         (UNIDRV.6)
+ 0000:0000  Imp  GlEnumObj            (UNIDRV.7)
+ 0000:0000  Imp  GlExtDeviceMode      (UNIDRV.90)
+ 0000:0000  Imp  GlExtTextOut         (UNIDRV.14)
+ 0000:0000  Imp  GlGetCharWidth       (UNIDRV.15)
+ 0000:0000  Imp  GlOutput             (UNIDRV.8)
+ 0000:0000  Imp  GlPixel              (UNIDRV.9)
+ 0000:0000  Imp  GlQueryDeviceNames   (UNIDRV.92)
+ 0000:0000  Imp  GlRealizeObject      (UNIDRV.10)
+ 0000:0000  Imp  GlScanLR             (UNIDRV.12)
+ 0000:0000  Imp  GlSetDIBitsToDevice  (UNIDRV.21)
+ 0000:0000  Imp  GlStrBlt             (UNIDRV.11)
+ 0000:0000  Imp  GlStretchDIB         (UNIDRV.28)
+ 0001:00A6       Output
+ 0001:0076       Pixel
+ 0001:0534       QueryDeviceNames
+ 0001:01DE       RealizeObject
+ 0002:000A       RGCHMODULENAME
+ 0001:012E       ScanLR
+ 0001:0374       SETATTRIBUTE
+ 0001:0488       SetDIBitsToDevice
+ 0001:00E8       StrBlt
+ 0001:04D0       StretchDIB
+ 0001:058C       WEP
+
+  Address         Publics by Value
+
+ 0000:0000  Imp  GlEnumDFonts         (UNIDRV.6)
+ 0000:0000  Imp  GlDeviceCapabilities (UNIDRV.91)
+ 0000:0000  Imp  GlControl            (UNIDRV.3)
+ 0000:0000  Imp  GlStretchDIB         (UNIDRV.28)
+ 0000:0000  Imp  GlSetDIBitsToDevice  (UNIDRV.21)
+ 0000:0000  Imp  GlStrBlt             (UNIDRV.11)
+ 0000:0000  Imp  GlQueryDeviceNames   (UNIDRV.92)
+ 0000:0000  Imp  GlScanLR             (UNIDRV.12)
+ 0000:0000  Imp  GETMODULEHANDLE      (KERNEL.47)
+ 0000:0000  Imp  GlEnable             (UNIDRV.5)
+ 0000:0000  Imp  GlAdvancedSetUpDialog (UNIDRV.93)
+ 0000:0000  Imp  GlExtDeviceMode      (UNIDRV.90)
+ 0000:0000  Imp  GlGetCharWidth       (UNIDRV.15)
+ 0000:0000  Imp  GlDeviceMode         (UNIDRV.13)
+ 0000:0000  Imp  GlOutput             (UNIDRV.8)
+ 0000:0000  Imp  GlExtTextOut         (UNIDRV.14)
+ 0000:0000  Imp  GlBitBlt             (UNIDRV.1)
+ 0000:0000  Imp  GlDeviceBitmapBits   (UNIDRV.19)
+ 0000:0000  Imp  GlDisable            (UNIDRV.4)
+ 0000:0000  Imp  GlPixel              (UNIDRV.9)
+ 0000:0000  Imp  GlDevInstall         (UNIDRV.94)
+ 0000:0000  Imp  GlEnumObj            (UNIDRV.7)
+ 0000:0000  Imp  GlRealizeObject      (UNIDRV.10)
+ 0000:0000  Imp  GlColorInfo          (UNIDRV.2)
+ 0000:0000  Imp  GlCreateDIBitmap     (UNIDRV.20)
+ 0001:0000       Control
+ 0001:002E       DevBitblt
+ 0001:0076       Pixel
+ 0001:00A6       Output
+ 0001:00E8       StrBlt
+ 0001:012E       ScanLR
+ 0001:015C       EnumObj
+ 0001:018A       ColorInfo
+ 0001:01B4       DeviceMode
+ 0001:01DE       RealizeObject
+ 0001:0212       EnumDFonts
+ 0001:0242       Enable
+ 0001:0298       Disable
+ 0001:02B6       DevExtTextOut
+ 0001:030A       DevGetCharWidth
+ 0001:0348       DEVICEBITMAP
+ 0001:035E       FASTBORDER
+ 0001:0374       SETATTRIBUTE
+ 0001:038A       ExtDeviceMode
+ 0001:03CA       DeviceCapabilities
+ 0001:0408       AdvancedSetUpDialog
+ 0001:0432       DeviceBitmapBits
+ 0001:0472       CreateDIBitmap
+ 0001:0488       SetDIBitsToDevice
+ 0001:04D0       StretchDIB
+ 0001:0534       QueryDeviceNames
+ 0001:055E       DevInstall
+ 0001:058C       WEP
+ 0002:000A       RGCHMODULENAME

@@ -1,0 +1,3073 @@
+
+ DISPLAY
+
+ Start     Length     Name                   Class
+ 0001:0000 0322AH     _TEXT                  CODE
+ 0002:0000 02650H     _PROTECT               CODE
+ 0003:0000 01E5AH     _REAL                  CODE
+ 0004:0000 00504H     _INIT                  CODE
+ 0005:0000 004B0H     _BLUEMOON              CODE
+ 0006:0000 01184H     _LINES                 CODE
+ 0007:0000 00288H     _PIXEL                 CODE
+ 0008:0000 005FAH     _SCANLINE              CODE
+ 0009:0000 00000H     _TEXTSTUFF             CODE
+ 0009:0000 01E3FH     _DIMAPS                CODE
+ 000A:0000 00260H     _DATA                  DATA
+ 000B:0000 01002H     _COMPOSE_AREA          DATA
+
+ Origin   Group
+ 000A:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:0466 BitBlt                  BitBlt
+ 0001:2027 CheckCursor             CheckCursor
+ 0001:18F8 ColorInfo               ColorInfo
+ 0005:0054 Control                 Control
+ 0009:0E0E CreateBitmap            CreateBitmap
+ 0005:0195 DeviceBitmap            DeviceBitmap
+ 0009:0D1E DeviceBitmapBits        DeviceBitmapBits
+ 0005:04AA DeviceMode              DeviceMode
+ 0009:0E2A DIBScreenBlt            DIBScreenBlt
+ 0004:0274 Disable                 Disable
+ 0006:00A0 do_polylines            do_polylines
+ 0008:006E do_scanlines            do_scanlines
+ 0004:02B2 Enable                  Enable
+ 0005:01CC EnumDFonts              EnumDFonts
+ 0005:01D2 EnumObj                 EnumObj
+ 0001:0000 ExtTextOut              ExtTextOut
+ 0001:2532 FastBorder              FastBorder
+ 0001:17DC GetCharWidth            GetCharWidth
+ 0005:01A4 Inquire                 Inquire
+ 0001:2092 MoveCursor              MoveCursor
+ 0001:284E Output                  Output
+ 0002:0837 PExtTextOut             PExtTextOut
+ 0007:0088 Pixel                   Pixel
+ 0002:082C PStrBlt                 PStrBlt
+ 0001:286E RealizeObject           RealizeObject
+ 0003:079D RExtTextOut             RExtTextOut
+ 0003:0792 RStrBlt                 RStrBlt
+ 0001:2BE2 SaveScreenBitmap        SaveScreenBitmap
+ 0005:02AA ScanLR                  ScanLR
+ 0005:019A SetAttribute            SetAttribute
+ 0001:1FA0 SetCursor               SetCursor
+ 0001:0005 StrBlt                  StrBlt
+ 0001:304A UserRepaintDisable      UserRepaintDisable
+
+  Address         Publics by Name
+
+ 0009:176C       absolute_absolute
+ 0009:178C       absolute_encode
+ 0009:17AC       absolute_overflow
+ 0009:17D3       absolute_to_scan_end
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSToCSAlias     (KERNEL.171)
+ 0000:0000  Imp  AllocSelector        (KERNEL.175)
+ 0006:09F8       all_passes_done
+ 0008:05F9       another_ret
+ 0008:015F       another_tbl
+ 0001:2195       base_patterns
+ 0002:1AB5       BBSG_AdjustColumn_386
+ 0002:19B2       BBSG_AlignHeight_386
+ 0002:1AC5       BBSG_Backup_386
+ 0002:17E8       BBSG_CantSkipBlank_386
+ 0002:1899       BBSG_Compose12Bytes_386
+ 0002:1855       BBSG_Compose16Bytes_386
+ 0002:19C3       BBSG_Compose1Byte_386
+ 0002:19E2       BBSG_Compose2Bytes_386
+ 0002:1A3F       BBSG_Compose3Bytes_386
+ 0002:192D       BBSG_Compose4Bytes_386
+ 0002:18E3       BBSG_Compose8Bytes_386
+ 0002:1988       BBSG_EntryComplete_386
+ 0002:17C2       BBSG_GetStackEntry_386
+ 0002:1823       BBSG_HeightIsAligned_386
+ 0002:1AEA       BBSG_IsNop_386
+ 0002:1977       BBSG_LoopBottom_386
+ 0002:198D       BBSG_MaybeAdjustColumn_386
+ 0003:154C       BBSG_MustRestart_286
+ 0002:1677       BBSG_MustRestart_386
+ 0002:1B04       BBSG_MustVerify_386
+ 0002:1C26       BBSG_P0AlignHeight_386
+ 0002:1B91       BBSG_P0Compose12Bytes_386
+ 0002:1B6A       BBSG_P0Compose16Bytes_386
+ 0002:1C35       BBSG_P0Compose1Byte_386
+ 0002:1C54       BBSG_P0Compose2Bytes_386
+ 0002:1C8E       BBSG_P0Compose3Bytes_386
+ 0002:1BE7       BBSG_P0Compose4Bytes_386
+ 0002:1BBC       BBSG_P0Compose8Bytes_386
+ 0002:1B38       BBSG_P0HeightIsAligned_386
+ 0002:1C12       BBSG_P0LoopBottom_386
+ 0002:1B56       BBSG_P0ShouldNeverGetHere_386
+ 0002:17F0       BBSG_PhaseIsNonZero_386
+ 0002:1B30       BBSG_PhaseIsZero_386
+ 0002:1AE3       BBSG_SameByte_386
+ 0002:1841       BBSG_ShouldNeverGetHere_386
+ 0002:1AF4       BBSG_SkipNullChar_386
+ 0003:1533       BBSG_SlowCompose_286
+ 0002:165A       BBSG_SlowCompose_386
+ 0002:1ABE       BBSG_StopOrBackup_386
+ 000A:000F       bEquipmentFlag
+ 0001:0466       BitBlt
+ 0001:06E7       bitblt_exit
+ 0001:06ED       bitblt_exit_fail
+ 0001:047D       bitblt_stack_ok
+ 0001:06F1       bitblt_stack_ov
+ 0001:00BC       bitmask_tbl1
+ 0001:00C4       bitmask_tbl2
+ 0009:0EF6       bit_count_ok
+ 0009:0FD5       blt_area_in_1_segment
+ 0001:0A12       blt_done_as_special_case
+ 0009:10FA       blt_next_scan
+ 0009:111B       blt_next_scan_continue
+ 0005:0000       BlueMoonSeg_color_table
+ 0006:0FB4       Bm_Diagonal_4Q
+ 0006:0F31       Bm_Negative_Y
+ 0006:0F64       Bm_Positive_X
+ 0001:087F       BrushMonoToColorFar
+ 0001:2B9E       brush_realizations
+ 0003:14B1       BSG_AdjustColumn_286
+ 0002:15CA       BSG_AdjustColumn_386
+ 0003:149E       BSG_AlignHeight_286
+ 0002:1529       BSG_AlignHeight_386
+ 0003:14BF       BSG_Backup_286
+ 0002:15DA       BSG_Backup_386
+ 0003:133B       BSG_CantSkipBlank_286
+ 0002:140D       BSG_CantSkipBlank_386
+ 0003:13E6       BSG_Compose10Bytes_286
+ 0003:13CD       BSG_Compose12Bytes_286
+ 0002:1486       BSG_Compose12Bytes_386
+ 0003:13B4       BSG_Compose14Bytes_286
+ 0003:149B       BSG_Compose16Bytes_10_286
+ 0003:139E       BSG_Compose16Bytes_286
+ 0002:1467       BSG_Compose16Bytes_386
+ 0003:149E       BSG_Compose1Byte_286
+ 0002:1538       BSG_Compose1Byte_386
+ 0003:144A       BSG_Compose2Bytes_286
+ 0002:154F       BSG_Compose2Bytes_386
+ 0002:157F       BSG_Compose3Bytes_386
+ 0003:1431       BSG_Compose4Bytes_286
+ 0002:14CA       BSG_Compose4Bytes_386
+ 0003:1418       BSG_Compose6Bytes_286
+ 0003:13FF       BSG_Compose8Bytes_286
+ 0002:14A8       BSG_Compose8Bytes_386
+ 0003:1499       BSG_Done_286
+ 0002:1527       BSG_Done_386
+ 0003:1471       BSG_EntryComplete_286
+ 0002:14FD       BSG_EntryComplete_386
+ 0003:131D       BSG_GetStackEntry_286
+ 0002:13E7       BSG_GetStackEntry_386
+ 0003:135B       BSG_HeightIsAligned_286
+ 0002:1435       BSG_HeightIsAligned_386
+ 0003:14E4       BSG_IsNop_286
+ 0002:15FF       BSG_IsNop_386
+ 0003:1463       BSG_LoopBottom_286
+ 0002:14EC       BSG_LoopBottom_386
+ 0003:1476       BSG_MaybeAdjustColumn_286
+ 0002:1502       BSG_MaybeAdjustColumn_386
+ 0003:1554       BSG_MustRestart_286
+ 0002:167F       BSG_MustRestart_386
+ 0003:14FD       BSG_MustVerify_286
+ 0002:1619       BSG_MustVerify_386
+ 0003:164A       BSG_P0AlignHeight_286
+ 0002:1767       BSG_P0AlignHeight_386
+ 0003:1619       BSG_P0Compose10Bytes_286
+ 0003:1612       BSG_P0Compose12Bytes_286
+ 0002:173A       BSG_P0Compose12Bytes_386
+ 0003:160B       BSG_P0Compose14Bytes_286
+ 0003:1606       BSG_P0Compose16Bytes_286
+ 0002:1732       BSG_P0Compose16Bytes_386
+ 0003:164A       BSG_P0Compose1Byte_286
+ 0002:1776       BSG_P0Compose1Byte_386
+ 0003:1635       BSG_P0Compose2Bytes_286
+ 0002:178A       BSG_P0Compose2Bytes_386
+ 0002:17A3       BSG_P0Compose3Bytes_386
+ 0003:162E       BSG_P0Compose4Bytes_286
+ 0002:174E       BSG_P0Compose4Bytes_386
+ 0003:1627       BSG_P0Compose6Bytes_286
+ 0003:1620       BSG_P0Compose8Bytes_286
+ 0002:1744       BSG_P0Compose8Bytes_386
+ 0003:15D8       BSG_P0HeightIsAligned_286
+ 0002:1704       BSG_P0HeightIsAligned_386
+ 0003:163C       BSG_P0LoopBottom_286
+ 0002:1758       BSG_P0LoopBottom_386
+ 0003:15F3       BSG_P0ShouldNeverGetHere_286
+ 0002:171F       BSG_P0ShouldNeverGetHere_386
+ 0003:1341       BSG_PhaseIsNonZero_286
+ 0002:1415       BSG_PhaseIsNonZero_386
+ 0003:15D2       BSG_PhaseIsZero_286
+ 0002:16FE       BSG_PhaseIsZero_386
+ 0003:14DD       BSG_SameByte_286
+ 0002:15F8       BSG_SameByte_386
+ 0003:138A       BSG_ShouldNeverGetHere_286
+ 0002:1453       BSG_ShouldNeverGetHere_386
+ 0003:14ED       BSG_SkipNullChar_286
+ 0002:1609       BSG_SkipNullChar_386
+ 0003:1522       BSG_SlowCompose_286
+ 0002:1645       BSG_SlowCompose_386
+ 0003:14BA       BSG_StopOrBackup_286
+ 0002:15D3       BSG_StopOrBackup_386
+ 0003:1308       BuildSuperGlyph_10_286
+ 0002:13C9       BuildSuperGlyph_10_386
+ 0003:12DB       BuildSuperGlyph_286
+ 0002:1394       BuildSuperGlyph_386
+ 0003:0126       build_all_done_286
+ 0002:00FA       build_all_done_386
+ 0003:010B       build_clip_next_time_286
+ 0002:00DF       build_clip_next_time_386
+ 0003:00C1       build_clr_stack_286
+ 0002:0095       build_clr_stack_386
+ 0003:0072       build_have_proc_286
+ 0002:0045       build_have_proc_386
+ 0003:011D       build_no_clip_next_time_286
+ 0002:00F1       build_no_clip_next_time_386
+ 0003:00F0       build_no_o_rect_286
+ 0002:00C4       build_no_o_rect_386
+ 0003:013C       build_really_done_286
+ 0002:0110       build_really_done_386
+ 0003:0075       build_restart_286
+ 0002:0048       build_restart_386
+ 0003:0129       build_restore_opaque_286
+ 0002:00FD       build_restore_opaque_386
+ 0003:0094       build_ret_addr_286
+ 0002:0067       build_ret_addr_386
+ 0003:002E       build_string_286
+ 0002:0000       build_string_386
+ 0003:0069       build_worst_ok_286
+ 0002:003C       build_worst_ok_386
+ 000A:0010       bWm3Capable
+ 0000:017E  Abs  BW_THRESHOLD
+ 0000:007F  Abs  B_ACTIVEBORDER
+ 0000:0000  Abs  B_ACTIVETITLE
+ 0000:00BF  Abs  B_APPWORKSPACE
+ 0000:007F  Abs  B_BACKGROUND
+ 0000:007F  Abs  B_INACTIVEBORDER
+ 0000:00FF  Abs  B_INACTIVETITLE
+ 0000:00FF  Abs  B_MENU
+ 0000:0000  Abs  B_MENUTEXT
+ 0000:003F  Abs  B_SCROLLBAR
+ 0000:00FF  Abs  B_TITLETEXT
+ 0000:00FF  Abs  B_WINDOW
+ 0000:0000  Abs  B_WINDOWFRAME
+ 0000:0000  Abs  B_WINDOWTEXT
+ 0006:0394       calculate_mask
+ 0001:0F76       calc_parms
+ 0001:06C7       call_blt
+ 0001:06DE       call_blt_do_it
+ 0001:06D0       call_blt_get_dest_bits
+ 0005:0201       call_client
+ 0001:1336       CBLT
+ 0001:1349       cblt_2020
+ 0001:13A2       cblt_2060
+ 0001:13C5       cblt_3020
+ 0001:13D1       cblt_3040
+ 0001:13D8       cblt_3060
+ 0001:13E7       cblt_3070
+ 0001:1412       cblt_3080
+ 0001:146D       cblt_3100
+ 0001:1481       cblt_3110
+ 0001:14CE       cblt_3160
+ 0001:14D0       cblt_3170
+ 0001:14D0       cblt_3180
+ 0001:14D3       cblt_3240
+ 0001:14F2       cblt_3260
+ 0001:1509       cblt_3280
+ 0001:151B       cblt_4000
+ 0001:153C       cblt_4020
+ 0001:1546       cblt_4040
+ 0001:1550       cblt_4280
+ 0001:1565       cblt_5000
+ 0001:1584       cblt_5020
+ 0001:1597       cblt_5040
+ 0001:15AC       cblt_5060
+ 0001:15B3       cblt_5080
+ 0001:15C3       cblt_5100
+ 0001:15D2       cblt_5120
+ 0001:15DD       cblt_5140
+ 0001:15DF       cblt_5500
+ 0001:15F3       cblt_5520
+ 0001:1615       cblt_5540
+ 0001:161F       cblt_5560
+ 0001:163D       cblt_5580
+ 0001:1653       cblt_5600
+ 0001:165E       cblt_6000
+ 0001:168F       cblt_6100
+ 0001:169A       cblt_6120
+ 0001:16A2       cblt_6140
+ 0001:16AE       cblt_6160
+ 0001:16CD       cblt_6180
+ 0001:16DF       cblt_6200
+ 0001:16EC       cblt_6220
+ 0001:1707       cblt_6240
+ 0001:1714       cblt_6260
+ 0001:173B       cblt_6300
+ 0001:1753       cblt_6340
+ 0001:1763       cblt_6380
+ 0001:1779       cblt_6400
+ 0001:1784       cblt_6420
+ 0001:06A1       cblt_allocate
+ 0001:06A9       cblt_alloc_stack_ok
+ 0001:13B3       cblt_initial_byte_fetch
+ 0001:1361       cblt_pattern_fetch
+ 0003:1859       CBmpOp_Clipped_286
+ 0002:1F27       CBmpOp_Clipped_386
+ 0003:17F7       CBmpOp_NotClipped_286
+ 0002:1EBD       CBmpOp_NotClipped_386
+ 0003:190C       CBmpTr_Clipped_286
+ 0002:1FE6       CBmpTr_Clipped_386
+ 0003:18CA       CBmpTr_NotClipped_286
+ 0002:1FA0       CBmpTr_NotClipped_386
+ 0001:0A10       cdsc_blt_not_special_cased
+ 0001:0956       cdsc_dest_is_device
+ 0001:0A12       cdsc_exit
+ 0001:098A       cdsc_its_0
+ 0001:097E       cdsc_its_1
+ 0001:09B3       cdsc_its_a_solid_color
+ 0001:09CF       cdsc_its_dn
+ 0001:09D4       cdsc_its_dpx
+ 0001:09E1       cdsc_its_grey_dpx
+ 0001:09B8       cdsc_its_inverse_patblt
+ 0001:0963       cdsc_its_not_src_copy
+ 0001:0995       cdsc_its_patblt
+ 0001:09B1       cdsc_its_solid_color
+ 0001:09E6       cdsc_its_solid_dpx
+ 0001:09EB       cdsc_its_src_copy
+ 0001:09AC       cdsc_not_solid_nor_grey
+ 0001:0967       cdsc_not_s_or_p
+ 0001:09FB       cdsc_source_is_memory
+ 0001:2027       CheckCursor
+ 0001:0949       check_device_special_cases
+ 0001:12D8       clean_up_before_exit
+ 0006:0D32       Clip_Line
+ 0001:000A       Code_palette
+ 0001:24A1       ColorDither
+ 0001:18F8       ColorInfo
+ 0000:0F07  Abs  COLOR_DONT_CARE
+ 0000:0104  Abs  COLOR_FORMAT
+ 0009:1D42       color_get_pel_from_buffer
+ 0001:191A       color_info_10
+ 0001:1930       color_info_20
+ 0009:1621       color_table_done
+ 0000:0010  Abs  COLOR_TBL_SIZE
+ 0001:04AE       complain
+ 000B:0000       ComposeArea
+ 0001:2323       ComputePColor
+ 0001:22BE       ComputeSubSpace
+ 0001:22A1       ComputeSymmetry
+ 0001:22EB       ComputeTransform
+ 0001:08AD       compute_y
+ 0001:08CA       compute_y_100
+ 0001:08CF       compute_y_120
+ 0001:08DA       compute_y_140
+ 0001:08F0       compute_y_160
+ 0001:08F8       compute_y_180
+ 0001:08FC       compute_y_200
+ 0001:093A       compute_y_220
+ 0001:093E       compute_y_240
+ 0001:0945       compute_y_260
+ 0008:04DE       comp_byte_interval_10
+ 0003:0C2F       comp_byte_interval_286
+ 0002:0CEB       comp_byte_interval_386
+ 0008:0489       comp_interval
+ 0008:0487       comp_interval_no_more
+ 0008:048C       comp_interval_null
+ 0008:04EF       comp_interval_save
+ 0008:016F       comp_scan
+ 0008:020A       comp_scan_exit
+ 0008:01C7       comp_scan_exit_vect
+ 0008:01C9       comp_scan_for_bitmap
+ 0008:0201       comp_scan_save
+ 0008:0517       comp_word_interval
+ 0008:0525       comp_word_interval_10
+ 0005:0054       Control
+ 0009:119A       copy_1_bp_done
+ 0009:1147       copy_1_bp_full
+ 0009:115E       copy_1_bp_loop
+ 0009:116B       copy_1_bp_same_byte
+ 0009:11F2       copy_24_bp_full
+ 0009:121E       copy_24_bp_loop
+ 0009:11D5       copy_4_bp_done
+ 0009:119B       copy_4_bp_full
+ 0009:11A2       copy_4_bp_loop
+ 0009:11C2       copy_4_bp_low_nibble
+ 0009:11D3       copy_4_bp_next_byte
+ 0009:11BF       copy_4_bp_next_nibble
+ 0009:11DC       copy_8_bp_full
+ 0009:11EF       copy_8_bp_loop
+ 0001:0883       copy_dev
+ 0001:0899       copy_dev_20
+ 0001:08AB       copy_dev_bad_clr_format
+ 0009:0A1B       copy_i1e1
+ 0009:0B1F       copy_ie1
+ 0001:1300       cps
+ 0009:0E0E       CreateBitmap
+ 0009:107F       create_color_table
+ 0001:0FB4       crosses_byte_boundary
+ 0000:0008  Abs  CR_HATCH_BR_0
+ 0000:0008  Abs  CR_HATCH_BR_1
+ 0000:0008  Abs  CR_HATCH_BR_2
+ 0000:0008  Abs  CR_HATCH_BR_3
+ 0000:00FF  Abs  CR_HATCH_BR_4
+ 0000:0008  Abs  CR_HATCH_BR_5
+ 0000:0008  Abs  CR_HATCH_BR_6
+ 0000:0008  Abs  CR_HATCH_BR_7
+ 0008:01D3       cs_for_bitmap_30
+ 0008:01DD       cs_for_bitmap_40
+ 0008:01EF       cs_for_bitmap_50
+ 0008:01F1       cs_for_bitmap_60
+ 0000:9B00  Abs  current_brush
+ 0001:1DBA       CursorOff
+ 0001:1BFB       CursorToSave
+ 0001:0525       cursor_exclusion
+ 0001:055A       cursor_exclusion_do_it
+ 0001:055D       cursor_exclusion_end
+ 0001:0556       cursor_exclusion_no_union
+ 0001:0550       cursor_exclusion_union
+ 0001:054A       cursor_exclusion_y
+ 000A:01FE       CURSOR_STATUS
+ 000A:01F6       CURSOR_X_COORDINATE
+ 000A:01FF       CURSOR_X_SIZE
+ 000A:01F8       CURSOR_Y_COORDINATE
+ 000A:0201       CURSOR_Y_SIZE
+ 0000:0080  Abs  D1_HATCH_BR_0
+ 0000:0040  Abs  D1_HATCH_BR_1
+ 0000:0020  Abs  D1_HATCH_BR_2
+ 0000:0010  Abs  D1_HATCH_BR_3
+ 0000:0008  Abs  D1_HATCH_BR_4
+ 0000:0004  Abs  D1_HATCH_BR_5
+ 0000:0002  Abs  D1_HATCH_BR_6
+ 0000:0001  Abs  D1_HATCH_BR_7
+ 0000:0001  Abs  D2_HATCH_BR_0
+ 0000:0002  Abs  D2_HATCH_BR_1
+ 0000:0004  Abs  D2_HATCH_BR_2
+ 0000:0008  Abs  D2_HATCH_BR_3
+ 0000:0010  Abs  D2_HATCH_BR_4
+ 0000:0020  Abs  D2_HATCH_BR_5
+ 0000:0040  Abs  D2_HATCH_BR_6
+ 0000:0080  Abs  D2_HATCH_BR_7
+ 0000:0081  Abs  DC_HATCH_BR_0
+ 0000:0042  Abs  DC_HATCH_BR_1
+ 0000:0024  Abs  DC_HATCH_BR_2
+ 0000:0018  Abs  DC_HATCH_BR_3
+ 0000:0018  Abs  DC_HATCH_BR_4
+ 0000:0024  Abs  DC_HATCH_BR_5
+ 0000:0042  Abs  DC_HATCH_BR_6
+ 0000:0081  Abs  DC_HATCH_BR_7
+ 0006:0763       dda_table
+ 0001:01E4       DDx
+ 0003:156D       DealWithBackSlackers_286
+ 0002:1698       DealWithBackSlackers_386
+ 0009:1DB3       decide_4_bit_strategy_4_bit
+ 0005:0195       DeviceBitmap
+ 0009:0D1E       DeviceBitmapBits
+ 0005:04AA       DeviceMode
+ 0003:16EA       DevOp_AdjustHeight_286
+ 0002:1D78       DevOp_AdjustHeight_386
+ 0003:1736       DevOp_BgPass_286
+ 0002:1DCA       DevOp_BgPass_386
+ 0003:16D2       DevOp_Byte1_286
+ 0002:1D60       DevOp_Byte1_386
+ 0003:16F9       DevOp_Clipped_286
+ 0002:1D8D       DevOp_Clipped_386
+ 0003:1684       DevOp_DestEven_286
+ 0002:1CF9       DevOp_DestEven_386
+ 0003:167F       DevOp_DestOdd_286
+ 0002:1CF4       DevOp_DestOdd_386
+ 0003:16E9       DevOp_Exit_286
+ 0002:1D77       DevOp_Exit_386
+ 0003:1729       DevOp_FgPass_286
+ 0002:1DBD       DevOp_FgPass_386
+ 0003:16A2       DevOp_HeightAdjusted_286
+ 0002:1D16       DevOp_HeightAdjusted_386
+ 0003:16BA       DevOp_InnerLoopBottom_286
+ 0002:1D44       DevOp_InnerLoopBottom_386
+ 0003:1722       DevOp_NoPlanesLeft_286
+ 0002:1DB6       DevOp_NoPlanesLeft_386
+ 0003:1679       DevOp_NotClipped_286
+ 0002:1CEE       DevOp_NotClipped_386
+ 0003:16CC       DevOp_WordsExit_286
+ 0002:1D5A       DevOp_WordsExit_386
+ 0003:1696       DevOp_WordsLoop_286
+ 0002:1D0A       DevOp_WordsLoop_386
+ 0003:1684       DevOp_Words_286
+ 0002:1CF9       DevOp_Words_386
+ 0003:1C4B       DevTrNo3_AdjustHeight_286
+ 0002:23C8       DevTrNo3_AdjustHeight_386
+ 0003:1C2F       DevTrNo3_Byte1Loop_286
+ 0002:23AC       DevTrNo3_Byte1Loop_386
+ 0003:1C29       DevTrNo3_Byte1_286
+ 0002:23A6       DevTrNo3_Byte1_386
+ 0003:1C70       DevTrNo3_ClippedLoop_286
+ 0002:23F3       DevTrNo3_ClippedLoop_386
+ 0003:1C6C       DevTrNo3_Clipped_286
+ 0002:23EF       DevTrNo3_Clipped_386
+ 0003:1BB9       DevTrNo3_DestEven_286
+ 0002:22F5       DevTrNo3_DestEven_386
+ 0003:1BB4       DevTrNo3_DestOdd_286
+ 0002:22F0       DevTrNo3_DestOdd_386
+ 0003:1C4A       DevTrNo3_Exit_286
+ 0002:23C7       DevTrNo3_Exit_386
+ 0003:1BD7       DevTrNo3_HeightAdjusted_286
+ 0002:2316       DevTrNo3_HeightAdjusted_386
+ 0003:1C11       DevTrNo3_InnerLoopBottom_286
+ 0002:2388       DevTrNo3_InnerLoopBottom_386
+ 0003:1BAE       DevTrNo3_NotClipped_286
+ 0002:22EA       DevTrNo3_NotClipped_386
+ 0003:1C23       DevTrNo3_WordsExit_286
+ 0002:23A0       DevTrNo3_WordsExit_386
+ 0003:1BCB       DevTrNo3_WordsLoop_286
+ 0002:2308       DevTrNo3_WordsLoop_386
+ 0003:1BB9       DevTrNo3_Words_286
+ 0002:22F5       DevTrNo3_Words_386
+ 0003:17CA       DevTr_AdjustHeight_286
+ 0002:1E89       DevTr_AdjustHeight_386
+ 0003:17B4       DevTr_Byte1Loop_286
+ 0002:1E73       DevTr_Byte1Loop_386
+ 0003:17AE       DevTr_Byte1_286
+ 0002:1E6D       DevTr_Byte1_386
+ 0003:17E5       DevTr_ClippedLoop_286
+ 0002:1EAB       DevTr_ClippedLoop_386
+ 0003:17E1       DevTr_Clipped_286
+ 0002:1EA7       DevTr_Clipped_386
+ 0003:1750       DevTr_DestEven_286
+ 0002:1DE4       DevTr_DestEven_386
+ 0003:174B       DevTr_DestOdd_286
+ 0002:1DDF       DevTr_DestOdd_386
+ 0003:17C9       DevTr_Exit_286
+ 0002:1E88       DevTr_Exit_386
+ 0003:176E       DevTr_HeightAdjusted_286
+ 0002:1E03       DevTr_HeightAdjusted_386
+ 0003:1796       DevTr_InnerLoopBottom_286
+ 0002:1E51       DevTr_InnerLoopBottom_386
+ 0003:1745       DevTr_NotClipped_286
+ 0002:1DD9       DevTr_NotClipped_386
+ 0003:17A8       DevTr_WordsExit_286
+ 0002:1E67       DevTr_WordsExit_386
+ 0003:1762       DevTr_WordsLoop_286
+ 0002:1DF5       DevTr_WordsLoop_386
+ 0003:1750       DevTr_Words_286
+ 0002:1DE4       DevTr_Words_386
+ 0009:1BCE       dev_color_get_pels
+ 0009:1B6E       dev_color_get_pels_masked
+ 0004:029B       dev_initialization
+ 0009:1DE3       dev_init_write_2
+ 0009:1C48       dev_mono_get_pels
+ 0009:1C0F       dev_mono_get_pels_masked
+ 0009:1E11       dev_reinit
+ 0009:19F0       dev_set_pels_full
+ 0009:19E7       dev_set_pels_partial
+ 0001:00AD       dev_to_background
+ 0001:007C       dev_to_foreground
+ 0001:0093       dev_to_res_regs
+ 0001:00B3       dev_to_save_regs
+ 0006:0ED8       Diagonal_4Q
+ 0009:0E2A       DIBScreenBlt
+ 0009:0000       DIMapSeg_color_table
+ 0004:0274       Disable
+ 0001:3131       disable_switching
+ 0009:1262       DIScreenBlt_Ret
+ 0001:2863       dispatch_lines
+ 0008:0324       dispatch_pattern
+ 0001:285E       dispatch_scanlines
+ 0001:210E       dither
+ 0001:0366       Dn
+ 0006:0985       do_another_pass
+ 0009:0668       do_bitmap_computations
+ 0001:281D       do_blt
+ 0005:027E       do_color
+ 0005:0286       do_color_10
+ 0001:128C       do_grey_dpx
+ 000A:0000       do_int_30
+ 0006:00A0       do_polylines
+ 0008:006E       do_scanlines
+ 0008:010F       do_scans_clear_exclude
+ 0008:00F3       do_scans_done
+ 0008:0114       do_scans_exit
+ 0001:0E20       do_solid_patcopy
+ 0006:09EB       do_the_last_scan
+ 0001:0DE2       do_wes_dpx_solidpat
+ 0001:0E20       do_wes_dpx_solid_pat_end
+ 0001:0DE0       do_wes_invert
+ 0001:0F1E       do_wes_mono_trick
+ 0001:0EE8       do_wes_patblt
+ 0001:03B7       DPan
+ 0001:01E6       DPna
+ 0001:01F8       DPon
+ 0001:0251       DPSaan
+ 0001:022B       DPSana
+ 0001:0340       DPSanon
+ 0001:0234       DPSaon
+ 0001:03D4       DPSax
+ 0001:036D       DPSDaox
+ 0001:0337       DPSDoax
+ 0001:0398       DPSDonox
+ 0001:02CA       DPSDxaxn
+ 0001:03A3       DPSDxox
+ 0001:024F       DPSnaa
+ 0001:043E       DPSnaon
+ 0001:03D2       DPSnaxn
+ 0001:0384       DPSnoan
+ 0001:01FD       DPSnoon
+ 0001:038D       DPSnox
+ 0001:0386       DPSoan
+ 0001:01EF       DPSona
+ 0001:03DD       DPSonon
+ 0001:01FF       DPSoon
+ 0001:038F       DPSox
+ 0001:023D       DPSxa
+ 0001:0309       DPSxnan
+ 0001:0450       DPSxnon
+ 0001:035F       DPSxon
+ 0001:037F       DPx
+ 0001:1A32       DrawCursor
+ 0003:1C90       DrawSpecialString_286
+ 0002:2410       DrawSpecialString_386
+ 0003:10E2       DrawString_286
+ 0002:11B4       DrawString_386
+ 0006:0773       Draw_Engine
+ 0006:02C9       Draw_Line
+ 0006:03F5       Draw_Line_Ret
+ 0004:0046       drivers_RC_caps
+ 0004:0042       drivers_TC_caps
+ 0004:0433       driver_initialization
+ 0001:0318       DSan
+ 0001:0222       DSna
+ 0001:0342       DSnon
+ 0001:0201       DSon
+ 0001:032A       DSPDaox
+ 0001:03FA       DSPDoax
+ 0001:03BC       DSPDSaoxxn
+ 0001:0287       DSPDSoaxxn
+ 0001:0244       DSPDxaxn
+ 0001:0431       DSPDxox
+ 0001:03AC       DSPnaon
+ 0001:0447       DSPnoan
+ 0003:1C90       dss_strblt_dummy_286
+ 0002:2410       dss_strblt_dummy_386
+ 0001:03D6       DSx
+ 0003:1121       DS_CannotSpecialCase_286
+ 0002:11E3       DS_CannotSpecialCase_386
+ 0003:11A6       DS_CheckDetectionStatus_286
+ 0002:126C       DS_CheckDetectionStatus_386
+ 0003:123F       DS_Exit_286
+ 0002:1305       DS_Exit_386
+ 0003:119D       DS_GetClippedWm3Routine_286
+ 0002:1263       DS_GetClippedWm3Routine_386
+ 0003:1197       DS_GetNonClippedWm3Routine_286
+ 0002:125D       DS_GetNonClippedWm3Routine_386
+ 0003:116C       DS_MaybePatchUpRoutines_286
+ 0002:1232       DS_MaybePatchUpRoutines_386
+ 0003:1141       DS_MaybeSpecialCaseFont_286
+ 0002:1205       DS_MaybeSpecialCaseFont_386
+ 0003:1275       DS_OutputStringWithRestart_286
+ 0002:132B       DS_OutputStringWithRestart_386
+ 0003:1219       DS_OutputString_286
+ 0002:12DF       DS_OutputString_386
+ 0003:11BF       DS_pp_done_286
+ 0002:1285       DS_pp_done_386
+ 0003:11A3       DS_pp_ega_trans_286
+ 0002:1269       DS_pp_ega_trans_386
+ 0003:1288       DS_RestartLoop_286
+ 0002:133E       DS_RestartLoop_386
+ 0003:11F3       DS_RoutinesDefined_286
+ 0002:12B9       DS_RoutinesDefined_386
+ 0003:1191       DS_SetClippedRoutine_286
+ 0002:1257       DS_SetClippedRoutine_386
+ 0003:1181       DS_SetNonClippedRoutine_286
+ 0002:1247       DS_SetNonClippedRoutine_386
+ 0003:11B1       DS_Wm3_NotSupported_286
+ 0002:1277       DS_Wm3_NotSupported_386
+ 0003:1587       DWBS_FoundABackSlacker_286
+ 0002:16B2       DWBS_FoundABackSlacker_386
+ 0003:1577       DWBS_GetStackEntry_286
+ 0002:16A2       DWBS_GetStackEntry_386
+ 0003:159F       DWBS_StopOrBackup_286
+ 0002:16CB       DWBS_StopOrBackup_386
+ 0001:122F       edge_grey_dpx
+ 0001:121F       edge_invert
+ 0001:1225       edge_invert_next_scan
+ 0001:10AA       edge_mono_to_color_blt
+ 0001:11C5       edge_pat_blt
+ 0001:006C       EGAindex8to7
+ 0008:053C       ega_all_partial
+ 0008:057E       ega_first_last
+ 0008:0566       ega_inner_latch
+ 0008:0577       ega_inner_stosb
+ 0006:02A3       ega_line_dispatch
+ 0001:0B2D       EGA_Single_Seg_Src_Copy
+ 0001:0CB6       ega_src_copy
+ 0001:0CF9       ega_src_copy_100
+ 0001:0CB9       ega_src_copy_40
+ 0001:0CC3       ega_src_copy_50
+ 0001:0CD3       ega_src_copy_60
+ 0001:0CE8       ega_src_copy_80
+ 0001:0CF0       ega_src_copy_90
+ 0001:0D3E       ega_src_copy_calc_10
+ 0001:0D51       ega_src_copy_calc_20
+ 0001:0D5C       ega_src_copy_calc_30
+ 0001:0D25       ega_src_copy_calc_params
+ 0001:0CFA       ega_src_copy_partial_byte
+ 0001:0D04       ega_src_copy_part_10
+ 0001:0D09       ega_src_copy_part_20
+ 0004:02B2       Enable
+ 000A:000C       enabled_flag
+ 0001:11D6       enable_next_plane
+ 0001:3159       enable_switching
+ 0000:9B0E  Abs  enable_test
+ 0009:1723       encode_absolute
+ 0009:1706       encode_encode
+ 0009:173B       encode_overflow
+ 0009:17C1       encode_to_scan_end
+ 000B:1000       EndOfComposeArea
+ 0001:1104       end_pass_one
+ 0005:01CC       EnumDFonts
+ 0005:01D2       EnumObj
+ 0005:0232       enum_brush
+ 0005:023D       enum_brush_10
+ 0005:0240       enum_brush_20
+ 0005:0243       enum_brush_30
+ 0005:0270       enum_brush_40
+ 0005:0214       enum_pen
+ 0005:021C       enum_pen_10
+ 0005:021F       enum_pen_20
+ 0005:022B       enum_pen_30
+ 0001:1CBF       EraseTail
+ 0001:1F00       exclude
+ 0001:1F3C       ExcludeTest
+ 0001:1EFC       exclude_far
+ 0005:00AB       exit_control
+ 0004:0351       exit_enable
+ 0005:01F3       exit_enum_obj
+ 0001:0000       ExtTextOut
+ 0001:3042       ExtTextOutFunction
+ 0001:2532       FastBorder
+ 0000:0000  Imp  FatalExit            (KERNEL.1)
+ 0001:25A7       fb_check_no_clipping
+ 0001:25B2       fb_chk_clip_1
+ 0001:25BD       fb_chk_clip_2
+ 0001:25C8       fb_chk_clip_3
+ 0001:2601       fb_chk_sides
+ 0001:262E       fb_clipping
+ 0001:2724       fb_clip_bottom_border
+ 0001:2797       fb_clip_left_border
+ 0001:26AC       fb_clip_right_border
+ 0001:262B       fb_easy_way_done
+ 0001:2812       fb_exit
+ 0001:2810       fb_exit_error
+ 0001:280F       fb_exit_ok
+ 0001:25D3       fb_no_clipping
+ 0001:25A4       fb_rejected
+ 0001:254A       fb_stack_ok
+ 0009:1B69       fill_get_buffer
+ 0000:0000  Imp  FindResource         (KERNEL.60)
+ 0006:082A       find_out_dda
+ 0001:216C       first_bit
+ 0000:0000  Imp  FreeSelector         (KERNEL.176)
+ 0001:17DC       GetCharWidth
+ 0009:0764       GetDeviceBitmapBits
+ 0000:0000  Imp  GetExePtr            (KERNEL.133)
+ 0000:0000  Imp  GetModuleHandle      (KERNEL.47)
+ 0000:0000  Imp  GetPrivateProfileInt (KERNEL.127)
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0000:0000  Imp  GetProfileInt        (KERNEL.57)
+ 0009:1223       get_byte_with_test
+ 0009:1238       get_byte_with_test_ret
+ 0009:1221       get_byte_wo_test
+ 0009:16BA       get_do_calc_for_small
+ 0009:1DCE       get_encoded_index_4_bit
+ 0009:1819       get_end_of_RLE
+ 0008:02A5       get_fill_brush
+ 0008:0270       get_fill_color_portion
+ 0008:020B       get_fill_data
+ 0008:026E       get_fill_do_nothing
+ 0008:0243       get_fill_pen
+ 0009:16A6       get_find_correct_segment
+ 0009:16B1       get_found_correct_segment
+ 0009:1D7E       get_next_abs_mode_index_4_bit
+ 0009:1B59       get_next_pel
+ 0009:16D2       get_rect_code_loop
+ 0009:15B2       get_RLE_bits
+ 0009:1694       get_RLE_init_done
+ 0009:16EF       get_scan_code_loop
+ 0009:1607       get_table_for_color
+ 0001:2924       greys
+ 0001:2170       grey_flags
+ 0000:007F  Abs  G_ACTIVEBORDER
+ 0000:0000  Abs  G_ACTIVETITLE
+ 0000:00BF  Abs  G_APPWORKSPACE
+ 0000:007F  Abs  G_BACKGROUND
+ 0000:007F  Abs  G_INACTIVEBORDER
+ 0000:00FF  Abs  G_INACTIVETITLE
+ 0000:00FF  Abs  G_MENU
+ 0000:0000  Abs  G_MENUTEXT
+ 0000:003F  Abs  G_SCROLLBAR
+ 0000:00FF  Abs  G_TITLETEXT
+ 0000:00FF  Abs  G_WINDOW
+ 0000:0000  Abs  G_WINDOWFRAME
+ 0000:0000  Abs  G_WINDOWTEXT
+ 0001:2BA6       hatched_brushes
+ 0009:14F4       have_mem_offset_calc_address
+ 0009:14E0       have_mem_set_pel_addresses
+ 0001:1163       hit_next_byte
+ 0004:03A0       hook_int_2Fh
+ 0000:0033  Abs  HYPOTENUSE
+ 0000:0000  Abs  H_HATCH_BR_0
+ 0000:0000  Abs  H_HATCH_BR_1
+ 0000:0000  Abs  H_HATCH_BR_2
+ 0000:0000  Abs  H_HATCH_BR_3
+ 0000:00FF  Abs  H_HATCH_BR_4
+ 0000:0000  Abs  H_HATCH_BR_5
+ 0000:0000  Abs  H_HATCH_BR_6
+ 0000:0000  Abs  H_HATCH_BR_7
+ 0001:1A15       IndexToColor
+ 0004:0020       info_table_base
+ 0009:16EF       initial_state
+ 0009:1753       initial_to_absolute
+ 0009:1706       initial_to_encoded
+ 0009:1011       init_1_bits_per_pel
+ 0009:1075       init_24_bits_per_pel
+ 0009:1036       init_4_bits_per_pel
+ 0009:105A       init_8_bits_per_pel
+ 0009:10B6       init_done
+ 0001:31FF       init_hw_regs
+ 0001:3209       init_hw_regs_10
+ 0001:04CB       input_clipping
+ 0001:0510       input_clip_btm_edge
+ 0001:051D       input_clip_chk_null_blt
+ 0001:0525       input_clip_end
+ 0001:04ED       input_clip_rgt_edge
+ 0001:04F7       input_clip_save_xext
+ 0001:051A       input_clip_save_yext
+ 0001:04CB       input_clip_x
+ 0001:04FA       input_clip_y
+ 0005:01A4       Inquire
+ 0004:0301       inquire_gdi_info
+ 0009:126D       IntersectRects
+ 0001:1200       invert
+ 0001:1210       invert_next_scan
+ 000A:021E       in_background
+ 0001:2147       is_base_pattern
+ 0005:0092       is_color_table
+ 000A:0008       is_protected
+ 0001:1324       jmp_cx_nz
+ 000B:1000       LastByteTouched
+ 0001:10A2       leave_in_set_mode
+ 000A:0001       Line43
+ 000A:0002       LineAddr
+ 0006:0000       LineSeg_check_stack
+ 0001:1D7E       LoadCursor
+ 0000:0000  Imp  LoadResource         (KERNEL.61)
+ 0006:01B7       load_color_info
+ 0000:0000  Imp  LockResource         (KERNEL.62)
+ 0001:2364       MakeColorCntTable
+ 0001:2404       MakeDitherBitmap
+ 0008:013F       map_1s_0s
+ 0009:0FB6       map_segment_update
+ 0009:0FC0       map_start_updated
+ 0001:1330       masked_store
+ 0006:0347       mask_needed
+ 0000:0066  Abs  MAX_STYLE_ERR
+ 0003:1A15       MBmpOp_AdjustHeight_286
+ 0002:2116       MBmpOp_AdjustHeight_386
+ 0003:19EF       MBmpOp_Byte1_286
+ 0002:20F0       MBmpOp_Byte1_386
+ 0003:1A57       MBmpOp_ClippedLoop_286
+ 0002:2162       MBmpOp_ClippedLoop_386
+ 0003:1A2F       MBmpOp_Clipped_286
+ 0002:2136       MBmpOp_Clipped_386
+ 0003:1A53       MBmpOp_C_ColorEntryPoint_286
+ 0002:215E       MBmpOp_C_ColorEntryPoint_386
+ 0003:198D       MBmpOp_DestEven_286
+ 0002:206F       MBmpOp_DestEven_386
+ 0003:1988       MBmpOp_DestOdd_286
+ 0002:206A       MBmpOp_DestOdd_386
+ 0003:1A14       MBmpOp_Exit_286
+ 0002:2115       MBmpOp_Exit_386
+ 0003:19AB       MBmpOp_HeightAdjusted_286
+ 0002:208E       MBmpOp_HeightAdjusted_386
+ 0003:19D7       MBmpOp_InnerLoopBottom_286
+ 0002:20D4       MBmpOp_InnerLoopBottom_386
+ 0003:1982       MBmpOp_NC_ColorEntryPoint_286
+ 0002:2064       MBmpOp_NC_ColorEntryPoint_386
+ 0003:1960       MBmpOp_NotClipped_286
+ 0002:203E       MBmpOp_NotClipped_386
+ 0003:19E9       MBmpOp_WordsExit_286
+ 0002:20EA       MBmpOp_WordsExit_386
+ 0003:199F       MBmpOp_WordsLoop_286
+ 0002:2080       MBmpOp_WordsLoop_386
+ 0003:198D       MBmpOp_Words_286
+ 0002:206F       MBmpOp_Words_386
+ 0003:1B12       MBmpTr_AdjustHeight_286
+ 0002:2246       MBmpTr_AdjustHeight_386
+ 0003:1AED       MBmpTr_Byte1_286
+ 0002:2221       MBmpTr_Byte1_386
+ 0003:1B47       MBmpTr_ClippedLoop_286
+ 0002:2283       MBmpTr_ClippedLoop_386
+ 0003:1B2F       MBmpTr_Clipped_286
+ 0002:2269       MBmpTr_Clipped_386
+ 0003:1B3E       MBmpTr_C_ColorEntryPoint_286
+ 0002:227A       MBmpTr_C_ColorEntryPoint_386
+ 0003:1A8C       MBmpTr_DestEven_286
+ 0002:2199       MBmpTr_DestEven_386
+ 0003:1A87       MBmpTr_DestOdd_286
+ 0002:2194       MBmpTr_DestOdd_386
+ 0003:1B11       MBmpTr_Exit_286
+ 0002:2245       MBmpTr_Exit_386
+ 0003:1AAA       MBmpTr_HeightAdjusted_286
+ 0002:21B8       MBmpTr_HeightAdjusted_386
+ 0003:1AD5       MBmpTr_InnerLoopBottom_286
+ 0002:2205       MBmpTr_InnerLoopBottom_386
+ 0003:1A81       MBmpTr_NC_ColorEntryPoint_286
+ 0002:218E       MBmpTr_NC_ColorEntryPoint_386
+ 0003:1A74       MBmpTr_NotClipped_286
+ 0002:217F       MBmpTr_NotClipped_386
+ 0003:1AE7       MBmpTr_WordsExit_286
+ 0002:221B       MBmpTr_WordsExit_386
+ 0003:1A9E       MBmpTr_WordsLoop_286
+ 0002:21AA       MBmpTr_WordsLoop_386
+ 0003:1A8C       MBmpTr_Words_286
+ 0002:2199       MBmpTr_Words_386
+ 0009:1CBF       mem_color_get_pels
+ 0009:1C62       mem_color_get_pels_masked
+ 0009:1D2F       mem_mono_get_pels
+ 0009:1CFB       mem_mono_get_pels_masked
+ 0009:1A6A       mem_set_pels_full
+ 0009:19F6       mem_set_pels_partial
+ 0001:1263       middle_grey_dpx
+ 0009:0EAE       monochrome_screen
+ 0009:1A93       monomem_set_pels_full
+ 0009:1A4D       monomem_set_pels_partial
+ 0009:1D5D       mono_get_pel_from_buffer
+ 0009:1DD9       mono_munge
+ 0009:1DE2       mono_munge_ret
+ 0001:1029       mono_to_color_blt
+ 0001:2092       MoveCursor
+ 0001:2B16       move_hatch
+ 0001:2B29       move_hatch_10
+ 0001:2B2B       move_hatch_20
+ 0001:18CA       my_check_stack
+ 0006:0DEF       Negative_Y
+ 0009:113C       new_scan_in_segment
+ 0001:10F4       nfirst_pass
+ 0001:108F       nmono_to_color_loop
+ 0001:1091       nnext_byte
+ 0006:078F       non_horizontal
+ 0009:0E83       normal_DIBScreenBlt
+ 0001:2148       not_base_pattern
+ 0001:18E3       not_smaller
+ 0006:0019       not_smaller_ls
+ 0008:0019       not_smaller_sl
+ 0001:0E12       no_inner_invert_loop
+ 0001:0F5A       no_inner_loop
+ 0001:0F10       no_inner_pat_loop
+ 0001:0F75       no_last_edge
+ 0001:0E1F       no_last_invert_edge
+ 0001:0F1D       no_last_pat_edge
+ 0001:0F3A       no_left_edge
+ 0001:0E00       no_left_invert_edge
+ 0001:0EFA       no_left_pat_edge
+ 0001:1025       no_pattern
+ 0001:1143       no_planes_left
+ 0001:18E8       no_room
+ 0006:001E       no_room_ls
+ 0008:001E       no_room_sl
+ 0001:1013       no_source
+ 0001:1131       nsecond_pass
+ 000A:020A       nSymmetryIndex
+ 0000:0003  Abs  NUMBER_CL1_COLORS
+ 0000:0003  Abs  NUMBER_CL2_COLORS
+ 0000:0004  Abs  NUMBER_CL3_COLORS
+ 0009:1B60       obtain_pel_from_buffer
+ 0008:05F2       opaque_ddx
+ 0008:05EE       opaque_ddxn
+ 0008:05A1       opaque_dn
+ 0008:0594       opaque_dpa
+ 0008:05C8       opaque_dpan
+ 0008:0589       opaque_dpna
+ 0008:05A8       opaque_dpno
+ 0008:05A8       opaque_dpo
+ 0008:05B1       opaque_dpon
+ 0008:059F       opaque_dpx
+ 0008:059F       opaque_dpxn
+ 0008:05F5       opaque_p
+ 0008:05B1       opaque_pdna
+ 0008:05C8       opaque_pdno
+ 0008:05F5       opaque_pn
+ 0001:284E       Output
+ 0003:0D70       output_o_rect_286
+ 0002:0E2C       output_o_rect_386
+ 0001:2868       output_return_error
+ 0001:11E2       over_scans
+ 0001:002C       PAccelTable
+ 0009:0F41       parameter_error
+ 0009:0EF4       parameter_error_relay
+ 0001:049B       parse_10
+ 0001:04B6       parse_end
+ 0001:076C       pattern_preprocessing
+ 0001:07B2       pattern_preproc_color
+ 0001:07D9       pattern_preproc_end
+ 0001:07DB       pattern_preproc_error
+ 0001:07D3       pattern_preproc_mono
+ 0001:1148       pat_blt
+ 0001:119E       pat_blt_loop
+ 0001:1196       pat_blt_next_scan
+ 0002:07FE       pCode_check_stack
+ 0001:003C       PColorTable
+ 0001:072F       pdevice_chk_color_conv
+ 0001:071A       pdevice_decode_dest
+ 0001:076A       pdevice_error
+ 0001:06FE       pdevice_processing
+ 0001:0768       pdevice_proc_end
+ 0001:075C       pdevice_set_dest_flag
+ 0001:0750       pdevice_set_src_flag
+ 0001:0366       PDna
+ 0001:0318       PDSana
+ 0001:01EA       PDSanon
+ 0001:01F3       PDSaon
+ 0001:0388       PDSax
+ 0001:01F1       PDSnaon
+ 0001:022D       PDSnaxn
+ 0001:0452       PDSnoan
+ 0001:0342       PDSnox
+ 0001:0289       PDSoan
+ 0001:0201       PDSona
+ 0001:01FA       PDSonon
+ 0001:0236       PDSox
+ 0001:022B       PDSPanaxn
+ 0001:0234       PDSPaox
+ 0001:032A       PDSPDaoxxn
+ 0001:03FA       PDSPDoaxxn
+ 0001:03AC       PDSPnaox
+ 0001:0447       PDSPnoax
+ 0001:0386       PDSPoax
+ 0001:0268       PDSPxaxn
+ 0001:035F       PDSPxox
+ 0001:0378       PDSxa
+ 0001:0391       PDSxnan
+ 0001:0381       PDSxnon
+ 0001:02EE       PDSxon
+ 0001:03D6       PDSxxn
+ 0002:0837       PExtTextOut
+ 0001:10DD       pfirst_pass
+ 0001:1328       phase_align
+ 0001:10F2       phase_is_negative1
+ 0001:112F       phase_is_negative2
+ 0001:108D       phase_neg
+ 0001:055D       phase_processing
+ 0001:055D       phase_processing_x
+ 0001:0647       phase_processing_y
+ 0001:0578       phase_proc_10
+ 0001:0692       phase_proc_100
+ 0001:05A5       phase_proc_20
+ 0001:05CB       phase_proc_30
+ 0001:0614       phase_proc_40
+ 0001:061F       phase_proc_50
+ 0001:0633       phase_proc_60
+ 0001:0669       phase_proc_70
+ 0001:0679       phase_proc_80
+ 0001:0681       phase_proc_90
+ 0001:00CC       phase_tbl1
+ 0001:107A       phase_zero
+ 0004:0000       physical_device
+ 0004:01F8       physical_disable
+ 0004:008E       physical_enable
+ 0000:0020  Abs  PHYS_DEVICE_SIZE
+ 0001:0022       PIndexTable1
+ 0001:0025       PIndexTable2
+ 0001:0028       PIndexTable3
+ 0007:0088       Pixel
+ 0007:0000       PixelSeg_color_table
+ 0007:0145       pixel_100
+ 0007:018A       pixel_110
+ 0007:01A3       pixel_120
+ 0007:01C1       pixel_130
+ 0007:01D0       pixel_140
+ 0007:01F4       pixel_160
+ 0007:00E2       pixel_20
+ 0007:01F9       pixel_200
+ 0007:020D       pixel_210
+ 0007:0214       pixel_220
+ 0007:022D       pixel_240
+ 0007:00F2       pixel_30
+ 0007:0252       pixel_300
+ 0007:00FC       pixel_40
+ 0007:010E       pixel_50
+ 0007:0110       pixel_60
+ 0007:011C       pixel_70
+ 0007:0142       pixel_90
+ 0007:01E3       pixel_is_0
+ 0007:01E9       pixel_is_1
+ 0007:01EB       pixel_is_dest
+ 0007:01E6       pixel_is_inverted
+ 0007:01B0       pixel_restore_ega
+ 0007:01B5       pixel_restore_ega_more
+ 0000:9B0D  Abs  plane_index
+ 0001:001B       PMatchTable1
+ 0001:001B       PMatchTable2
+ 0001:001E       PMatchTable3
+ 0001:1063       pmono_to_color_loop
+ 0001:01E6       Pn
+ 0001:1065       pnext_byte
+ 0006:0E6D       Positive_X
+ 0008:02DE       preprocess_dispatch
+ 0000:0000  Imp  PrestoChangeoSelector (KERNEL.177)
+ 0001:3104       pre_switch_to_background
+ 0001:06DF       process_stack_code
+ 0008:011F       proc_addr_tbl
+ 0001:02A4       PSan
+ 0001:0256       PSDnaon
+ 0001:029D       PSDnoan
+ 0001:02AF       PSDPaox
+ 0001:02DA       PSDPoax
+ 0001:021E       PSDPSanaxx
+ 0001:026F       PSDPSaoxxn
+ 0001:03E8       PSDPSoaxxn
+ 0001:03DB       PSDPSonoxxn
+ 0001:0321       PSDPxaxn
+ 0001:0294       PSDPxox
+ 0001:1118       psecond_pass
+ 0001:024F       PSna
+ 0001:01ED       PSnon
+ 0001:01EF       PSon
+ 0002:082C       PStrBlt
+ 0001:02E1       PSx
+ 000A:01E3       Qhead
+ 000A:01E7       Qsize
+ 000A:01E5       Qtail
+ 0003:0000       rCode_check_stack
+ 0009:1862       ReadRLE
+ 0001:286E       RealizeObject
+ 0001:28DB       realize_brush
+ 0001:28E5       realize_brush_10
+ 0001:2909       realize_brush_20
+ 0001:2914       realize_brush_30
+ 0001:2BD6       realize_dispatch
+ 0001:28AA       realize_exit
+ 0001:2AB9       realize_hatch
+ 0001:2AC4       realize_hatch_10
+ 0001:2B36       realize_hollow
+ 0001:2B3B       realize_just_a_return
+ 0001:2A20       realize_pattern
+ 0001:2A4B       realize_pattern_10
+ 0001:2A4F       realize_pattern_20
+ 0001:2A6B       realize_pattern_30
+ 0001:2AA7       realize_pattern_40
+ 0001:28B6       realize_pen
+ 0001:28CC       realize_pen_10
+ 0001:28D3       realize_pen_20
+ 0001:2BDC       realize_sizes
+ 0001:292A       realize_solid
+ 0004:03FE       restore_int_2Fh
+ 0001:31D3       res_hw_regs
+ 0001:28A5       return_obj_size
+ 0003:079D       RExtTextOut
+ 0001:006D       RGB192Brush
+ 0001:1956       rgb_to_ipc
+ 0009:12EC       RLEBitBlt
+ 0009:1856       RLEend
+ 0009:1854       RLEerror
+ 0009:184F       RLEget_end
+ 0009:15AC       RLEset_end
+ 0008:0589       rops_start
+ 0001:00DC       roptable
+ 0007:0268       rop_indexes
+ 0001:2B3C       rotate_brush_x
+ 0001:2B49       rotate_brush_x_10
+ 0001:2B63       rotate_brush_y
+ 0001:2B71       rotate_brush_y_10
+ 0001:2B7E       rotate_brush_y_20
+ 0001:1E2F       rotate_masks
+ 0001:1315       rot_and_xor
+ 0001:2175       rows_and_masks
+ 0003:0792       RStrBlt
+ 0000:007F  Abs  R_ACTIVEBORDER
+ 0000:0000  Abs  R_ACTIVETITLE
+ 0000:00BF  Abs  R_APPWORKSPACE
+ 0000:007F  Abs  R_BACKGROUND
+ 0000:007F  Abs  R_INACTIVEBORDER
+ 0000:00FF  Abs  R_INACTIVETITLE
+ 0000:00FF  Abs  R_MENU
+ 0000:0000  Abs  R_MENUTEXT
+ 0000:003F  Abs  R_SCROLLBAR
+ 0000:00FF  Abs  R_TITLETEXT
+ 0000:00FF  Abs  R_WINDOW
+ 0000:0000  Abs  R_WINDOWFRAME
+ 0000:0000  Abs  R_WINDOWTEXT
+ 0009:1DC9       same_color_strategy
+ 0009:1816       same_display_surface_seg
+ 000A:025B       saved_bit_mask
+ 000A:0257       saved_data_rot
+ 000A:0255       saved_enab_sr
+ 0000:9B0F  Abs  saved_latches
+ 000A:025C       saved_map_mask
+ 000A:0259       saved_read_map
+ 0001:2BE2       SaveScreenBitmap
+ 0001:1B3F       SaveToSave
+ 0001:1BE0       SaveToScreen
+ 0001:317E       save_hw_regs
+ 0009:0EC7       save_num_colors_used
+ 0008:0000       ScanlineSeg_check_stack
+ 0005:02AA       ScanLR
+ 0005:02DF       scan_10
+ 0005:03A9       scan_100
+ 0005:03B7       scan_110
+ 0005:03D8       scan_120
+ 0005:040A       scan_140
+ 0005:042B       scan_150
+ 0005:042C       scan_160
+ 0005:031D       scan_20
+ 0005:0431       scan_200
+ 0005:0447       scan_210
+ 0005:0461       scan_230
+ 0005:046D       scan_240
+ 0005:0471       scan_250
+ 0005:047D       scan_260
+ 0005:0482       scan_270
+ 0005:0484       scan_280
+ 0005:0499       scan_290
+ 0005:0323       scan_30
+ 0005:04A4       scan_300
+ 0005:0343       scan_40
+ 0005:034D       scan_50
+ 0005:0361       scan_60
+ 0005:0366       scan_70
+ 0005:0375       scan_80
+ 0008:00C5       scan_do_first
+ 0008:00D8       scan_do_inner
+ 0008:00E5       scan_do_last
+ 0009:17F7       scan_epilogue
+ 0008:0093       scan_next
+ 0008:009B       scan_next_plane
+ 0008:00F0       scan_restore_pointer
+ 000A:0006       ScratchSel
+ 0000:0000  Imp  ScreenSelector       (KERNEL.174)
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0001:1BC5       ScreenToSave
+ 000A:01F3       screen_busy
+ 0000:01E0  Abs  SCREEN_HEIGHT
+ 0000:0280  Abs  SCREEN_WIDTH
+ 0000:0050  Abs  SCREEN_W_BYTES
+ 0006:03F6       sdda_table
+ 0006:04A3       sdda_X__R
+ 0006:0406       sdda_X___
+ 0006:05F9       sdda__Y_R
+ 0006:0542       sdda__Y__
+ 0006:070A       sdda___DR
+ 0006:06B3       sdda___D_
+ 0001:0349       SDPana
+ 0001:02AF       SDPaon
+ 0001:03F3       SDPax
+ 0001:02A6       SDPnaon
+ 0001:0428       SDPnoan
+ 0001:03C9       SDPnox
+ 0001:02DA       SDPoan
+ 0001:02D3       SDPox
+ 0001:021E       SDPSanaxn
+ 0001:026F       SDPSaox
+ 0001:043C       SDPSnaox
+ 0001:0407       SDPSnoax
+ 0001:03E8       SDPSoax
+ 0001:03DB       SDPSonox
+ 0001:02B8       SDPSoox
+ 0001:023B       SDPSxaxn
+ 0001:041F       SDPSxox
+ 0001:0321       SDPxa
+ 0001:045D       SDPxnan
+ 0001:0208       SDPxnon
+ 0001:0294       SDPxon
+ 0001:0414       SDxPDxa
+ 0001:2168       second_bit
+ 0005:019A       SetAttribute
+ 0001:1FA0       SetCursor
+ 0009:0048       SetDeviceBitmapBits
+ 0003:1B62       setup_ega_opaque_clip_magic_286
+ 0002:229E       setup_ega_opaque_clip_magic_386
+ 0009:1966       set_4bpp_onepel_segment
+ 0009:151D       set_absolute_mode
+ 0009:18DF       set_clip_type_2_or_3
+ 0009:14FE       set_decode_RLE
+ 0003:1B8C       set_ega_opaque_mode_286
+ 0002:22C8       set_ega_opaque_mode_386
+ 0009:1556       set_encoded_run
+ 0009:1586       set_EOL
+ 0009:1592       set_EORLE
+ 0009:1A9D       set_get_bit_mask
+ 0009:1AAA       set_get_byte_mask
+ 0009:1AF9       set_get_huge_segment_loop
+ 0009:1ADE       set_get_offset_in_segment
+ 0009:189D       set_get_segment
+ 0009:18F2       set_get_segment_end
+ 0009:1B04       set_got_huge_segment
+ 0009:14CE       set_have_addresses
+ 0009:1AF1       set_huge_start_offset
+ 0009:14F8       set_initializations_done
+ 0009:1910       set_multipel_loop
+ 0009:18FD       set_multipel_segment
+ 0009:1540       set_multipel_update_X_Y
+ 0001:115A       set_next_plane
+ 0009:193F       set_onepel_first
+ 0009:195F       set_onepel_last
+ 0009:1958       set_onepel_loop
+ 0009:1922       set_onepel_segment
+ 0009:156A       set_onepel_update_X_Y
+ 0008:0338       set_procs_color
+ 0008:03DE       set_procs_color_vect
+ 0008:035F       set_procs_ega
+ 0008:037A       set_procs_ega_10
+ 0008:032A       set_procs_ega_3_pass
+ 0008:03CB       set_procs_ega_40
+ 0008:03E1       set_procs_ega_50
+ 0008:035D       set_procs_ega_do_nothing
+ 0008:0350       set_procs_mono
+ 0008:0431       set_procs_non_ega
+ 0008:0451       set_procs_no_map
+ 0008:0483       set_proc_non_ega_exit
+ 0009:1408       set_RLE_bits
+ 0009:1AD8       set_small_start_offset
+ 0009:18D7       set_start_on_lft_edge
+ 0000:9B0C  Abs  shadowed_mode
+ 000A:01F4       shadow_mem_status
+ 0001:1109       skip_first_pass
+ 0001:00DC       Sn
+ 0001:29E3       solid_brush_30
+ 0009:17E9       solitary_pel_at_end
+ 0001:23A5       SortColorCntTable
+ 0001:179A       spans_a_segment
+ 0001:025F       SPDnaon
+ 0001:02F5       SPDnoan
+ 0001:02E3       SPDnox
+ 0001:0316       SPDSanaxn
+ 0001:02C1       SPDSaox
+ 0001:030B       SPDSnaox
+ 0001:0452       SPDSnoax
+ 0001:0287       SPDSoax
+ 0001:02FE       SPDSonox
+ 0001:0376       SPDSxaxn
+ 0001:02EC       SPDSxox
+ 0006:0EF4       special_diagonal
+ 0001:0213       SPxDSxa
+ 0001:0354       SPxDSxo
+ 0001:027C       SPxPDxa
+ 0001:2BF3       ssb_chk_mem_exists
+ 0001:2F13       ssb_clip_x
+ 0001:2DE5       ssb_do_right
+ 0000:FFFF  Abs  SSB_END_OFFSET
+ 0001:3034       ssb_exit_error
+ 0001:2C14       ssb_exit_error_vect
+ 0001:2F0C       ssb_exit_error_vect2
+ 0001:3033       ssb_exit_ok
+ 0001:2C18       ssb_ignore_it
+ 000A:000A       ssb_mask
+ 0001:2C2E       ssb_perform_restore
+ 0001:2F10       ssb_perform_save
+ 0001:2C20       ssb_restore_check
+ 0001:3015       ssb_restore_video_state
+ 0001:2C08       ssb_save
+ 0000:6000  Abs  SSB_SIZE_IN_BYTES
+ 0000:A000  Abs  SSB_START_OFFSET
+ 0001:0412       SSDxPDxaxn
+ 0001:0211       SSPxDSxaxn
+ 0001:0352       SSPxDSxoxn
+ 0001:027A       SSPxPDxaxn
+ 0000:000E  Abs  stack_bot
+ 0000:000C  Abs  stack_min
+ 0000:000A  Abs  stack_top
+ 0009:13D6       start_work
+ 0006:112B       StBm_Diagonal_4Q
+ 0006:1097       StBm_Negative_Y
+ 0006:10EA       StBm_Positive_X
+ 0009:1873       StoreRLE
+ 0009:1882       StoreRLEIncCount
+ 0001:0005       StrBlt
+ 0001:3046       StrBltFunction
+ 0003:002E       strblt_dummy1_286
+ 0002:0000       strblt_dummy1_386
+ 0003:10E2       strblt_dummy2_286
+ 0002:11B4       strblt_dummy2_386
+ 0006:0A16       style_draw_pass
+ 0006:105F       St_Diagonal_4Q
+ 0006:0FED       St_Negative_Y
+ 0006:1022       St_Positive_X
+ 0001:2915       sum_RGB_alt_far
+ 0001:2919       sum_RGB_colors
+ 0001:291E       sum_RGB_colors_alt
+ 0001:2923       sum_RGB_colors_exit
+ 0009:138A       surface_is_memory
+ 0009:160E       table_for_color
+ 0006:0887       tests_done
+ 0008:0311       test_if_obj_required
+ 0001:2165       third_bit
+ 0000:9B08  Abs  tonys_bar_n_grill
+ 0008:058B       transp_ddx
+ 0008:05AA       transp_ddxn
+ 0008:05AA       transp_ddxn_next
+ 0008:058D       transp_ddx_next
+ 0008:05A1       transp_dn
+ 0008:05A1       transp_dn_next
+ 0008:0594       transp_dpa
+ 0008:05C8       transp_dpan
+ 0008:05D0       transp_dpan_next
+ 0008:0598       transp_dpa_next
+ 0008:0589       transp_dpna
+ 0008:05A8       transp_dpno
+ 0008:05A8       transp_dpo
+ 0008:05B1       transp_dpon
+ 0008:059F       transp_dpx
+ 0008:059F       transp_dpxn
+ 0008:05DF       transp_p
+ 0008:05B1       transp_pdna
+ 0008:05B9       transp_pdna_next
+ 0008:05C8       transp_pdno
+ 0008:05DF       transp_pn
+ 0008:05E2       transp_p_next
+ 000A:01FA       UNDONE_X_COORDINATE
+ 000A:01FC       UNDONE_Y_COORDINATE
+ 0001:1F85       unexclude
+ 0001:1F81       unexclude_far
+ 0009:1D66       update_set_src_ptr_4_bit
+ 0009:1D72       update_set_src_ptr_8_bit
+ 0001:304A       UserRepaintDisable
+ 0009:0F46       valid_extents
+ 0000:9B0A  Abs  VDD_latch_byte
+ 0001:04B3       v_exit
+ 0000:0008  Abs  V_HATCH_BR_0
+ 0000:0008  Abs  V_HATCH_BR_1
+ 0000:0008  Abs  V_HATCH_BR_2
+ 0000:0008  Abs  V_HATCH_BR_3
+ 0000:0008  Abs  V_HATCH_BR_4
+ 0000:0008  Abs  V_HATCH_BR_5
+ 0000:0008  Abs  V_HATCH_BR_6
+ 0000:0008  Abs  V_HATCH_BR_7
+ 0003:04C5       wccl_all_done_286
+ 0002:0511       wccl_all_done_386
+ 0003:0402       wccl_bad_character_286
+ 0002:0438       wccl_bad_character_386
+ 0003:0491       wccl_current_is_visible_286
+ 0002:04CA       wccl_current_is_visible_386
+ 0003:048A       wccl_dummy_is_visible_286
+ 0002:04C3       wccl_dummy_is_visible_386
+ 0003:045E       wccl_get_user_width_286
+ 0002:0497       wccl_get_user_width_386
+ 0003:0443       wccl_good_character_286
+ 0002:0479       wccl_good_character_386
+ 0003:0407       wccl_have_break_char_286
+ 0002:043D       wccl_have_break_char_386
+ 0003:044B       wccl_have_tot_extra_286
+ 0002:0481       wccl_have_tot_extra_386
+ 0003:04B6       wccl_have_vis_start_286
+ 0002:0502       wccl_have_vis_start_386
+ 0003:0473       wccl_have_width_286
+ 0002:04AC       wccl_have_width_386
+ 0003:042C       wccl_neg_dda_286
+ 0002:0462       wccl_neg_dda_386
+ 0003:043A       wccl_next_char_286
+ 0002:0470       wccl_next_char_386
+ 0003:04C4       wccl_save_first_286
+ 0002:0510       wccl_save_first_386
+ 0003:0485       wccl_see_if_next_286
+ 0002:04BE       wccl_see_if_next_386
+ 0003:04A8       wccl_step_clipped_char_286
+ 0002:04EB       wccl_step_clipped_char_386
+ 0003:05DE       wcc_all_done_286
+ 0002:0645       wcc_all_done_386
+ 0003:04CC       wcc_bad_char_286
+ 0002:0518       wcc_bad_char_386
+ 0003:0580       wcc_been_clipped_286
+ 0002:05DB       wcc_been_clipped_386
+ 0003:0605       wcc_char_is_clipped_286
+ 0002:066C       wcc_char_is_clipped_386
+ 0003:059D       wcc_check_dummy_286
+ 0002:0603       wcc_check_dummy_386
+ 0003:0645       wcc_check_string_origin_286
+ 0002:06AC       wcc_check_string_origin_386
+ 0003:060D       wcc_clipped_no_backup_286
+ 0002:0674       wcc_clipped_no_backup_386
+ 0003:0546       wcc_clip_enters_here_286
+ 0002:059F       wcc_clip_enters_here_386
+ 0003:05B3       wcc_dummys_been_clipped_286
+ 0002:061C       wcc_dummys_been_clipped_386
+ 0003:05F7       wcc_dummy_is_clipped_286
+ 0002:065E       wcc_dummy_is_clipped_386
+ 0003:05BC       wcc_dummy_still_wide_286
+ 0002:0625       wcc_dummy_still_wide_386
+ 0003:05C6       wcc_dummy_width_ok_286
+ 0002:0630       wcc_dummy_width_ok_386
+ 0003:052F       wcc_get_users_width_286
+ 0002:0588       wcc_get_users_width_386
+ 0003:063C       wcc_going_back_286
+ 0002:06A3       wcc_going_back_386
+ 0003:050D       wcc_good_character_286
+ 0002:0559       wcc_good_character_386
+ 0003:0571       wcc_have_adj_width_286
+ 0002:05CA       wcc_have_adj_width_386
+ 0003:04D1       wcc_have_break_char_286
+ 0002:051D       wcc_have_break_char_386
+ 0003:056E       wcc_have_entire_width_286
+ 0002:05C7       wcc_have_entire_width_386
+ 0003:0515       wcc_have_tot_extra_286
+ 0002:0561       wcc_have_tot_extra_386
+ 0003:056C       wcc_have_what_fits_286
+ 0002:05C5       wcc_have_what_fits_386
+ 0003:0546       wcc_have_width_286
+ 0002:059F       wcc_have_width_386
+ 0003:0620       wcc_might_backup_286
+ 0002:0687       wcc_might_backup_386
+ 0003:065A       wcc_must_restart_286
+ 0002:06C2       wcc_must_restart_386
+ 0003:04F6       wcc_neg_dda_286
+ 0002:0542       wcc_neg_dda_386
+ 0003:0504       wcc_next_char_286
+ 0002:0550       wcc_next_char_386
+ 0003:068C       wcc_pad_still_wide_286
+ 0002:06F5       wcc_pad_still_wide_386
+ 0003:0679       wcc_pad_up_to_rhs_286
+ 0002:06E1       wcc_pad_up_to_rhs_386
+ 0003:0696       wcc_pad_width_ok_286
+ 0002:0700       wcc_pad_width_ok_386
+ 0003:0673       wcc_restart_286
+ 0002:06DB       wcc_restart_386
+ 0003:05CA       wcc_see_if_next_286
+ 0002:0635       wcc_see_if_next_386
+ 0003:0589       wcc_still_wide_286
+ 0002:05E4       wcc_still_wide_386
+ 0003:0596       wcc_width_ok_286
+ 0002:05FB       wcc_width_ok_386
+ 000A:000D       wGraphicsMode
+ 000A:0207       wInhibitCount
+ 0000:0001  Abs  WINP
+ 0000:9B0B  Abs  wm3_detection
+ 000A:0012       wMouseTrails
+ 0003:03EE       worst_case_286
+ 0002:0424       worst_case_386
+ 0003:0B92       worst_case_ext_286
+ 0002:0C4B       worst_case_ext_386
+ 000A:020B       wRGB
+ 0001:2465       WritePBrush
+ 0000:0000  Imp  WritePrivateProfileString (KERNEL.129)
+ 0000:0000  Imp  WriteProfileString   (KERNEL.59)
+ 000A:01E9       wXORCursor
+ 0009:1470       xlate_next_color
+ 000A:0203       X_HOT_SPOT
+ 0000:0024  Abs  X_MAJOR_DIST
+ 0000:000F  Abs  X_MINOR_DIST
+ 000A:0205       Y_HOT_SPOT
+ 0000:0024  Abs  Y_MAJOR_DIST
+ 0000:000F  Abs  Y_MINOR_DIST
+ 0001:1788       y_update
+ 0001:1793       y_update_10
+ 0001:17AB       y_update_30
+ 0001:17DB       y_update_40
+ 0001:107A       zmono_to_color_loop
+ 0001:1FA1       _cstods
+ 0000:0000  Imp  _DebugOutput         (KERNEL.328)
+ 0000:0000  Imp  __NEXTSEG            (KERNEL.114)
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+
+  Address         Publics by Value
+
+ 0000:0000  Abs  H_HATCH_BR_2
+ 0000:0000  Imp  GetModuleHandle      (KERNEL.47)
+ 0000:0000  Abs  R_ACTIVETITLE
+ 0000:0000  Imp  GetExePtr            (KERNEL.133)
+ 0000:0000  Imp  WritePrivateProfileString (KERNEL.129)
+ 0000:0000  Abs  R_MENUTEXT
+ 0000:0000  Abs  B_ACTIVETITLE
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0000:0000  Abs  R_WINDOWFRAME
+ 0000:0000  Imp  FindResource         (KERNEL.60)
+ 0000:0000  Imp  FreeSelector         (KERNEL.176)
+ 0000:0000  Imp  __NEXTSEG            (KERNEL.114)
+ 0000:0000  Abs  G_WINDOWFRAME
+ 0000:0000  Abs  G_WINDOWTEXT
+ 0000:0000  Imp  FatalExit            (KERNEL.1)
+ 0000:0000  Imp  GetProfileInt        (KERNEL.57)
+ 0000:0000  Imp  GetPrivateProfileInt (KERNEL.127)
+ 0000:0000  Imp  ScreenSelector       (KERNEL.174)
+ 0000:0000  Abs  G_ACTIVETITLE
+ 0000:0000  Abs  B_WINDOWFRAME
+ 0000:0000  Imp  AllocSelector        (KERNEL.175)
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0000:0000  Imp  PrestoChangeoSelector (KERNEL.177)
+ 0000:0000  Imp  LockResource         (KERNEL.62)
+ 0000:0000  Imp  _DebugOutput         (KERNEL.328)
+ 0000:0000  Abs  H_HATCH_BR_0
+ 0000:0000  Abs  H_HATCH_BR_3
+ 0000:0000  Abs  B_MENUTEXT
+ 0000:0000  Imp  WriteProfileString   (KERNEL.59)
+ 0000:0000  Abs  R_WINDOWTEXT
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+ 0000:0000  Abs  G_MENUTEXT
+ 0000:0000  Abs  H_HATCH_BR_7
+ 0000:0000  Abs  H_HATCH_BR_6
+ 0000:0000  Imp  LoadResource         (KERNEL.61)
+ 0000:0000  Abs  H_HATCH_BR_5
+ 0000:0000  Abs  B_WINDOWTEXT
+ 0000:0000  Abs  H_HATCH_BR_1
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSToCSAlias     (KERNEL.171)
+ 0000:0001  Abs  D1_HATCH_BR_7
+ 0000:0001  Abs  D2_HATCH_BR_0
+ 0000:0001  Abs  WINP
+ 0000:0002  Abs  D2_HATCH_BR_1
+ 0000:0002  Abs  D1_HATCH_BR_6
+ 0000:0003  Abs  NUMBER_CL2_COLORS
+ 0000:0003  Abs  NUMBER_CL1_COLORS
+ 0000:0004  Abs  NUMBER_CL3_COLORS
+ 0000:0004  Abs  D2_HATCH_BR_2
+ 0000:0004  Abs  D1_HATCH_BR_5
+ 0000:0008  Abs  CR_HATCH_BR_2
+ 0000:0008  Abs  CR_HATCH_BR_1
+ 0000:0008  Abs  CR_HATCH_BR_0
+ 0000:0008  Abs  CR_HATCH_BR_3
+ 0000:0008  Abs  D1_HATCH_BR_4
+ 0000:0008  Abs  V_HATCH_BR_3
+ 0000:0008  Abs  CR_HATCH_BR_6
+ 0000:0008  Abs  V_HATCH_BR_1
+ 0000:0008  Abs  D2_HATCH_BR_3
+ 0000:0008  Abs  CR_HATCH_BR_7
+ 0000:0008  Abs  CR_HATCH_BR_5
+ 0000:0008  Abs  V_HATCH_BR_6
+ 0000:0008  Abs  V_HATCH_BR_2
+ 0000:0008  Abs  V_HATCH_BR_4
+ 0000:0008  Abs  V_HATCH_BR_5
+ 0000:0008  Abs  V_HATCH_BR_0
+ 0000:0008  Abs  V_HATCH_BR_7
+ 0000:000A  Abs  stack_top
+ 0000:000C  Abs  stack_min
+ 0000:000E  Abs  stack_bot
+ 0000:000F  Abs  Y_MINOR_DIST
+ 0000:000F  Abs  X_MINOR_DIST
+ 0000:0010  Abs  D1_HATCH_BR_3
+ 0000:0010  Abs  D2_HATCH_BR_4
+ 0000:0010  Abs  COLOR_TBL_SIZE
+ 0000:0018  Abs  DC_HATCH_BR_4
+ 0000:0018  Abs  DC_HATCH_BR_3
+ 0000:0020  Abs  D2_HATCH_BR_5
+ 0000:0020  Abs  PHYS_DEVICE_SIZE
+ 0000:0020  Abs  D1_HATCH_BR_2
+ 0000:0024  Abs  DC_HATCH_BR_2
+ 0000:0024  Abs  X_MAJOR_DIST
+ 0000:0024  Abs  DC_HATCH_BR_5
+ 0000:0024  Abs  Y_MAJOR_DIST
+ 0000:0033  Abs  HYPOTENUSE
+ 0000:003F  Abs  G_SCROLLBAR
+ 0000:003F  Abs  R_SCROLLBAR
+ 0000:003F  Abs  B_SCROLLBAR
+ 0000:0040  Abs  D1_HATCH_BR_1
+ 0000:0040  Abs  D2_HATCH_BR_6
+ 0000:0042  Abs  DC_HATCH_BR_1
+ 0000:0042  Abs  DC_HATCH_BR_6
+ 0000:0050  Abs  SCREEN_W_BYTES
+ 0000:0066  Abs  MAX_STYLE_ERR
+ 0000:007F  Abs  G_INACTIVEBORDER
+ 0000:007F  Abs  B_BACKGROUND
+ 0000:007F  Abs  B_ACTIVEBORDER
+ 0000:007F  Abs  G_BACKGROUND
+ 0000:007F  Abs  B_INACTIVEBORDER
+ 0000:007F  Abs  R_ACTIVEBORDER
+ 0000:007F  Abs  G_ACTIVEBORDER
+ 0000:007F  Abs  R_BACKGROUND
+ 0000:007F  Abs  R_INACTIVEBORDER
+ 0000:0080  Abs  D2_HATCH_BR_7
+ 0000:0080  Abs  D1_HATCH_BR_0
+ 0000:0081  Abs  DC_HATCH_BR_7
+ 0000:0081  Abs  DC_HATCH_BR_0
+ 0000:00BF  Abs  R_APPWORKSPACE
+ 0000:00BF  Abs  B_APPWORKSPACE
+ 0000:00BF  Abs  G_APPWORKSPACE
+ 0000:00FF  Abs  G_TITLETEXT
+ 0000:00FF  Abs  R_WINDOW
+ 0000:00FF  Abs  CR_HATCH_BR_4
+ 0000:00FF  Abs  B_WINDOW
+ 0000:00FF  Abs  H_HATCH_BR_4
+ 0000:00FF  Abs  B_INACTIVETITLE
+ 0000:00FF  Abs  R_TITLETEXT
+ 0000:00FF  Abs  R_MENU
+ 0000:00FF  Abs  B_MENU
+ 0000:00FF  Abs  B_TITLETEXT
+ 0000:00FF  Abs  G_MENU
+ 0000:00FF  Abs  R_INACTIVETITLE
+ 0000:00FF  Abs  G_WINDOW
+ 0000:00FF  Abs  G_INACTIVETITLE
+ 0000:0104  Abs  COLOR_FORMAT
+ 0000:017E  Abs  BW_THRESHOLD
+ 0000:01E0  Abs  SCREEN_HEIGHT
+ 0000:0280  Abs  SCREEN_WIDTH
+ 0000:0F07  Abs  COLOR_DONT_CARE
+ 0000:6000  Abs  SSB_SIZE_IN_BYTES
+ 0000:9B00  Abs  current_brush
+ 0000:9B08  Abs  tonys_bar_n_grill
+ 0000:9B0A  Abs  VDD_latch_byte
+ 0000:9B0B  Abs  wm3_detection
+ 0000:9B0C  Abs  shadowed_mode
+ 0000:9B0D  Abs  plane_index
+ 0000:9B0E  Abs  enable_test
+ 0000:9B0F  Abs  saved_latches
+ 0000:A000  Abs  SSB_START_OFFSET
+ 0000:FFFF  Abs  SSB_END_OFFSET
+ 0001:0000       ExtTextOut
+ 0001:0005       StrBlt
+ 0001:000A       Code_palette
+ 0001:001B       PMatchTable1
+ 0001:001B       PMatchTable2
+ 0001:001E       PMatchTable3
+ 0001:0022       PIndexTable1
+ 0001:0025       PIndexTable2
+ 0001:0028       PIndexTable3
+ 0001:002C       PAccelTable
+ 0001:003C       PColorTable
+ 0001:006C       EGAindex8to7
+ 0001:006D       RGB192Brush
+ 0001:007C       dev_to_foreground
+ 0001:0093       dev_to_res_regs
+ 0001:00AD       dev_to_background
+ 0001:00B3       dev_to_save_regs
+ 0001:00BC       bitmask_tbl1
+ 0001:00C4       bitmask_tbl2
+ 0001:00CC       phase_tbl1
+ 0001:00DC       roptable
+ 0001:00DC       Sn
+ 0001:01E4       DDx
+ 0001:01E6       DPna
+ 0001:01E6       Pn
+ 0001:01EA       PDSanon
+ 0001:01ED       PSnon
+ 0001:01EF       DPSona
+ 0001:01EF       PSon
+ 0001:01F1       PDSnaon
+ 0001:01F3       PDSaon
+ 0001:01F8       DPon
+ 0001:01FA       PDSonon
+ 0001:01FD       DPSnoon
+ 0001:01FF       DPSoon
+ 0001:0201       DSon
+ 0001:0201       PDSona
+ 0001:0208       SDPxnon
+ 0001:0211       SSPxDSxaxn
+ 0001:0213       SPxDSxa
+ 0001:021E       PSDPSanaxx
+ 0001:021E       SDPSanaxn
+ 0001:0222       DSna
+ 0001:022B       PDSPanaxn
+ 0001:022B       DPSana
+ 0001:022D       PDSnaxn
+ 0001:0234       DPSaon
+ 0001:0234       PDSPaox
+ 0001:0236       PDSox
+ 0001:023B       SDPSxaxn
+ 0001:023D       DPSxa
+ 0001:0244       DSPDxaxn
+ 0001:024F       DPSnaa
+ 0001:024F       PSna
+ 0001:0251       DPSaan
+ 0001:0256       PSDnaon
+ 0001:025F       SPDnaon
+ 0001:0268       PDSPxaxn
+ 0001:026F       SDPSaox
+ 0001:026F       PSDPSaoxxn
+ 0001:027A       SSPxPDxaxn
+ 0001:027C       SPxPDxa
+ 0001:0287       SPDSoax
+ 0001:0287       DSPDSoaxxn
+ 0001:0289       PDSoan
+ 0001:0294       SDPxon
+ 0001:0294       PSDPxox
+ 0001:029D       PSDnoan
+ 0001:02A4       PSan
+ 0001:02A6       SDPnaon
+ 0001:02AF       SDPaon
+ 0001:02AF       PSDPaox
+ 0001:02B8       SDPSoox
+ 0001:02C1       SPDSaox
+ 0001:02CA       DPSDxaxn
+ 0001:02D3       SDPox
+ 0001:02DA       PSDPoax
+ 0001:02DA       SDPoan
+ 0001:02E1       PSx
+ 0001:02E3       SPDnox
+ 0001:02EC       SPDSxox
+ 0001:02EE       PDSxon
+ 0001:02F5       SPDnoan
+ 0001:02FE       SPDSonox
+ 0001:0309       DPSxnan
+ 0001:030B       SPDSnaox
+ 0001:0316       SPDSanaxn
+ 0001:0318       DSan
+ 0001:0318       PDSana
+ 0001:0321       PSDPxaxn
+ 0001:0321       SDPxa
+ 0001:032A       PDSPDaoxxn
+ 0001:032A       DSPDaox
+ 0001:0337       DPSDoax
+ 0001:0340       DPSanon
+ 0001:0342       DSnon
+ 0001:0342       PDSnox
+ 0001:0349       SDPana
+ 0001:0352       SSPxDSxoxn
+ 0001:0354       SPxDSxo
+ 0001:035F       PDSPxox
+ 0001:035F       DPSxon
+ 0001:0366       PDna
+ 0001:0366       Dn
+ 0001:036D       DPSDaox
+ 0001:0376       SPDSxaxn
+ 0001:0378       PDSxa
+ 0001:037F       DPx
+ 0001:0381       PDSxnon
+ 0001:0384       DPSnoan
+ 0001:0386       DPSoan
+ 0001:0386       PDSPoax
+ 0001:0388       PDSax
+ 0001:038D       DPSnox
+ 0001:038F       DPSox
+ 0001:0391       PDSxnan
+ 0001:0398       DPSDonox
+ 0001:03A3       DPSDxox
+ 0001:03AC       DSPnaon
+ 0001:03AC       PDSPnaox
+ 0001:03B7       DPan
+ 0001:03BC       DSPDSaoxxn
+ 0001:03C9       SDPnox
+ 0001:03D2       DPSnaxn
+ 0001:03D4       DPSax
+ 0001:03D6       DSx
+ 0001:03D6       PDSxxn
+ 0001:03DB       SDPSonox
+ 0001:03DB       PSDPSonoxxn
+ 0001:03DD       DPSonon
+ 0001:03E8       PSDPSoaxxn
+ 0001:03E8       SDPSoax
+ 0001:03F3       SDPax
+ 0001:03FA       DSPDoax
+ 0001:03FA       PDSPDoaxxn
+ 0001:0407       SDPSnoax
+ 0001:0412       SSDxPDxaxn
+ 0001:0414       SDxPDxa
+ 0001:041F       SDPSxox
+ 0001:0428       SDPnoan
+ 0001:0431       DSPDxox
+ 0001:043C       SDPSnaox
+ 0001:043E       DPSnaon
+ 0001:0447       DSPnoan
+ 0001:0447       PDSPnoax
+ 0001:0450       DPSxnon
+ 0001:0452       SPDSnoax
+ 0001:0452       PDSnoan
+ 0001:045D       SDPxnan
+ 0001:0466       BitBlt
+ 0001:047D       bitblt_stack_ok
+ 0001:049B       parse_10
+ 0001:04AE       complain
+ 0001:04B3       v_exit
+ 0001:04B6       parse_end
+ 0001:04CB       input_clipping
+ 0001:04CB       input_clip_x
+ 0001:04ED       input_clip_rgt_edge
+ 0001:04F7       input_clip_save_xext
+ 0001:04FA       input_clip_y
+ 0001:0510       input_clip_btm_edge
+ 0001:051A       input_clip_save_yext
+ 0001:051D       input_clip_chk_null_blt
+ 0001:0525       input_clip_end
+ 0001:0525       cursor_exclusion
+ 0001:054A       cursor_exclusion_y
+ 0001:0550       cursor_exclusion_union
+ 0001:0556       cursor_exclusion_no_union
+ 0001:055A       cursor_exclusion_do_it
+ 0001:055D       phase_processing
+ 0001:055D       phase_processing_x
+ 0001:055D       cursor_exclusion_end
+ 0001:0578       phase_proc_10
+ 0001:05A5       phase_proc_20
+ 0001:05CB       phase_proc_30
+ 0001:0614       phase_proc_40
+ 0001:061F       phase_proc_50
+ 0001:0633       phase_proc_60
+ 0001:0647       phase_processing_y
+ 0001:0669       phase_proc_70
+ 0001:0679       phase_proc_80
+ 0001:0681       phase_proc_90
+ 0001:0692       phase_proc_100
+ 0001:06A1       cblt_allocate
+ 0001:06A9       cblt_alloc_stack_ok
+ 0001:06C7       call_blt
+ 0001:06D0       call_blt_get_dest_bits
+ 0001:06DE       call_blt_do_it
+ 0001:06DF       process_stack_code
+ 0001:06E7       bitblt_exit
+ 0001:06ED       bitblt_exit_fail
+ 0001:06F1       bitblt_stack_ov
+ 0001:06FE       pdevice_processing
+ 0001:071A       pdevice_decode_dest
+ 0001:072F       pdevice_chk_color_conv
+ 0001:0750       pdevice_set_src_flag
+ 0001:075C       pdevice_set_dest_flag
+ 0001:0768       pdevice_proc_end
+ 0001:076A       pdevice_error
+ 0001:076C       pattern_preprocessing
+ 0001:07B2       pattern_preproc_color
+ 0001:07D3       pattern_preproc_mono
+ 0001:07D9       pattern_preproc_end
+ 0001:07DB       pattern_preproc_error
+ 0001:087F       BrushMonoToColorFar
+ 0001:0883       copy_dev
+ 0001:0899       copy_dev_20
+ 0001:08AB       copy_dev_bad_clr_format
+ 0001:08AD       compute_y
+ 0001:08CA       compute_y_100
+ 0001:08CF       compute_y_120
+ 0001:08DA       compute_y_140
+ 0001:08F0       compute_y_160
+ 0001:08F8       compute_y_180
+ 0001:08FC       compute_y_200
+ 0001:093A       compute_y_220
+ 0001:093E       compute_y_240
+ 0001:0945       compute_y_260
+ 0001:0949       check_device_special_cases
+ 0001:0956       cdsc_dest_is_device
+ 0001:0963       cdsc_its_not_src_copy
+ 0001:0967       cdsc_not_s_or_p
+ 0001:097E       cdsc_its_1
+ 0001:098A       cdsc_its_0
+ 0001:0995       cdsc_its_patblt
+ 0001:09AC       cdsc_not_solid_nor_grey
+ 0001:09B1       cdsc_its_solid_color
+ 0001:09B3       cdsc_its_a_solid_color
+ 0001:09B8       cdsc_its_inverse_patblt
+ 0001:09CF       cdsc_its_dn
+ 0001:09D4       cdsc_its_dpx
+ 0001:09E1       cdsc_its_grey_dpx
+ 0001:09E6       cdsc_its_solid_dpx
+ 0001:09EB       cdsc_its_src_copy
+ 0001:09FB       cdsc_source_is_memory
+ 0001:0A10       cdsc_blt_not_special_cased
+ 0001:0A12       blt_done_as_special_case
+ 0001:0A12       cdsc_exit
+ 0001:0B2D       EGA_Single_Seg_Src_Copy
+ 0001:0CB6       ega_src_copy
+ 0001:0CB9       ega_src_copy_40
+ 0001:0CC3       ega_src_copy_50
+ 0001:0CD3       ega_src_copy_60
+ 0001:0CE8       ega_src_copy_80
+ 0001:0CF0       ega_src_copy_90
+ 0001:0CF9       ega_src_copy_100
+ 0001:0CFA       ega_src_copy_partial_byte
+ 0001:0D04       ega_src_copy_part_10
+ 0001:0D09       ega_src_copy_part_20
+ 0001:0D25       ega_src_copy_calc_params
+ 0001:0D3E       ega_src_copy_calc_10
+ 0001:0D51       ega_src_copy_calc_20
+ 0001:0D5C       ega_src_copy_calc_30
+ 0001:0DE0       do_wes_invert
+ 0001:0DE2       do_wes_dpx_solidpat
+ 0001:0E00       no_left_invert_edge
+ 0001:0E12       no_inner_invert_loop
+ 0001:0E1F       no_last_invert_edge
+ 0001:0E20       do_solid_patcopy
+ 0001:0E20       do_wes_dpx_solid_pat_end
+ 0001:0EE8       do_wes_patblt
+ 0001:0EFA       no_left_pat_edge
+ 0001:0F10       no_inner_pat_loop
+ 0001:0F1D       no_last_pat_edge
+ 0001:0F1E       do_wes_mono_trick
+ 0001:0F3A       no_left_edge
+ 0001:0F5A       no_inner_loop
+ 0001:0F75       no_last_edge
+ 0001:0F76       calc_parms
+ 0001:0FB4       crosses_byte_boundary
+ 0001:1013       no_source
+ 0001:1025       no_pattern
+ 0001:1029       mono_to_color_blt
+ 0001:1063       pmono_to_color_loop
+ 0001:1065       pnext_byte
+ 0001:107A       phase_zero
+ 0001:107A       zmono_to_color_loop
+ 0001:108D       phase_neg
+ 0001:108F       nmono_to_color_loop
+ 0001:1091       nnext_byte
+ 0001:10A2       leave_in_set_mode
+ 0001:10AA       edge_mono_to_color_blt
+ 0001:10DD       pfirst_pass
+ 0001:10F2       phase_is_negative1
+ 0001:10F4       nfirst_pass
+ 0001:1104       end_pass_one
+ 0001:1109       skip_first_pass
+ 0001:1118       psecond_pass
+ 0001:112F       phase_is_negative2
+ 0001:1131       nsecond_pass
+ 0001:1143       no_planes_left
+ 0001:1148       pat_blt
+ 0001:115A       set_next_plane
+ 0001:1163       hit_next_byte
+ 0001:1196       pat_blt_next_scan
+ 0001:119E       pat_blt_loop
+ 0001:11C5       edge_pat_blt
+ 0001:11D6       enable_next_plane
+ 0001:11E2       over_scans
+ 0001:1200       invert
+ 0001:1210       invert_next_scan
+ 0001:121F       edge_invert
+ 0001:1225       edge_invert_next_scan
+ 0001:122F       edge_grey_dpx
+ 0001:1263       middle_grey_dpx
+ 0001:128C       do_grey_dpx
+ 0001:12D8       clean_up_before_exit
+ 0001:1300       cps
+ 0001:1315       rot_and_xor
+ 0001:1324       jmp_cx_nz
+ 0001:1328       phase_align
+ 0001:1330       masked_store
+ 0001:1336       CBLT
+ 0001:1349       cblt_2020
+ 0001:1361       cblt_pattern_fetch
+ 0001:13A2       cblt_2060
+ 0001:13B3       cblt_initial_byte_fetch
+ 0001:13C5       cblt_3020
+ 0001:13D1       cblt_3040
+ 0001:13D8       cblt_3060
+ 0001:13E7       cblt_3070
+ 0001:1412       cblt_3080
+ 0001:146D       cblt_3100
+ 0001:1481       cblt_3110
+ 0001:14CE       cblt_3160
+ 0001:14D0       cblt_3180
+ 0001:14D0       cblt_3170
+ 0001:14D3       cblt_3240
+ 0001:14F2       cblt_3260
+ 0001:1509       cblt_3280
+ 0001:151B       cblt_4000
+ 0001:153C       cblt_4020
+ 0001:1546       cblt_4040
+ 0001:1550       cblt_4280
+ 0001:1565       cblt_5000
+ 0001:1584       cblt_5020
+ 0001:1597       cblt_5040
+ 0001:15AC       cblt_5060
+ 0001:15B3       cblt_5080
+ 0001:15C3       cblt_5100
+ 0001:15D2       cblt_5120
+ 0001:15DD       cblt_5140
+ 0001:15DF       cblt_5500
+ 0001:15F3       cblt_5520
+ 0001:1615       cblt_5540
+ 0001:161F       cblt_5560
+ 0001:163D       cblt_5580
+ 0001:1653       cblt_5600
+ 0001:165E       cblt_6000
+ 0001:168F       cblt_6100
+ 0001:169A       cblt_6120
+ 0001:16A2       cblt_6140
+ 0001:16AE       cblt_6160
+ 0001:16CD       cblt_6180
+ 0001:16DF       cblt_6200
+ 0001:16EC       cblt_6220
+ 0001:1707       cblt_6240
+ 0001:1714       cblt_6260
+ 0001:173B       cblt_6300
+ 0001:1753       cblt_6340
+ 0001:1763       cblt_6380
+ 0001:1779       cblt_6400
+ 0001:1784       cblt_6420
+ 0001:1788       y_update
+ 0001:1793       y_update_10
+ 0001:179A       spans_a_segment
+ 0001:17AB       y_update_30
+ 0001:17DB       y_update_40
+ 0001:17DC       GetCharWidth
+ 0001:18CA       my_check_stack
+ 0001:18E3       not_smaller
+ 0001:18E8       no_room
+ 0001:18F8       ColorInfo
+ 0001:191A       color_info_10
+ 0001:1930       color_info_20
+ 0001:1956       rgb_to_ipc
+ 0001:1A15       IndexToColor
+ 0001:1A32       DrawCursor
+ 0001:1B3F       SaveToSave
+ 0001:1BC5       ScreenToSave
+ 0001:1BE0       SaveToScreen
+ 0001:1BFB       CursorToSave
+ 0001:1CBF       EraseTail
+ 0001:1D7E       LoadCursor
+ 0001:1DBA       CursorOff
+ 0001:1E2F       rotate_masks
+ 0001:1EFC       exclude_far
+ 0001:1F00       exclude
+ 0001:1F3C       ExcludeTest
+ 0001:1F81       unexclude_far
+ 0001:1F85       unexclude
+ 0001:1FA0       SetCursor
+ 0001:1FA1       _cstods
+ 0001:2027       CheckCursor
+ 0001:2092       MoveCursor
+ 0001:210E       dither
+ 0001:2147       is_base_pattern
+ 0001:2148       not_base_pattern
+ 0001:2165       third_bit
+ 0001:2168       second_bit
+ 0001:216C       first_bit
+ 0001:2170       grey_flags
+ 0001:2175       rows_and_masks
+ 0001:2195       base_patterns
+ 0001:22A1       ComputeSymmetry
+ 0001:22BE       ComputeSubSpace
+ 0001:22EB       ComputeTransform
+ 0001:2323       ComputePColor
+ 0001:2364       MakeColorCntTable
+ 0001:23A5       SortColorCntTable
+ 0001:2404       MakeDitherBitmap
+ 0001:2465       WritePBrush
+ 0001:24A1       ColorDither
+ 0001:2532       FastBorder
+ 0001:254A       fb_stack_ok
+ 0001:25A4       fb_rejected
+ 0001:25A7       fb_check_no_clipping
+ 0001:25B2       fb_chk_clip_1
+ 0001:25BD       fb_chk_clip_2
+ 0001:25C8       fb_chk_clip_3
+ 0001:25D3       fb_no_clipping
+ 0001:2601       fb_chk_sides
+ 0001:262B       fb_easy_way_done
+ 0001:262E       fb_clipping
+ 0001:26AC       fb_clip_right_border
+ 0001:2724       fb_clip_bottom_border
+ 0001:2797       fb_clip_left_border
+ 0001:280F       fb_exit_ok
+ 0001:2810       fb_exit_error
+ 0001:2812       fb_exit
+ 0001:281D       do_blt
+ 0001:284E       Output
+ 0001:285E       dispatch_scanlines
+ 0001:2863       dispatch_lines
+ 0001:2868       output_return_error
+ 0001:286E       RealizeObject
+ 0001:28A5       return_obj_size
+ 0001:28AA       realize_exit
+ 0001:28B6       realize_pen
+ 0001:28CC       realize_pen_10
+ 0001:28D3       realize_pen_20
+ 0001:28DB       realize_brush
+ 0001:28E5       realize_brush_10
+ 0001:2909       realize_brush_20
+ 0001:2914       realize_brush_30
+ 0001:2915       sum_RGB_alt_far
+ 0001:2919       sum_RGB_colors
+ 0001:291E       sum_RGB_colors_alt
+ 0001:2923       sum_RGB_colors_exit
+ 0001:2924       greys
+ 0001:292A       realize_solid
+ 0001:29E3       solid_brush_30
+ 0001:2A20       realize_pattern
+ 0001:2A4B       realize_pattern_10
+ 0001:2A4F       realize_pattern_20
+ 0001:2A6B       realize_pattern_30
+ 0001:2AA7       realize_pattern_40
+ 0001:2AB9       realize_hatch
+ 0001:2AC4       realize_hatch_10
+ 0001:2B16       move_hatch
+ 0001:2B29       move_hatch_10
+ 0001:2B2B       move_hatch_20
+ 0001:2B36       realize_hollow
+ 0001:2B3B       realize_just_a_return
+ 0001:2B3C       rotate_brush_x
+ 0001:2B49       rotate_brush_x_10
+ 0001:2B63       rotate_brush_y
+ 0001:2B71       rotate_brush_y_10
+ 0001:2B7E       rotate_brush_y_20
+ 0001:2B9E       brush_realizations
+ 0001:2BA6       hatched_brushes
+ 0001:2BD6       realize_dispatch
+ 0001:2BDC       realize_sizes
+ 0001:2BE2       SaveScreenBitmap
+ 0001:2BF3       ssb_chk_mem_exists
+ 0001:2C08       ssb_save
+ 0001:2C14       ssb_exit_error_vect
+ 0001:2C18       ssb_ignore_it
+ 0001:2C20       ssb_restore_check
+ 0001:2C2E       ssb_perform_restore
+ 0001:2DE5       ssb_do_right
+ 0001:2F0C       ssb_exit_error_vect2
+ 0001:2F10       ssb_perform_save
+ 0001:2F13       ssb_clip_x
+ 0001:3015       ssb_restore_video_state
+ 0001:3033       ssb_exit_ok
+ 0001:3034       ssb_exit_error
+ 0001:3042       ExtTextOutFunction
+ 0001:3046       StrBltFunction
+ 0001:304A       UserRepaintDisable
+ 0001:3104       pre_switch_to_background
+ 0001:3131       disable_switching
+ 0001:3159       enable_switching
+ 0001:317E       save_hw_regs
+ 0001:31D3       res_hw_regs
+ 0001:31FF       init_hw_regs
+ 0001:3209       init_hw_regs_10
+ 0002:0000       build_string_386
+ 0002:0000       strblt_dummy1_386
+ 0002:003C       build_worst_ok_386
+ 0002:0045       build_have_proc_386
+ 0002:0048       build_restart_386
+ 0002:0067       build_ret_addr_386
+ 0002:0095       build_clr_stack_386
+ 0002:00C4       build_no_o_rect_386
+ 0002:00DF       build_clip_next_time_386
+ 0002:00F1       build_no_clip_next_time_386
+ 0002:00FA       build_all_done_386
+ 0002:00FD       build_restore_opaque_386
+ 0002:0110       build_really_done_386
+ 0002:0424       worst_case_386
+ 0002:0438       wccl_bad_character_386
+ 0002:043D       wccl_have_break_char_386
+ 0002:0462       wccl_neg_dda_386
+ 0002:0470       wccl_next_char_386
+ 0002:0479       wccl_good_character_386
+ 0002:0481       wccl_have_tot_extra_386
+ 0002:0497       wccl_get_user_width_386
+ 0002:04AC       wccl_have_width_386
+ 0002:04BE       wccl_see_if_next_386
+ 0002:04C3       wccl_dummy_is_visible_386
+ 0002:04CA       wccl_current_is_visible_386
+ 0002:04EB       wccl_step_clipped_char_386
+ 0002:0502       wccl_have_vis_start_386
+ 0002:0510       wccl_save_first_386
+ 0002:0511       wccl_all_done_386
+ 0002:0518       wcc_bad_char_386
+ 0002:051D       wcc_have_break_char_386
+ 0002:0542       wcc_neg_dda_386
+ 0002:0550       wcc_next_char_386
+ 0002:0559       wcc_good_character_386
+ 0002:0561       wcc_have_tot_extra_386
+ 0002:0588       wcc_get_users_width_386
+ 0002:059F       wcc_have_width_386
+ 0002:059F       wcc_clip_enters_here_386
+ 0002:05C5       wcc_have_what_fits_386
+ 0002:05C7       wcc_have_entire_width_386
+ 0002:05CA       wcc_have_adj_width_386
+ 0002:05DB       wcc_been_clipped_386
+ 0002:05E4       wcc_still_wide_386
+ 0002:05FB       wcc_width_ok_386
+ 0002:0603       wcc_check_dummy_386
+ 0002:061C       wcc_dummys_been_clipped_386
+ 0002:0625       wcc_dummy_still_wide_386
+ 0002:0630       wcc_dummy_width_ok_386
+ 0002:0635       wcc_see_if_next_386
+ 0002:0645       wcc_all_done_386
+ 0002:065E       wcc_dummy_is_clipped_386
+ 0002:066C       wcc_char_is_clipped_386
+ 0002:0674       wcc_clipped_no_backup_386
+ 0002:0687       wcc_might_backup_386
+ 0002:06A3       wcc_going_back_386
+ 0002:06AC       wcc_check_string_origin_386
+ 0002:06C2       wcc_must_restart_386
+ 0002:06DB       wcc_restart_386
+ 0002:06E1       wcc_pad_up_to_rhs_386
+ 0002:06F5       wcc_pad_still_wide_386
+ 0002:0700       wcc_pad_width_ok_386
+ 0002:07FE       pCode_check_stack
+ 0002:082C       PStrBlt
+ 0002:0837       PExtTextOut
+ 0002:0C4B       worst_case_ext_386
+ 0002:0CEB       comp_byte_interval_386
+ 0002:0E2C       output_o_rect_386
+ 0002:11B4       strblt_dummy2_386
+ 0002:11B4       DrawString_386
+ 0002:11E3       DS_CannotSpecialCase_386
+ 0002:1205       DS_MaybeSpecialCaseFont_386
+ 0002:1232       DS_MaybePatchUpRoutines_386
+ 0002:1247       DS_SetNonClippedRoutine_386
+ 0002:1257       DS_SetClippedRoutine_386
+ 0002:125D       DS_GetNonClippedWm3Routine_386
+ 0002:1263       DS_GetClippedWm3Routine_386
+ 0002:1269       DS_pp_ega_trans_386
+ 0002:126C       DS_CheckDetectionStatus_386
+ 0002:1277       DS_Wm3_NotSupported_386
+ 0002:1285       DS_pp_done_386
+ 0002:12B9       DS_RoutinesDefined_386
+ 0002:12DF       DS_OutputString_386
+ 0002:1305       DS_Exit_386
+ 0002:132B       DS_OutputStringWithRestart_386
+ 0002:133E       DS_RestartLoop_386
+ 0002:1394       BuildSuperGlyph_386
+ 0002:13C9       BuildSuperGlyph_10_386
+ 0002:13E7       BSG_GetStackEntry_386
+ 0002:140D       BSG_CantSkipBlank_386
+ 0002:1415       BSG_PhaseIsNonZero_386
+ 0002:1435       BSG_HeightIsAligned_386
+ 0002:1453       BSG_ShouldNeverGetHere_386
+ 0002:1467       BSG_Compose16Bytes_386
+ 0002:1486       BSG_Compose12Bytes_386
+ 0002:14A8       BSG_Compose8Bytes_386
+ 0002:14CA       BSG_Compose4Bytes_386
+ 0002:14EC       BSG_LoopBottom_386
+ 0002:14FD       BSG_EntryComplete_386
+ 0002:1502       BSG_MaybeAdjustColumn_386
+ 0002:1527       BSG_Done_386
+ 0002:1529       BSG_AlignHeight_386
+ 0002:1538       BSG_Compose1Byte_386
+ 0002:154F       BSG_Compose2Bytes_386
+ 0002:157F       BSG_Compose3Bytes_386
+ 0002:15CA       BSG_AdjustColumn_386
+ 0002:15D3       BSG_StopOrBackup_386
+ 0002:15DA       BSG_Backup_386
+ 0002:15F8       BSG_SameByte_386
+ 0002:15FF       BSG_IsNop_386
+ 0002:1609       BSG_SkipNullChar_386
+ 0002:1619       BSG_MustVerify_386
+ 0002:1645       BSG_SlowCompose_386
+ 0002:165A       BBSG_SlowCompose_386
+ 0002:1677       BBSG_MustRestart_386
+ 0002:167F       BSG_MustRestart_386
+ 0002:1698       DealWithBackSlackers_386
+ 0002:16A2       DWBS_GetStackEntry_386
+ 0002:16B2       DWBS_FoundABackSlacker_386
+ 0002:16CB       DWBS_StopOrBackup_386
+ 0002:16FE       BSG_PhaseIsZero_386
+ 0002:1704       BSG_P0HeightIsAligned_386
+ 0002:171F       BSG_P0ShouldNeverGetHere_386
+ 0002:1732       BSG_P0Compose16Bytes_386
+ 0002:173A       BSG_P0Compose12Bytes_386
+ 0002:1744       BSG_P0Compose8Bytes_386
+ 0002:174E       BSG_P0Compose4Bytes_386
+ 0002:1758       BSG_P0LoopBottom_386
+ 0002:1767       BSG_P0AlignHeight_386
+ 0002:1776       BSG_P0Compose1Byte_386
+ 0002:178A       BSG_P0Compose2Bytes_386
+ 0002:17A3       BSG_P0Compose3Bytes_386
+ 0002:17C2       BBSG_GetStackEntry_386
+ 0002:17E8       BBSG_CantSkipBlank_386
+ 0002:17F0       BBSG_PhaseIsNonZero_386
+ 0002:1823       BBSG_HeightIsAligned_386
+ 0002:1841       BBSG_ShouldNeverGetHere_386
+ 0002:1855       BBSG_Compose16Bytes_386
+ 0002:1899       BBSG_Compose12Bytes_386
+ 0002:18E3       BBSG_Compose8Bytes_386
+ 0002:192D       BBSG_Compose4Bytes_386
+ 0002:1977       BBSG_LoopBottom_386
+ 0002:1988       BBSG_EntryComplete_386
+ 0002:198D       BBSG_MaybeAdjustColumn_386
+ 0002:19B2       BBSG_AlignHeight_386
+ 0002:19C3       BBSG_Compose1Byte_386
+ 0002:19E2       BBSG_Compose2Bytes_386
+ 0002:1A3F       BBSG_Compose3Bytes_386
+ 0002:1AB5       BBSG_AdjustColumn_386
+ 0002:1ABE       BBSG_StopOrBackup_386
+ 0002:1AC5       BBSG_Backup_386
+ 0002:1AE3       BBSG_SameByte_386
+ 0002:1AEA       BBSG_IsNop_386
+ 0002:1AF4       BBSG_SkipNullChar_386
+ 0002:1B04       BBSG_MustVerify_386
+ 0002:1B30       BBSG_PhaseIsZero_386
+ 0002:1B38       BBSG_P0HeightIsAligned_386
+ 0002:1B56       BBSG_P0ShouldNeverGetHere_386
+ 0002:1B6A       BBSG_P0Compose16Bytes_386
+ 0002:1B91       BBSG_P0Compose12Bytes_386
+ 0002:1BBC       BBSG_P0Compose8Bytes_386
+ 0002:1BE7       BBSG_P0Compose4Bytes_386
+ 0002:1C12       BBSG_P0LoopBottom_386
+ 0002:1C26       BBSG_P0AlignHeight_386
+ 0002:1C35       BBSG_P0Compose1Byte_386
+ 0002:1C54       BBSG_P0Compose2Bytes_386
+ 0002:1C8E       BBSG_P0Compose3Bytes_386
+ 0002:1CEE       DevOp_NotClipped_386
+ 0002:1CF4       DevOp_DestOdd_386
+ 0002:1CF9       DevOp_DestEven_386
+ 0002:1CF9       DevOp_Words_386
+ 0002:1D0A       DevOp_WordsLoop_386
+ 0002:1D16       DevOp_HeightAdjusted_386
+ 0002:1D44       DevOp_InnerLoopBottom_386
+ 0002:1D5A       DevOp_WordsExit_386
+ 0002:1D60       DevOp_Byte1_386
+ 0002:1D77       DevOp_Exit_386
+ 0002:1D78       DevOp_AdjustHeight_386
+ 0002:1D8D       DevOp_Clipped_386
+ 0002:1DB6       DevOp_NoPlanesLeft_386
+ 0002:1DBD       DevOp_FgPass_386
+ 0002:1DCA       DevOp_BgPass_386
+ 0002:1DD9       DevTr_NotClipped_386
+ 0002:1DDF       DevTr_DestOdd_386
+ 0002:1DE4       DevTr_DestEven_386
+ 0002:1DE4       DevTr_Words_386
+ 0002:1DF5       DevTr_WordsLoop_386
+ 0002:1E03       DevTr_HeightAdjusted_386
+ 0002:1E51       DevTr_InnerLoopBottom_386
+ 0002:1E67       DevTr_WordsExit_386
+ 0002:1E6D       DevTr_Byte1_386
+ 0002:1E73       DevTr_Byte1Loop_386
+ 0002:1E88       DevTr_Exit_386
+ 0002:1E89       DevTr_AdjustHeight_386
+ 0002:1EA7       DevTr_Clipped_386
+ 0002:1EAB       DevTr_ClippedLoop_386
+ 0002:1EBD       CBmpOp_NotClipped_386
+ 0002:1F27       CBmpOp_Clipped_386
+ 0002:1FA0       CBmpTr_NotClipped_386
+ 0002:1FE6       CBmpTr_Clipped_386
+ 0002:203E       MBmpOp_NotClipped_386
+ 0002:2064       MBmpOp_NC_ColorEntryPoint_386
+ 0002:206A       MBmpOp_DestOdd_386
+ 0002:206F       MBmpOp_DestEven_386
+ 0002:206F       MBmpOp_Words_386
+ 0002:2080       MBmpOp_WordsLoop_386
+ 0002:208E       MBmpOp_HeightAdjusted_386
+ 0002:20D4       MBmpOp_InnerLoopBottom_386
+ 0002:20EA       MBmpOp_WordsExit_386
+ 0002:20F0       MBmpOp_Byte1_386
+ 0002:2115       MBmpOp_Exit_386
+ 0002:2116       MBmpOp_AdjustHeight_386
+ 0002:2136       MBmpOp_Clipped_386
+ 0002:215E       MBmpOp_C_ColorEntryPoint_386
+ 0002:2162       MBmpOp_ClippedLoop_386
+ 0002:217F       MBmpTr_NotClipped_386
+ 0002:218E       MBmpTr_NC_ColorEntryPoint_386
+ 0002:2194       MBmpTr_DestOdd_386
+ 0002:2199       MBmpTr_Words_386
+ 0002:2199       MBmpTr_DestEven_386
+ 0002:21AA       MBmpTr_WordsLoop_386
+ 0002:21B8       MBmpTr_HeightAdjusted_386
+ 0002:2205       MBmpTr_InnerLoopBottom_386
+ 0002:221B       MBmpTr_WordsExit_386
+ 0002:2221       MBmpTr_Byte1_386
+ 0002:2245       MBmpTr_Exit_386
+ 0002:2246       MBmpTr_AdjustHeight_386
+ 0002:2269       MBmpTr_Clipped_386
+ 0002:227A       MBmpTr_C_ColorEntryPoint_386
+ 0002:2283       MBmpTr_ClippedLoop_386
+ 0002:229E       setup_ega_opaque_clip_magic_386
+ 0002:22C8       set_ega_opaque_mode_386
+ 0002:22EA       DevTrNo3_NotClipped_386
+ 0002:22F0       DevTrNo3_DestOdd_386
+ 0002:22F5       DevTrNo3_DestEven_386
+ 0002:22F5       DevTrNo3_Words_386
+ 0002:2308       DevTrNo3_WordsLoop_386
+ 0002:2316       DevTrNo3_HeightAdjusted_386
+ 0002:2388       DevTrNo3_InnerLoopBottom_386
+ 0002:23A0       DevTrNo3_WordsExit_386
+ 0002:23A6       DevTrNo3_Byte1_386
+ 0002:23AC       DevTrNo3_Byte1Loop_386
+ 0002:23C7       DevTrNo3_Exit_386
+ 0002:23C8       DevTrNo3_AdjustHeight_386
+ 0002:23EF       DevTrNo3_Clipped_386
+ 0002:23F3       DevTrNo3_ClippedLoop_386
+ 0002:2410       DrawSpecialString_386
+ 0002:2410       dss_strblt_dummy_386
+ 0003:0000       rCode_check_stack
+ 0003:002E       strblt_dummy1_286
+ 0003:002E       build_string_286
+ 0003:0069       build_worst_ok_286
+ 0003:0072       build_have_proc_286
+ 0003:0075       build_restart_286
+ 0003:0094       build_ret_addr_286
+ 0003:00C1       build_clr_stack_286
+ 0003:00F0       build_no_o_rect_286
+ 0003:010B       build_clip_next_time_286
+ 0003:011D       build_no_clip_next_time_286
+ 0003:0126       build_all_done_286
+ 0003:0129       build_restore_opaque_286
+ 0003:013C       build_really_done_286
+ 0003:03EE       worst_case_286
+ 0003:0402       wccl_bad_character_286
+ 0003:0407       wccl_have_break_char_286
+ 0003:042C       wccl_neg_dda_286
+ 0003:043A       wccl_next_char_286
+ 0003:0443       wccl_good_character_286
+ 0003:044B       wccl_have_tot_extra_286
+ 0003:045E       wccl_get_user_width_286
+ 0003:0473       wccl_have_width_286
+ 0003:0485       wccl_see_if_next_286
+ 0003:048A       wccl_dummy_is_visible_286
+ 0003:0491       wccl_current_is_visible_286
+ 0003:04A8       wccl_step_clipped_char_286
+ 0003:04B6       wccl_have_vis_start_286
+ 0003:04C4       wccl_save_first_286
+ 0003:04C5       wccl_all_done_286
+ 0003:04CC       wcc_bad_char_286
+ 0003:04D1       wcc_have_break_char_286
+ 0003:04F6       wcc_neg_dda_286
+ 0003:0504       wcc_next_char_286
+ 0003:050D       wcc_good_character_286
+ 0003:0515       wcc_have_tot_extra_286
+ 0003:052F       wcc_get_users_width_286
+ 0003:0546       wcc_clip_enters_here_286
+ 0003:0546       wcc_have_width_286
+ 0003:056C       wcc_have_what_fits_286
+ 0003:056E       wcc_have_entire_width_286
+ 0003:0571       wcc_have_adj_width_286
+ 0003:0580       wcc_been_clipped_286
+ 0003:0589       wcc_still_wide_286
+ 0003:0596       wcc_width_ok_286
+ 0003:059D       wcc_check_dummy_286
+ 0003:05B3       wcc_dummys_been_clipped_286
+ 0003:05BC       wcc_dummy_still_wide_286
+ 0003:05C6       wcc_dummy_width_ok_286
+ 0003:05CA       wcc_see_if_next_286
+ 0003:05DE       wcc_all_done_286
+ 0003:05F7       wcc_dummy_is_clipped_286
+ 0003:0605       wcc_char_is_clipped_286
+ 0003:060D       wcc_clipped_no_backup_286
+ 0003:0620       wcc_might_backup_286
+ 0003:063C       wcc_going_back_286
+ 0003:0645       wcc_check_string_origin_286
+ 0003:065A       wcc_must_restart_286
+ 0003:0673       wcc_restart_286
+ 0003:0679       wcc_pad_up_to_rhs_286
+ 0003:068C       wcc_pad_still_wide_286
+ 0003:0696       wcc_pad_width_ok_286
+ 0003:0792       RStrBlt
+ 0003:079D       RExtTextOut
+ 0003:0B92       worst_case_ext_286
+ 0003:0C2F       comp_byte_interval_286
+ 0003:0D70       output_o_rect_286
+ 0003:10E2       strblt_dummy2_286
+ 0003:10E2       DrawString_286
+ 0003:1121       DS_CannotSpecialCase_286
+ 0003:1141       DS_MaybeSpecialCaseFont_286
+ 0003:116C       DS_MaybePatchUpRoutines_286
+ 0003:1181       DS_SetNonClippedRoutine_286
+ 0003:1191       DS_SetClippedRoutine_286
+ 0003:1197       DS_GetNonClippedWm3Routine_286
+ 0003:119D       DS_GetClippedWm3Routine_286
+ 0003:11A3       DS_pp_ega_trans_286
+ 0003:11A6       DS_CheckDetectionStatus_286
+ 0003:11B1       DS_Wm3_NotSupported_286
+ 0003:11BF       DS_pp_done_286
+ 0003:11F3       DS_RoutinesDefined_286
+ 0003:1219       DS_OutputString_286
+ 0003:123F       DS_Exit_286
+ 0003:1275       DS_OutputStringWithRestart_286
+ 0003:1288       DS_RestartLoop_286
+ 0003:12DB       BuildSuperGlyph_286
+ 0003:1308       BuildSuperGlyph_10_286
+ 0003:131D       BSG_GetStackEntry_286
+ 0003:133B       BSG_CantSkipBlank_286
+ 0003:1341       BSG_PhaseIsNonZero_286
+ 0003:135B       BSG_HeightIsAligned_286
+ 0003:138A       BSG_ShouldNeverGetHere_286
+ 0003:139E       BSG_Compose16Bytes_286
+ 0003:13B4       BSG_Compose14Bytes_286
+ 0003:13CD       BSG_Compose12Bytes_286
+ 0003:13E6       BSG_Compose10Bytes_286
+ 0003:13FF       BSG_Compose8Bytes_286
+ 0003:1418       BSG_Compose6Bytes_286
+ 0003:1431       BSG_Compose4Bytes_286
+ 0003:144A       BSG_Compose2Bytes_286
+ 0003:1463       BSG_LoopBottom_286
+ 0003:1471       BSG_EntryComplete_286
+ 0003:1476       BSG_MaybeAdjustColumn_286
+ 0003:1499       BSG_Done_286
+ 0003:149B       BSG_Compose16Bytes_10_286
+ 0003:149E       BSG_Compose1Byte_286
+ 0003:149E       BSG_AlignHeight_286
+ 0003:14B1       BSG_AdjustColumn_286
+ 0003:14BA       BSG_StopOrBackup_286
+ 0003:14BF       BSG_Backup_286
+ 0003:14DD       BSG_SameByte_286
+ 0003:14E4       BSG_IsNop_286
+ 0003:14ED       BSG_SkipNullChar_286
+ 0003:14FD       BSG_MustVerify_286
+ 0003:1522       BSG_SlowCompose_286
+ 0003:1533       BBSG_SlowCompose_286
+ 0003:154C       BBSG_MustRestart_286
+ 0003:1554       BSG_MustRestart_286
+ 0003:156D       DealWithBackSlackers_286
+ 0003:1577       DWBS_GetStackEntry_286
+ 0003:1587       DWBS_FoundABackSlacker_286
+ 0003:159F       DWBS_StopOrBackup_286
+ 0003:15D2       BSG_PhaseIsZero_286
+ 0003:15D8       BSG_P0HeightIsAligned_286
+ 0003:15F3       BSG_P0ShouldNeverGetHere_286
+ 0003:1606       BSG_P0Compose16Bytes_286
+ 0003:160B       BSG_P0Compose14Bytes_286
+ 0003:1612       BSG_P0Compose12Bytes_286
+ 0003:1619       BSG_P0Compose10Bytes_286
+ 0003:1620       BSG_P0Compose8Bytes_286
+ 0003:1627       BSG_P0Compose6Bytes_286
+ 0003:162E       BSG_P0Compose4Bytes_286
+ 0003:1635       BSG_P0Compose2Bytes_286
+ 0003:163C       BSG_P0LoopBottom_286
+ 0003:164A       BSG_P0AlignHeight_286
+ 0003:164A       BSG_P0Compose1Byte_286
+ 0003:1679       DevOp_NotClipped_286
+ 0003:167F       DevOp_DestOdd_286
+ 0003:1684       DevOp_DestEven_286
+ 0003:1684       DevOp_Words_286
+ 0003:1696       DevOp_WordsLoop_286
+ 0003:16A2       DevOp_HeightAdjusted_286
+ 0003:16BA       DevOp_InnerLoopBottom_286
+ 0003:16CC       DevOp_WordsExit_286
+ 0003:16D2       DevOp_Byte1_286
+ 0003:16E9       DevOp_Exit_286
+ 0003:16EA       DevOp_AdjustHeight_286
+ 0003:16F9       DevOp_Clipped_286
+ 0003:1722       DevOp_NoPlanesLeft_286
+ 0003:1729       DevOp_FgPass_286
+ 0003:1736       DevOp_BgPass_286
+ 0003:1745       DevTr_NotClipped_286
+ 0003:174B       DevTr_DestOdd_286
+ 0003:1750       DevTr_DestEven_286
+ 0003:1750       DevTr_Words_286
+ 0003:1762       DevTr_WordsLoop_286
+ 0003:176E       DevTr_HeightAdjusted_286
+ 0003:1796       DevTr_InnerLoopBottom_286
+ 0003:17A8       DevTr_WordsExit_286
+ 0003:17AE       DevTr_Byte1_286
+ 0003:17B4       DevTr_Byte1Loop_286
+ 0003:17C9       DevTr_Exit_286
+ 0003:17CA       DevTr_AdjustHeight_286
+ 0003:17E1       DevTr_Clipped_286
+ 0003:17E5       DevTr_ClippedLoop_286
+ 0003:17F7       CBmpOp_NotClipped_286
+ 0003:1859       CBmpOp_Clipped_286
+ 0003:18CA       CBmpTr_NotClipped_286
+ 0003:190C       CBmpTr_Clipped_286
+ 0003:1960       MBmpOp_NotClipped_286
+ 0003:1982       MBmpOp_NC_ColorEntryPoint_286
+ 0003:1988       MBmpOp_DestOdd_286
+ 0003:198D       MBmpOp_Words_286
+ 0003:198D       MBmpOp_DestEven_286
+ 0003:199F       MBmpOp_WordsLoop_286
+ 0003:19AB       MBmpOp_HeightAdjusted_286
+ 0003:19D7       MBmpOp_InnerLoopBottom_286
+ 0003:19E9       MBmpOp_WordsExit_286
+ 0003:19EF       MBmpOp_Byte1_286
+ 0003:1A14       MBmpOp_Exit_286
+ 0003:1A15       MBmpOp_AdjustHeight_286
+ 0003:1A2F       MBmpOp_Clipped_286
+ 0003:1A53       MBmpOp_C_ColorEntryPoint_286
+ 0003:1A57       MBmpOp_ClippedLoop_286
+ 0003:1A74       MBmpTr_NotClipped_286
+ 0003:1A81       MBmpTr_NC_ColorEntryPoint_286
+ 0003:1A87       MBmpTr_DestOdd_286
+ 0003:1A8C       MBmpTr_DestEven_286
+ 0003:1A8C       MBmpTr_Words_286
+ 0003:1A9E       MBmpTr_WordsLoop_286
+ 0003:1AAA       MBmpTr_HeightAdjusted_286
+ 0003:1AD5       MBmpTr_InnerLoopBottom_286
+ 0003:1AE7       MBmpTr_WordsExit_286
+ 0003:1AED       MBmpTr_Byte1_286
+ 0003:1B11       MBmpTr_Exit_286
+ 0003:1B12       MBmpTr_AdjustHeight_286
+ 0003:1B2F       MBmpTr_Clipped_286
+ 0003:1B3E       MBmpTr_C_ColorEntryPoint_286
+ 0003:1B47       MBmpTr_ClippedLoop_286
+ 0003:1B62       setup_ega_opaque_clip_magic_286
+ 0003:1B8C       set_ega_opaque_mode_286
+ 0003:1BAE       DevTrNo3_NotClipped_286
+ 0003:1BB4       DevTrNo3_DestOdd_286
+ 0003:1BB9       DevTrNo3_DestEven_286
+ 0003:1BB9       DevTrNo3_Words_286
+ 0003:1BCB       DevTrNo3_WordsLoop_286
+ 0003:1BD7       DevTrNo3_HeightAdjusted_286
+ 0003:1C11       DevTrNo3_InnerLoopBottom_286
+ 0003:1C23       DevTrNo3_WordsExit_286
+ 0003:1C29       DevTrNo3_Byte1_286
+ 0003:1C2F       DevTrNo3_Byte1Loop_286
+ 0003:1C4A       DevTrNo3_Exit_286
+ 0003:1C4B       DevTrNo3_AdjustHeight_286
+ 0003:1C6C       DevTrNo3_Clipped_286
+ 0003:1C70       DevTrNo3_ClippedLoop_286
+ 0003:1C90       DrawSpecialString_286
+ 0003:1C90       dss_strblt_dummy_286
+ 0004:0000       physical_device
+ 0004:0020       info_table_base
+ 0004:0042       drivers_TC_caps
+ 0004:0046       drivers_RC_caps
+ 0004:008E       physical_enable
+ 0004:01F8       physical_disable
+ 0004:0274       Disable
+ 0004:029B       dev_initialization
+ 0004:02B2       Enable
+ 0004:0301       inquire_gdi_info
+ 0004:0351       exit_enable
+ 0004:03A0       hook_int_2Fh
+ 0004:03FE       restore_int_2Fh
+ 0004:0433       driver_initialization
+ 0005:0000       BlueMoonSeg_color_table
+ 0005:0054       Control
+ 0005:0092       is_color_table
+ 0005:00AB       exit_control
+ 0005:0195       DeviceBitmap
+ 0005:019A       SetAttribute
+ 0005:01A4       Inquire
+ 0005:01CC       EnumDFonts
+ 0005:01D2       EnumObj
+ 0005:01F3       exit_enum_obj
+ 0005:0201       call_client
+ 0005:0214       enum_pen
+ 0005:021C       enum_pen_10
+ 0005:021F       enum_pen_20
+ 0005:022B       enum_pen_30
+ 0005:0232       enum_brush
+ 0005:023D       enum_brush_10
+ 0005:0240       enum_brush_20
+ 0005:0243       enum_brush_30
+ 0005:0270       enum_brush_40
+ 0005:027E       do_color
+ 0005:0286       do_color_10
+ 0005:02AA       ScanLR
+ 0005:02DF       scan_10
+ 0005:031D       scan_20
+ 0005:0323       scan_30
+ 0005:0343       scan_40
+ 0005:034D       scan_50
+ 0005:0361       scan_60
+ 0005:0366       scan_70
+ 0005:0375       scan_80
+ 0005:03A9       scan_100
+ 0005:03B7       scan_110
+ 0005:03D8       scan_120
+ 0005:040A       scan_140
+ 0005:042B       scan_150
+ 0005:042C       scan_160
+ 0005:0431       scan_200
+ 0005:0447       scan_210
+ 0005:0461       scan_230
+ 0005:046D       scan_240
+ 0005:0471       scan_250
+ 0005:047D       scan_260
+ 0005:0482       scan_270
+ 0005:0484       scan_280
+ 0005:0499       scan_290
+ 0005:04A4       scan_300
+ 0005:04AA       DeviceMode
+ 0006:0000       LineSeg_check_stack
+ 0006:0019       not_smaller_ls
+ 0006:001E       no_room_ls
+ 0006:00A0       do_polylines
+ 0006:01B7       load_color_info
+ 0006:02A3       ega_line_dispatch
+ 0006:02C9       Draw_Line
+ 0006:0347       mask_needed
+ 0006:0394       calculate_mask
+ 0006:03F5       Draw_Line_Ret
+ 0006:03F6       sdda_table
+ 0006:0406       sdda_X___
+ 0006:04A3       sdda_X__R
+ 0006:0542       sdda__Y__
+ 0006:05F9       sdda__Y_R
+ 0006:06B3       sdda___D_
+ 0006:070A       sdda___DR
+ 0006:0763       dda_table
+ 0006:0773       Draw_Engine
+ 0006:078F       non_horizontal
+ 0006:082A       find_out_dda
+ 0006:0887       tests_done
+ 0006:0985       do_another_pass
+ 0006:09EB       do_the_last_scan
+ 0006:09F8       all_passes_done
+ 0006:0A16       style_draw_pass
+ 0006:0D32       Clip_Line
+ 0006:0DEF       Negative_Y
+ 0006:0E6D       Positive_X
+ 0006:0ED8       Diagonal_4Q
+ 0006:0EF4       special_diagonal
+ 0006:0F31       Bm_Negative_Y
+ 0006:0F64       Bm_Positive_X
+ 0006:0FB4       Bm_Diagonal_4Q
+ 0006:0FED       St_Negative_Y
+ 0006:1022       St_Positive_X
+ 0006:105F       St_Diagonal_4Q
+ 0006:1097       StBm_Negative_Y
+ 0006:10EA       StBm_Positive_X
+ 0006:112B       StBm_Diagonal_4Q
+ 0007:0000       PixelSeg_color_table
+ 0007:0088       Pixel
+ 0007:00E2       pixel_20
+ 0007:00F2       pixel_30
+ 0007:00FC       pixel_40
+ 0007:010E       pixel_50
+ 0007:0110       pixel_60
+ 0007:011C       pixel_70
+ 0007:0142       pixel_90
+ 0007:0145       pixel_100
+ 0007:018A       pixel_110
+ 0007:01A3       pixel_120
+ 0007:01B0       pixel_restore_ega
+ 0007:01B5       pixel_restore_ega_more
+ 0007:01C1       pixel_130
+ 0007:01D0       pixel_140
+ 0007:01E3       pixel_is_0
+ 0007:01E6       pixel_is_inverted
+ 0007:01E9       pixel_is_1
+ 0007:01EB       pixel_is_dest
+ 0007:01F4       pixel_160
+ 0007:01F9       pixel_200
+ 0007:020D       pixel_210
+ 0007:0214       pixel_220
+ 0007:022D       pixel_240
+ 0007:0252       pixel_300
+ 0007:0268       rop_indexes
+ 0008:0000       ScanlineSeg_check_stack
+ 0008:0019       not_smaller_sl
+ 0008:001E       no_room_sl
+ 0008:006E       do_scanlines
+ 0008:0093       scan_next
+ 0008:009B       scan_next_plane
+ 0008:00C5       scan_do_first
+ 0008:00D8       scan_do_inner
+ 0008:00E5       scan_do_last
+ 0008:00F0       scan_restore_pointer
+ 0008:00F3       do_scans_done
+ 0008:010F       do_scans_clear_exclude
+ 0008:0114       do_scans_exit
+ 0008:011F       proc_addr_tbl
+ 0008:013F       map_1s_0s
+ 0008:015F       another_tbl
+ 0008:016F       comp_scan
+ 0008:01C7       comp_scan_exit_vect
+ 0008:01C9       comp_scan_for_bitmap
+ 0008:01D3       cs_for_bitmap_30
+ 0008:01DD       cs_for_bitmap_40
+ 0008:01EF       cs_for_bitmap_50
+ 0008:01F1       cs_for_bitmap_60
+ 0008:0201       comp_scan_save
+ 0008:020A       comp_scan_exit
+ 0008:020B       get_fill_data
+ 0008:0243       get_fill_pen
+ 0008:026E       get_fill_do_nothing
+ 0008:0270       get_fill_color_portion
+ 0008:02A5       get_fill_brush
+ 0008:02DE       preprocess_dispatch
+ 0008:0311       test_if_obj_required
+ 0008:0324       dispatch_pattern
+ 0008:032A       set_procs_ega_3_pass
+ 0008:0338       set_procs_color
+ 0008:0350       set_procs_mono
+ 0008:035D       set_procs_ega_do_nothing
+ 0008:035F       set_procs_ega
+ 0008:037A       set_procs_ega_10
+ 0008:03CB       set_procs_ega_40
+ 0008:03DE       set_procs_color_vect
+ 0008:03E1       set_procs_ega_50
+ 0008:0431       set_procs_non_ega
+ 0008:0451       set_procs_no_map
+ 0008:0483       set_proc_non_ega_exit
+ 0008:0487       comp_interval_no_more
+ 0008:0489       comp_interval
+ 0008:048C       comp_interval_null
+ 0008:04DE       comp_byte_interval_10
+ 0008:04EF       comp_interval_save
+ 0008:0517       comp_word_interval
+ 0008:0525       comp_word_interval_10
+ 0008:053C       ega_all_partial
+ 0008:0566       ega_inner_latch
+ 0008:0577       ega_inner_stosb
+ 0008:057E       ega_first_last
+ 0008:0589       rops_start
+ 0008:0589       transp_dpna
+ 0008:0589       opaque_dpna
+ 0008:058B       transp_ddx
+ 0008:058D       transp_ddx_next
+ 0008:0594       transp_dpa
+ 0008:0594       opaque_dpa
+ 0008:0598       transp_dpa_next
+ 0008:059F       opaque_dpx
+ 0008:059F       transp_dpxn
+ 0008:059F       opaque_dpxn
+ 0008:059F       transp_dpx
+ 0008:05A1       opaque_dn
+ 0008:05A1       transp_dn_next
+ 0008:05A1       transp_dn
+ 0008:05A8       transp_dpno
+ 0008:05A8       opaque_dpo
+ 0008:05A8       transp_dpo
+ 0008:05A8       opaque_dpno
+ 0008:05AA       transp_ddxn
+ 0008:05AA       transp_ddxn_next
+ 0008:05B1       transp_pdna
+ 0008:05B1       opaque_pdna
+ 0008:05B1       opaque_dpon
+ 0008:05B1       transp_dpon
+ 0008:05B9       transp_pdna_next
+ 0008:05C8       opaque_pdno
+ 0008:05C8       transp_pdno
+ 0008:05C8       transp_dpan
+ 0008:05C8       opaque_dpan
+ 0008:05D0       transp_dpan_next
+ 0008:05DF       transp_pn
+ 0008:05DF       transp_p
+ 0008:05E2       transp_p_next
+ 0008:05EE       opaque_ddxn
+ 0008:05F2       opaque_ddx
+ 0008:05F5       opaque_p
+ 0008:05F5       opaque_pn
+ 0008:05F9       another_ret
+ 0009:0000       DIMapSeg_color_table
+ 0009:0048       SetDeviceBitmapBits
+ 0009:0668       do_bitmap_computations
+ 0009:0764       GetDeviceBitmapBits
+ 0009:0A1B       copy_i1e1
+ 0009:0B1F       copy_ie1
+ 0009:0D1E       DeviceBitmapBits
+ 0009:0E0E       CreateBitmap
+ 0009:0E2A       DIBScreenBlt
+ 0009:0E83       normal_DIBScreenBlt
+ 0009:0EAE       monochrome_screen
+ 0009:0EC7       save_num_colors_used
+ 0009:0EF4       parameter_error_relay
+ 0009:0EF6       bit_count_ok
+ 0009:0F41       parameter_error
+ 0009:0F46       valid_extents
+ 0009:0FB6       map_segment_update
+ 0009:0FC0       map_start_updated
+ 0009:0FD5       blt_area_in_1_segment
+ 0009:1011       init_1_bits_per_pel
+ 0009:1036       init_4_bits_per_pel
+ 0009:105A       init_8_bits_per_pel
+ 0009:1075       init_24_bits_per_pel
+ 0009:107F       create_color_table
+ 0009:10B6       init_done
+ 0009:10FA       blt_next_scan
+ 0009:111B       blt_next_scan_continue
+ 0009:113C       new_scan_in_segment
+ 0009:1147       copy_1_bp_full
+ 0009:115E       copy_1_bp_loop
+ 0009:116B       copy_1_bp_same_byte
+ 0009:119A       copy_1_bp_done
+ 0009:119B       copy_4_bp_full
+ 0009:11A2       copy_4_bp_loop
+ 0009:11BF       copy_4_bp_next_nibble
+ 0009:11C2       copy_4_bp_low_nibble
+ 0009:11D3       copy_4_bp_next_byte
+ 0009:11D5       copy_4_bp_done
+ 0009:11DC       copy_8_bp_full
+ 0009:11EF       copy_8_bp_loop
+ 0009:11F2       copy_24_bp_full
+ 0009:121E       copy_24_bp_loop
+ 0009:1221       get_byte_wo_test
+ 0009:1223       get_byte_with_test
+ 0009:1238       get_byte_with_test_ret
+ 0009:1262       DIScreenBlt_Ret
+ 0009:126D       IntersectRects
+ 0009:12EC       RLEBitBlt
+ 0009:138A       surface_is_memory
+ 0009:13D6       start_work
+ 0009:1408       set_RLE_bits
+ 0009:1470       xlate_next_color
+ 0009:14CE       set_have_addresses
+ 0009:14E0       have_mem_set_pel_addresses
+ 0009:14F4       have_mem_offset_calc_address
+ 0009:14F8       set_initializations_done
+ 0009:14FE       set_decode_RLE
+ 0009:151D       set_absolute_mode
+ 0009:1540       set_multipel_update_X_Y
+ 0009:1556       set_encoded_run
+ 0009:156A       set_onepel_update_X_Y
+ 0009:1586       set_EOL
+ 0009:1592       set_EORLE
+ 0009:15AC       RLEset_end
+ 0009:15B2       get_RLE_bits
+ 0009:1607       get_table_for_color
+ 0009:160E       table_for_color
+ 0009:1621       color_table_done
+ 0009:1694       get_RLE_init_done
+ 0009:16A6       get_find_correct_segment
+ 0009:16B1       get_found_correct_segment
+ 0009:16BA       get_do_calc_for_small
+ 0009:16D2       get_rect_code_loop
+ 0009:16EF       get_scan_code_loop
+ 0009:16EF       initial_state
+ 0009:1706       initial_to_encoded
+ 0009:1706       encode_encode
+ 0009:1723       encode_absolute
+ 0009:173B       encode_overflow
+ 0009:1753       initial_to_absolute
+ 0009:176C       absolute_absolute
+ 0009:178C       absolute_encode
+ 0009:17AC       absolute_overflow
+ 0009:17C1       encode_to_scan_end
+ 0009:17D3       absolute_to_scan_end
+ 0009:17E9       solitary_pel_at_end
+ 0009:17F7       scan_epilogue
+ 0009:1816       same_display_surface_seg
+ 0009:1819       get_end_of_RLE
+ 0009:184F       RLEget_end
+ 0009:1854       RLEerror
+ 0009:1856       RLEend
+ 0009:1862       ReadRLE
+ 0009:1873       StoreRLE
+ 0009:1882       StoreRLEIncCount
+ 0009:189D       set_get_segment
+ 0009:18D7       set_start_on_lft_edge
+ 0009:18DF       set_clip_type_2_or_3
+ 0009:18F2       set_get_segment_end
+ 0009:18FD       set_multipel_segment
+ 0009:1910       set_multipel_loop
+ 0009:1922       set_onepel_segment
+ 0009:193F       set_onepel_first
+ 0009:1958       set_onepel_loop
+ 0009:195F       set_onepel_last
+ 0009:1966       set_4bpp_onepel_segment
+ 0009:19E7       dev_set_pels_partial
+ 0009:19F0       dev_set_pels_full
+ 0009:19F6       mem_set_pels_partial
+ 0009:1A4D       monomem_set_pels_partial
+ 0009:1A6A       mem_set_pels_full
+ 0009:1A93       monomem_set_pels_full
+ 0009:1A9D       set_get_bit_mask
+ 0009:1AAA       set_get_byte_mask
+ 0009:1AD8       set_small_start_offset
+ 0009:1ADE       set_get_offset_in_segment
+ 0009:1AF1       set_huge_start_offset
+ 0009:1AF9       set_get_huge_segment_loop
+ 0009:1B04       set_got_huge_segment
+ 0009:1B59       get_next_pel
+ 0009:1B60       obtain_pel_from_buffer
+ 0009:1B69       fill_get_buffer
+ 0009:1B6E       dev_color_get_pels_masked
+ 0009:1BCE       dev_color_get_pels
+ 0009:1C0F       dev_mono_get_pels_masked
+ 0009:1C48       dev_mono_get_pels
+ 0009:1C62       mem_color_get_pels_masked
+ 0009:1CBF       mem_color_get_pels
+ 0009:1CFB       mem_mono_get_pels_masked
+ 0009:1D2F       mem_mono_get_pels
+ 0009:1D42       color_get_pel_from_buffer
+ 0009:1D5D       mono_get_pel_from_buffer
+ 0009:1D66       update_set_src_ptr_4_bit
+ 0009:1D72       update_set_src_ptr_8_bit
+ 0009:1D7E       get_next_abs_mode_index_4_bit
+ 0009:1DB3       decide_4_bit_strategy_4_bit
+ 0009:1DC9       same_color_strategy
+ 0009:1DCE       get_encoded_index_4_bit
+ 0009:1DD9       mono_munge
+ 0009:1DE2       mono_munge_ret
+ 0009:1DE3       dev_init_write_2
+ 0009:1E11       dev_reinit
+ 000A:0000       do_int_30
+ 000A:0001       Line43
+ 000A:0002       LineAddr
+ 000A:0006       ScratchSel
+ 000A:0008       is_protected
+ 000A:000A       ssb_mask
+ 000A:000C       enabled_flag
+ 000A:000D       wGraphicsMode
+ 000A:000F       bEquipmentFlag
+ 000A:0010       bWm3Capable
+ 000A:0012       wMouseTrails
+ 000A:01E3       Qhead
+ 000A:01E5       Qtail
+ 000A:01E7       Qsize
+ 000A:01E9       wXORCursor
+ 000A:01F3       screen_busy
+ 000A:01F4       shadow_mem_status
+ 000A:01F6       CURSOR_X_COORDINATE
+ 000A:01F8       CURSOR_Y_COORDINATE
+ 000A:01FA       UNDONE_X_COORDINATE
+ 000A:01FC       UNDONE_Y_COORDINATE
+ 000A:01FE       CURSOR_STATUS
+ 000A:01FF       CURSOR_X_SIZE
+ 000A:0201       CURSOR_Y_SIZE
+ 000A:0203       X_HOT_SPOT
+ 000A:0205       Y_HOT_SPOT
+ 000A:0207       wInhibitCount
+ 000A:020A       nSymmetryIndex
+ 000A:020B       wRGB
+ 000A:021E       in_background
+ 000A:0255       saved_enab_sr
+ 000A:0257       saved_data_rot
+ 000A:0259       saved_read_map
+ 000A:025B       saved_bit_mask
+ 000A:025C       saved_map_mask
+ 000B:0000       ComposeArea
+ 000B:1000       EndOfComposeArea
+ 000B:1000       LastByteTouched
+
+Program entry point at 0004:0433

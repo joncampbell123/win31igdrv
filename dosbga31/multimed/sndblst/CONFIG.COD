@@ -1,0 +1,1097 @@
+;	Static Name Aliases
+;
+	TITLE   config.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+INIT	SEGMENT  WORD PUBLIC 'CODE'
+INIT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _aszHexFormat
+PUBLIC  _aszIntFormat
+EXTRN	CHECKRADIOBUTTON:FAR
+EXTRN	ISDLGBUTTONCHECKED:FAR
+EXTRN	LOADSTRING:FAR
+EXTRN	_wsprintf:FAR
+EXTRN	MESSAGEBOX:FAR
+EXTRN	INITVERIFYCONFIGURATION:FAR
+EXTRN	INITGETCONFIGURATION:FAR
+EXTRN	CONFIGGETIRQ:NEAR
+EXTRN	CONFIGGETPORTBASE:NEAR
+EXTRN	WRITEPRIVATEPROFILESTRING:FAR
+EXTRN	DIALOGBOX:FAR
+EXTRN	ENDDIALOG:FAR
+EXTRN	_STR_PORT:BYTE
+EXTRN	_STR_INT:BYTE
+EXTRN	_STR_DRIVERNAME:BYTE
+EXTRN	_STR_INIFILE:BYTE
+EXTRN	_STR_PRODUCTNAME:BYTE
+EXTRN	_ghModule:WORD
+INIT      SEGMENT
+	ASSUME	CS: INIT
+	PUBLIC	PORTTOID
+PORTTOID	PROC NEAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   config.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** static char _based(_segname("_CODE")) aszHexFormat[] = "%X";
+;|*** static char _based(_segname("_CODE")) aszIntFormat[] = "%d";
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** static int NEAR PASCAL PortToId(WORD wPort)
+;|*** {
+; Line 23
+	*** 000000	55 			push	bp
+	*** 000001	8b ec 			mov	bp,sp
+;	wPort = 4
+;|***     switch(wPort) {
+; Line 24
+	*** 000003	8b 46 04 		mov	ax,WORD PTR [bp+4]	;wPort
+;|***         case 0x210:  return IDC_210;
+;|***         case 0x220:  return IDC_220;
+;|***         case 0x230:  return IDC_230;
+;|***         case 0x240:  return IDC_240;
+;|***         case 0x250:  return IDC_250;
+;|***         case 0x260:  return IDC_260;
+;|***         default:     return -1;
+;|***     }                              
+; Line 32
+	*** 000006	2d 10 02 		sub	ax,528	;0210H
+	*** 000009	a8 0f 			test	al,15	;000fH
+	*** 00000b	75 1a 			jne	$SD2522
+	*** 00000d	c1 e8 03 		shr	ax,3
+	*** 000010	3d 0a 00 		cmp	ax,10	;000aH
+	*** 000013	77 12 			ja	$SD2522
+	*** 000015	93 			xchg	ax,bx
+	*** 000016	2e ff a7 00 00 		jmp	WORD PTR cs:$L2634[bx]
+					$L2634:
+	*** 00001b	00 00 				DW	$SC2516
+	*** 00001d	00 00 				DW	$SC2517
+	*** 00001f	00 00 				DW	$SC2518
+	*** 000021	00 00 				DW	$SC2519
+	*** 000023	00 00 				DW	$SC2520
+	*** 000025	00 00 				DW	$SC2521
+;|***         default:     return -1;
+; Line 31
+					$SD2522:
+	*** 000027	b8 ff ff 		mov	ax,-1	;ffffH
+	*** 00002a	eb 1c 			jmp	SHORT $EX2511
+;|***         case 0x210:  return IDC_210;
+; Line 25
+					$SC2516:
+	*** 00002c	b8 01 02 		mov	ax,513	;0201H
+	*** 00002f	eb 17 			jmp	SHORT $EX2511
+;|***         case 0x220:  return IDC_220;
+; Line 26
+					$SC2517:
+	*** 000031	b8 02 02 		mov	ax,514	;0202H
+	*** 000034	eb 12 			jmp	SHORT $EX2511
+;|***         case 0x230:  return IDC_230;
+; Line 27
+					$SC2518:
+	*** 000036	b8 03 02 		mov	ax,515	;0203H
+	*** 000039	eb 0d 			jmp	SHORT $EX2511
+;|***         case 0x240:  return IDC_240;
+; Line 28
+					$SC2519:
+	*** 00003b	b8 04 02 		mov	ax,516	;0204H
+	*** 00003e	eb 08 			jmp	SHORT $EX2511
+;|***         case 0x250:  return IDC_250;
+; Line 29
+					$SC2520:
+	*** 000040	b8 05 02 		mov	ax,517	;0205H
+	*** 000043	eb 03 			jmp	SHORT $EX2511
+;|***         case 0x260:  return IDC_260;
+; Line 30
+					$SC2521:
+	*** 000045	b8 06 02 		mov	ax,518	;0206H
+;|***         default:     return -1;
+;|***     }                              
+;|*** }
+; Line 33
+					$EX2511:
+	*** 000048	c9 			leave	
+	*** 000049	c2 02 00 		ret	2
+						_aszIntFormat	DB	'%d',  00H
+						_aszHexFormat	DB	'%X',  00H
+
+PORTTOID	ENDP
+	PUBLIC	IDTOPORT
+IDTOPORT	PROC NEAR
+;|*** 
+;|*** static WORD NEAR PASCAL IdToPort(int id)
+;|*** {
+; Line 36
+	*** 000052	55 			push	bp
+	*** 000053	8b ec 			mov	bp,sp
+;	id = 4
+;|***     switch(id) {
+; Line 37
+	*** 000055	8b 46 04 		mov	ax,WORD PTR [bp+4]	;id
+;|***         case IDC_210:  return 0x210;
+;|***         case IDC_220:  return 0x220;
+;|***         case IDC_230:  return 0x230;
+;|***         case IDC_240:  return 0x240;
+;|***         case IDC_250:  return 0x250;
+;|***         case IDC_260:  return 0x260;
+;|***         default:       return (WORD)-1;
+;|***     }
+; Line 45
+	*** 000058	2d 01 02 		sub	ax,513	;0201H
+	*** 00005b	3d 05 00 		cmp	ax,5
+	*** 00005e	77 14 			ja	$SD2537
+	*** 000060	03 c0 			add	ax,ax
+	*** 000062	93 			xchg	ax,bx
+	*** 000063	2e ff a7 00 00 		jmp	WORD PTR cs:$L2635[bx]
+					$L2635:
+	*** 000068	00 00 				DW	$SC2531
+	*** 00006a	00 00 				DW	$SC2532
+	*** 00006c	00 00 				DW	$SC2533
+	*** 00006e	00 00 				DW	$SC2534
+	*** 000070	00 00 				DW	$SC2535
+	*** 000072	00 00 				DW	$SC2536
+;|***         default:       return (WORD)-1;
+; Line 44
+					$SD2537:
+	*** 000074	b8 ff ff 		mov	ax,-1	;ffffH
+	*** 000077	eb 1c 			jmp	SHORT $EX2526
+;|***         case IDC_210:  return 0x210;
+; Line 38
+					$SC2531:
+	*** 000079	b8 10 02 		mov	ax,528	;0210H
+	*** 00007c	eb 17 			jmp	SHORT $EX2526
+;|***         case IDC_220:  return 0x220;
+; Line 39
+					$SC2532:
+	*** 00007e	b8 20 02 		mov	ax,544	;0220H
+	*** 000081	eb 12 			jmp	SHORT $EX2526
+;|***         case IDC_230:  return 0x230;
+; Line 40
+					$SC2533:
+	*** 000083	b8 30 02 		mov	ax,560	;0230H
+	*** 000086	eb 0d 			jmp	SHORT $EX2526
+;|***         case IDC_240:  return 0x240;
+; Line 41
+					$SC2534:
+	*** 000088	b8 40 02 		mov	ax,576	;0240H
+	*** 00008b	eb 08 			jmp	SHORT $EX2526
+;|***         case IDC_250:  return 0x250;
+; Line 42
+					$SC2535:
+	*** 00008d	b8 50 02 		mov	ax,592	;0250H
+	*** 000090	eb 03 			jmp	SHORT $EX2526
+;|***         case IDC_260:  return 0x260;
+; Line 43
+					$SC2536:
+	*** 000092	b8 60 02 		mov	ax,608	;0260H
+;|***         default:       return (WORD)-1;
+;|***     }
+;|*** }
+; Line 46
+					$EX2526:
+	*** 000095	c9 			leave	
+	*** 000096	c2 02 00 		ret	2
+	*** 000099	90 			nop	
+
+IDTOPORT	ENDP
+	PUBLIC	INTTOID
+INTTOID	PROC NEAR
+;|*** 
+;|*** static int NEAR PASCAL IntToId(BYTE bInt)
+;|*** {
+; Line 49
+	*** 00009a	55 			push	bp
+	*** 00009b	8b ec 			mov	bp,sp
+;	bInt = 4
+;|***     switch(bInt) {
+; Line 50
+	*** 00009d	2a e4 			sub	ah,ah
+	*** 00009f	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bInt
+;|***         case 2:  return IDC_2;
+;|***         case 9:  return IDC_2;
+;|***         case 3:  return IDC_3;
+;|***         case 5:  return IDC_5;
+;|***         case 7:  return IDC_7;
+;|***         default: return -1;
+;|***     }
+; Line 57
+	*** 0000a2	48 			dec	ax
+	*** 0000a3	48 			dec	ax
+	*** 0000a4	74 23 			je	$SC2547
+	*** 0000a6	48 			dec	ax
+	*** 0000a7	74 11 			je	$SC2548
+	*** 0000a9	48 			dec	ax
+	*** 0000aa	48 			dec	ax
+	*** 0000ab	74 12 			je	$SC2549
+	*** 0000ad	48 			dec	ax
+	*** 0000ae	48 			dec	ax
+	*** 0000af	74 13 			je	$SC2550
+	*** 0000b1	48 			dec	ax
+	*** 0000b2	48 			dec	ax
+	*** 0000b3	74 14 			je	$SC2547
+;|***         default: return -1;
+; Line 56
+	*** 0000b5	b8 ff ff 		mov	ax,-1	;ffffH
+	*** 0000b8	eb 12 			jmp	SHORT $EX2541
+					$SC2548:
+	*** 0000ba	b8 01 01 		mov	ax,257	;0101H
+	*** 0000bd	eb 0d 			jmp	SHORT $EX2541
+;|***         case 5:  return IDC_5;
+; Line 54
+					$SC2549:
+	*** 0000bf	b8 02 01 		mov	ax,258	;0102H
+	*** 0000c2	eb 08 			jmp	SHORT $EX2541
+;|***         case 7:  return IDC_7;
+; Line 55
+					$SC2550:
+	*** 0000c4	b8 03 01 		mov	ax,259	;0103H
+	*** 0000c7	eb 03 			jmp	SHORT $EX2541
+;|***         case 9:  return IDC_2;
+; Line 52
+					$SC2547:
+	*** 0000c9	b8 00 01 		mov	ax,256	;0100H
+;|***         case 3:  return IDC_3;
+;|***         case 5:  return IDC_5;
+;|***         case 7:  return IDC_7;
+;|***         default: return -1;
+;|***     }
+;|*** }
+; Line 58
+					$EX2541:
+	*** 0000cc	c9 			leave	
+	*** 0000cd	c2 02 00 		ret	2
+
+INTTOID	ENDP
+	PUBLIC	IDTOINT
+IDTOINT	PROC NEAR
+;|*** 
+;|*** static BYTE NEAR PASCAL IdToInt(int id)
+;|*** {
+; Line 61
+	*** 0000d0	55 			push	bp
+	*** 0000d1	8b ec 			mov	bp,sp
+;	id = 4
+;|***     switch(id) {
+; Line 62
+	*** 0000d3	8b 46 04 		mov	ax,WORD PTR [bp+4]	;id
+;|***         case IDC_2:  return 9;
+;|***         case IDC_3:  return 3;
+;|***         case IDC_5:  return 5;
+;|***         case IDC_7:  return 7;
+;|***         default:     return (BYTE)-1;
+;|***     }
+; Line 68
+	*** 0000d6	2d 00 01 		sub	ax,256	;0100H
+	*** 0000d9	74 0d 			je	$SC2560
+	*** 0000db	48 			dec	ax
+	*** 0000dc	74 0e 			je	$SC2561
+	*** 0000de	48 			dec	ax
+	*** 0000df	74 0f 			je	$SC2562
+	*** 0000e1	48 			dec	ax
+	*** 0000e2	74 10 			je	$SC2563
+;|***         default:     return (BYTE)-1;
+; Line 67
+	*** 0000e4	b0 ff 			mov	al,255	;00ffH
+	*** 0000e6	eb 0e 			jmp	SHORT $EX2555
+;|***         case IDC_2:  return 9;
+; Line 63
+					$SC2560:
+	*** 0000e8	b0 09 			mov	al,9
+	*** 0000ea	eb 0a 			jmp	SHORT $EX2555
+;|***         case IDC_3:  return 3;
+; Line 64
+					$SC2561:
+	*** 0000ec	b0 03 			mov	al,3
+	*** 0000ee	eb 06 			jmp	SHORT $EX2555
+;|***         case IDC_5:  return 5;
+; Line 65
+					$SC2562:
+	*** 0000f0	b0 05 			mov	al,5
+	*** 0000f2	eb 02 			jmp	SHORT $EX2555
+;|***         case IDC_7:  return 7;
+; Line 66
+					$SC2563:
+	*** 0000f4	b0 07 			mov	al,7
+;|***         default:     return (BYTE)-1;
+;|***     }
+;|*** }
+; Line 69
+					$EX2555:
+	*** 0000f6	c9 			leave	
+	*** 0000f7	c2 02 00 		ret	2
+
+IDTOINT	ENDP
+	PUBLIC	CONFIGERRORMSGBOX
+CONFIGERRORMSGBOX	PROC NEAR
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** static void NEAR PASCAL ConfigErrorMsgBox(HWND hDlg, WORD wStringId)
+;|*** {
+; Line 74
+	*** 0000fa	c8 fa 00 00 		enter	250,0
+;	hDlg = 6
+;	wStringId = 4
+;	szErrorBuffer = -250
+;|*** char szErrorBuffer[MAX_ERR_STRING];    /* buffer for error messages */
+;|*** 
+;|***     LoadString(ghModule, wStringId, szErrorBuffer, sizeof(szErrorBuffer));
+; Line 77
+	*** 0000fe	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 000102	ff 76 04 		push	WORD PTR [bp+4]	;wStringId
+	*** 000105	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 000109	16 			push	ss
+	*** 00010a	50 			push	ax
+	*** 00010b	68 fa 00 		push	250	;00faH
+	*** 00010e	9a 00 00 00 00 		call	FAR PTR LOADSTRING
+;|***     MessageBox(hDlg, szErrorBuffer, STR_PRODUCTNAME, MB_OK|MB_ICONEXCLAMATION);
+; Line 78
+	*** 000113	ff 76 06 		push	WORD PTR [bp+6]	;hDlg
+	*** 000116	8d 86 06 ff 		lea	ax,WORD PTR [bp-250]	;szErrorBuffer
+	*** 00011a	16 			push	ss
+	*** 00011b	50 			push	ax
+	*** 00011c	68 00 00 		push	SEG _STR_PRODUCTNAME
+	*** 00011f	68 00 00 		push	OFFSET _STR_PRODUCTNAME
+	*** 000122	6a 30 			push	48	;0030H
+	*** 000124	9a 00 00 00 00 		call	FAR PTR MESSAGEBOX
+;|*** }
+; Line 79
+	*** 000129	c9 			leave	
+	*** 00012a	c2 04 00 		ret	4
+	*** 00012d	90 			nop	
+
+CONFIGERRORMSGBOX	ENDP
+	PUBLIC	CONFIGREMOVE
+CONFIGREMOVE	PROC FAR
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** void FAR PASCAL ConfigRemove(void)
+;|*** {
+;|***     WritePrivateProfileString(STR_DRIVERNAME, NULL, NULL, STR_INIFILE);
+; Line 85
+	*** 00012e	68 00 00 		push	SEG _STR_DRIVERNAME
+	*** 000131	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 000134	6a 00 			push	0
+	*** 000136	6a 00 			push	0
+	*** 000138	6a 00 			push	0
+	*** 00013a	6a 00 			push	0
+	*** 00013c	68 00 00 		push	SEG _STR_INIFILE
+	*** 00013f	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 000142	9a 00 00 00 00 		call	FAR PTR WRITEPRIVATEPROFILESTRING
+;|*** }
+; Line 86
+	*** 000147	cb 			ret	
+
+CONFIGREMOVE	ENDP
+	PUBLIC	CONFIG
+CONFIG	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | Config | This puts up the configuration dialog box.
+;|***  *
+;|***  * @parm HWND | hWnd | Our Window handle.
+;|***  *
+;|***  * @parm HANDLE | hInstance | Our instance handle.
+;|***  *
+;|***  * @rdesc Returns whatever was returned from the dialog box procedure.
+;|***  ***************************************************************************/
+;|*** int FAR PASCAL Config(HWND hWnd, HANDLE hInstance)
+;|*** {
+; Line 100
+	*** 000148	55 			push	bp
+	*** 000149	8b ec 			mov	bp,sp
+;	hWnd = 8
+;	hInstance = 6
+;|***     return DialogBox(hInstance, MAKEINTATOM(DLG_CONFIG), hWnd, (FARPROC)ConfigDlgProc);
+; Line 101
+	*** 00014b	ff 76 06 		push	WORD PTR [bp+6]	;hInstance
+	*** 00014e	6a 00 			push	0
+	*** 000150	6a 2a 			push	42	;002aH
+	*** 000152	ff 76 08 		push	WORD PTR [bp+8]	;hWnd
+	*** 000155	68 00 00 		push	SEG CONFIGDLGPROC
+	*** 000158	68 00 00 		push	OFFSET CONFIGDLGPROC
+	*** 00015b	9a 00 00 00 00 		call	FAR PTR DIALOGBOX
+;|*** }
+; Line 102
+	*** 000160	c9 			leave	
+	*** 000161	ca 04 00 		ret	4
+
+CONFIG	ENDP
+	PUBLIC	GETPORTANDINT
+GETPORTANDINT	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | GetPortAndInt | Determines which port and interrupt settings
+;|***  *     the user has chosen in the configuration dialog box.
+;|***  *
+;|***  * @parm HWND | hDlg | Handle to the configuration dialog box.
+;|***  *
+;|***  * @rdesc HIWORD = new interrupt, LOWORD = new port
+;|***  ***************************************************************************/
+;|*** static DWORD NEAR PASCAL GetPortAndInt(HWND hDlg)
+;|*** {
+; Line 115
+	*** 000164	c8 04 00 00 		enter	4,0
+	*** 000168	57 			push	di
+	*** 000169	56 			push	si
+;	hDlg = 4
+;	wNewPort = -4
+;	bNewInt = -1
+;	register si = id
+	*** 00016a	8b 7e 04 		mov	di,WORD PTR [bp+4]	;hDlg
+;|*** WORD wNewPort   = -1;       /* new port chosen by user in config box */
+; Line 116
+	*** 00016d	c7 46 fc ff ff 		mov	WORD PTR [bp-4],-1	;ffffH	;wNewPort
+;|*** BYTE bNewInt    = -1;       /* new interrupt chosen */
+; Line 117
+	*** 000172	c6 46 ff ff 		mov	BYTE PTR [bp-1],255	;00ffH	;bNewInt
+;|*** int  id;
+;|*** 
+;|***     for (id = IDC_FIRSTPORT; id <= IDC_LASTPORT; id++)
+; Line 120
+	*** 000176	be 01 02 		mov	si,513	;0201H
+					$F2585:
+;|***         if (IsDlgButtonChecked(hDlg, id)) {
+; Line 121
+	*** 000179	57 			push	di
+	*** 00017a	56 			push	si
+	*** 00017b	9a 00 00 00 00 		call	FAR PTR ISDLGBUTTONCHECKED
+	*** 000180	0b c0 			or	ax,ax
+	*** 000182	75 09 			jne	$L2638
+	*** 000184	46 			inc	si
+	*** 000185	81 fe 06 02 		cmp	si,518	;0206H
+	*** 000189	7e ee 			jle	$F2585
+	*** 00018b	eb 07 			jmp	SHORT $FB2587
+					$L2638:
+;|***             wNewPort = IdToPort(id);
+; Line 122
+	*** 00018d	56 			push	si
+	*** 00018e	e8 c1 fe 		call	IDTOPORT
+	*** 000191	89 46 fc 		mov	WORD PTR [bp-4],ax	;wNewPort
+;|***             break;
+;|***         }
+;|*** 
+;|***     for (id = IDC_FIRSTINT; id <= IDC_LASTINT; id++)
+; Line 126
+					$FB2587:
+	*** 000194	be 00 01 		mov	si,256	;0100H
+					$F2589:
+;|***         if (IsDlgButtonChecked(hDlg, id)) {
+; Line 127
+	*** 000197	57 			push	di
+	*** 000198	56 			push	si
+	*** 000199	9a 00 00 00 00 		call	FAR PTR ISDLGBUTTONCHECKED
+	*** 00019e	0b c0 			or	ax,ax
+	*** 0001a0	75 09 			jne	$L2639
+	*** 0001a2	46 			inc	si
+	*** 0001a3	81 fe 03 01 		cmp	si,259	;0103H
+	*** 0001a7	7e ee 			jle	$F2589
+	*** 0001a9	eb 07 			jmp	SHORT $FB2591
+					$L2639:
+;|***             bNewInt = IdToInt(id);
+; Line 128
+	*** 0001ab	56 			push	si
+	*** 0001ac	e8 21 ff 		call	IDTOINT
+	*** 0001af	88 46 ff 		mov	BYTE PTR [bp-1],al	;bNewInt
+;|***             break;
+;|***         }
+;|*** 
+;|***     return MAKELONG(wNewPort, bNewInt);
+; Line 132
+					$FB2591:
+	*** 0001b2	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bNewInt
+	*** 0001b5	2a e4 			sub	ah,ah
+	*** 0001b7	8b d0 			mov	dx,ax
+	*** 0001b9	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;wNewPort
+;|*** }
+; Line 133
+	*** 0001bc	5e 			pop	si
+	*** 0001bd	5f 			pop	di
+	*** 0001be	c9 			leave	
+	*** 0001bf	c2 02 00 		ret	2
+
+GETPORTANDINT	ENDP
+	PUBLIC	CONFIGDLGPROC
+CONFIGDLGPROC	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | ConfigDlgProc | Dialog proc for the configuration dialog box.
+;|***  *
+;|***  * @parm HWND | hDlg | Handle to the configuration dialog box.
+;|***  *
+;|***  * @parm WORD | msg | Message sent to the dialog box.
+;|***  *
+;|***  * @parm WORD | wParam | Message dependent parameter.
+;|***  *
+;|***  * @parm LONG | lParam | Message dependent parameter.
+;|***  *
+;|***  * @rdesc Returns DRV_RESTART if the user has changed settings, which will
+;|***  *     cause the drivers applet which launched this to give the user a
+;|***  *     message about having to restart Windows for the changes to take
+;|***  *     effect.  If the user clicks on "Cancel" or if no settings have changed,
+;|***  *     DRV_CANCEL is returned.
+;|***  ***************************************************************************/
+;|*** int FAR PASCAL _loadds ConfigDlgProc(HWND hDlg, WORD msg, WORD wParam, LONG lParam)
+;|*** {
+; Line 155
+	*** 0001c2	c8 1e 00 00 		enter	30,0
+	*** 0001c6	57 			push	di
+	*** 0001c7	56 			push	si
+	*** 0001c8	1e 			push	ds
+	*** 0001c9	b8 00 00 		mov	ax,DGROUP
+	*** 0001cc	8e d8 			mov	ds,ax
+	ASSUME DS: DGROUP
+;	hDlg = 14
+;	msg = 12
+;	wParam = 10
+;	lParam = 6
+;	buf = -26
+;	dw = -4
+;	register si = wNewPort
+;	bNewInt = -6
+;	bNewDMAChannel = -5
+;	register si = id
+;|*** char    buf[20];            /* buffer to write profile string into */
+;|*** DWORD   dw;                 /* return value from GetPortAndInt */
+;|*** WORD    wNewPort;           /* new port chosen by user in config box */
+;|*** BYTE    bNewInt;            /* new interrupt chosen */
+;|*** BYTE    bNewDMAChannel;     /* new DMA channel chosen */
+;|*** int     id;
+;|*** 
+;|***     switch (msg) {
+; Line 163
+	*** 0001ce	8b 46 0c 		mov	ax,WORD PTR [bp+12]	;msg
+;|***         case WM_INITDIALOG:
+;|***             bNewInt = ConfigGetIRQ();
+;|***             wNewPort = ConfigGetPortBase();
+;|*** 
+;|***             if ((id = PortToId(wNewPort)) != -1)
+;|***                 CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, id);
+;|*** 
+;|***             if ((id = IntToId(bNewInt)) != -1)
+;|***                 CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, id);
+;|***             break;
+;|*** 
+;|***         case WM_COMMAND:
+;|***             switch (wParam) {
+;|***                 case IDOK:
+;|***                     dw = GetPortAndInt(hDlg);
+;|***                     wNewPort = LOWORD(dw);
+;|***                     bNewInt  = (BYTE)HIWORD(dw);
+;|*** 
+;|***                     /*  we don't have a config option for DMA channel */
+;|***                     /*  so use the current setting */
+;|***                     bNewDMAChannel = (BYTE)(HIWORD(InitGetConfiguration())>>8);
+;|*** 
+;|***                     /*  verify settings - if this fails, DO NOT WRITE INI */
+;|***                     /*  SETTINGS! */
+;|***                     if (LOWORD(dw = InitVerifyConfiguration(wNewPort, bNewInt, bNewDMAChannel)))
+;|***                     {
+;|***                         ConfigErrorMsgBox(hDlg, LOWORD(dw));
+;|***                         break;
+;|***                     }
+;|*** 
+;|***                     /*  do NOT allow driver to install on < 2.00 DSP!! */
+;|***                     if (HIWORD(dw) < DSP_VERSION_REQD) {
+;|***                         /*  display error and DON'T write INI settings - */
+;|***                         /*  this way the driver will never enable */
+;|***                         ConfigErrorMsgBox(hDlg, IDS_ERRBADVERSION);
+;|***                         break;
+;|***                     }
+;|*** 
+;|***                     /* high bit set if Thunder Board - warn them */
+;|***                     /* but continue installing */
+;|***                     if (HIWORD(dw) & 0x8000)
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNTHUNDER);
+;|*** 
+;|***                     /*  if installing on a Pro card, warn them */
+;|***                     /*  but continue installing */
+;|***                     else if (HIWORD(dw) >= DSP_VERSION_PRO)
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNPROCARD);
+;|*** 
+;|***                     /* settings are valid, so write them out */
+;|***                     wsprintf(buf, aszHexFormat, wNewPort);
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_PORT, buf, STR_INIFILE);
+;|***                     wsprintf(buf, aszIntFormat, bNewInt);
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_INT, buf, STR_INIFILE);
+;|*** 
+;|***                     dw = InitGetConfiguration();
+;|***                     if ((wNewPort != LOWORD(dw))||(bNewInt != (BYTE)HIWORD(dw)))
+;|***                         EndDialog(hDlg, DRVCNF_RESTART);
+;|***                     else
+;|***                         EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDCANCEL:
+;|***                     EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDC_210:
+;|***                 case IDC_220:
+;|***                 case IDC_230:
+;|***                 case IDC_240:
+;|***                 case IDC_250:
+;|***                 case IDC_260:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, wParam);
+;|***                     break;
+;|*** 
+;|***                 case IDC_2:
+;|***                 case IDC_3:
+;|***                 case IDC_5:
+;|***                 case IDC_7:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, wParam);
+;|***                     break;
+;|*** 
+;|***                 default:
+;|***                     break;
+;|***             }
+;|***             break;
+;|*** 
+;|***         default:
+;|***             return FALSE;
+;|***     }
+; Line 252
+	*** 0001d1	2d 10 01 		sub	ax,272	;0110H
+	*** 0001d4	74 08 			je	$SC2612
+	*** 0001d6	48 			dec	ax
+	*** 0001d7	74 46 			je	$SC2615
+;|***             return FALSE;
+; Line 251
+	*** 0001d9	33 c0 			xor	ax,ax
+	*** 0001db	e9 86 01 		jmp	$EX2601
+;|***         case WM_INITDIALOG:
+; Line 164
+					$SC2612:
+;|***             bNewInt = ConfigGetIRQ();
+; Line 165
+	*** 0001de	e8 00 00 		call	CONFIGGETIRQ
+	*** 0001e1	88 46 fa 		mov	BYTE PTR [bp-6],al	;bNewInt
+;|***             wNewPort = ConfigGetPortBase();
+;|*** 
+;|***             if ((id = PortToId(wNewPort)) != -1)
+; Line 168
+	*** 0001e4	e8 00 00 		call	CONFIGGETPORTBASE
+	*** 0001e7	50 			push	ax
+	*** 0001e8	e8 15 fe 		call	PORTTOID
+	*** 0001eb	8b f0 			mov	si,ax
+	*** 0001ed	83 fe ff 		cmp	si,-1	;ffffH
+	*** 0001f0	74 0f 			je	$I2613
+;|***                 CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, id);
+; Line 169
+	*** 0001f2	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 0001f5	68 01 02 		push	513	;0201H
+	*** 0001f8	68 06 02 		push	518	;0206H
+	*** 0001fb	50 			push	ax
+	*** 0001fc	9a 00 00 00 00 		call	FAR PTR CHECKRADIOBUTTON
+;|*** 
+;|***             if ((id = IntToId(bNewInt)) != -1)
+; Line 171
+					$I2613:
+	*** 000201	8a 46 fa 		mov	al,BYTE PTR [bp-6]	;bNewInt
+	*** 000204	50 			push	ax
+	*** 000205	e8 92 fe 		call	INTTOID
+	*** 000208	8b f0 			mov	si,ax
+	*** 00020a	83 fe ff 		cmp	si,-1	;ffffH
+	*** 00020d	75 03 			jne	$JCC525
+	*** 00020f	e9 4f 01 		jmp	$SB2609
+					$JCC525:
+;|***                 CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, id);
+; Line 172
+	*** 000212	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000215	68 00 01 		push	256	;0100H
+	*** 000218	68 03 01 		push	259	;0103H
+	*** 00021b	50 			push	ax
+	*** 00021c	e9 3d 01 		jmp	$L2642
+;|***             break;
+;|*** 
+;|***         case WM_COMMAND:
+; Line 175
+					$SC2615:
+	*** 00021f	8b 4e 0a 		mov	cx,WORD PTR [bp+10]	;wParam
+;|***             switch (wParam) {
+; Line 176
+	*** 000222	8b c1 			mov	ax,cx
+;|***                 case IDOK:
+;|***                     dw = GetPortAndInt(hDlg);
+;|***                     wNewPort = LOWORD(dw);
+;|***                     bNewInt  = (BYTE)HIWORD(dw);
+;|*** 
+;|***                     /*  we don't have a config option for DMA channel */
+;|***                     /*  so use the current setting */
+;|***                     bNewDMAChannel = (BYTE)(HIWORD(InitGetConfiguration())>>8);
+;|*** 
+;|***                     /*  verify settings - if this fails, DO NOT WRITE INI */
+;|***                     /*  SETTINGS! */
+;|***                     if (LOWORD(dw = InitVerifyConfiguration(wNewPort, bNewInt, bNewDMAChannel)))
+;|***                     {
+;|***                         ConfigErrorMsgBox(hDlg, LOWORD(dw));
+;|***                         break;
+;|***                     }
+;|*** 
+;|***                     /*  do NOT allow driver to install on < 2.00 DSP!! */
+;|***                     if (HIWORD(dw) < DSP_VERSION_REQD) {
+;|***                         /*  display error and DON'T write INI settings - */
+;|***                         /*  this way the driver will never enable */
+;|***                         ConfigErrorMsgBox(hDlg, IDS_ERRBADVERSION);
+;|***                         break;
+;|***                     }
+;|*** 
+;|***                     /* high bit set if Thunder Board - warn them */
+;|***                     /* but continue installing */
+;|***                     if (HIWORD(dw) & 0x8000)
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNTHUNDER);
+;|*** 
+;|***                     /*  if installing on a Pro card, warn them */
+;|***                     /*  but continue installing */
+;|***                     else if (HIWORD(dw) >= DSP_VERSION_PRO)
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNPROCARD);
+;|*** 
+;|***                     /* settings are valid, so write them out */
+;|***                     wsprintf(buf, aszHexFormat, wNewPort);
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_PORT, buf, STR_INIFILE);
+;|***                     wsprintf(buf, aszIntFormat, bNewInt);
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_INT, buf, STR_INIFILE);
+;|*** 
+;|***                     dw = InitGetConfiguration();
+;|***                     if ((wNewPort != LOWORD(dw))||(bNewInt != (BYTE)HIWORD(dw)))
+;|***                         EndDialog(hDlg, DRVCNF_RESTART);
+;|***                     else
+;|***                         EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDCANCEL:
+;|***                     EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDC_210:
+;|***                 case IDC_220:
+;|***                 case IDC_230:
+;|***                 case IDC_240:
+;|***                 case IDC_250:
+;|***                 case IDC_260:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, wParam);
+;|***                     break;
+;|*** 
+;|***                 case IDC_2:
+;|***                 case IDC_3:
+;|***                 case IDC_5:
+;|***                 case IDC_7:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, wParam);
+;|***                     break;
+;|*** 
+;|***                 default:
+;|***                     break;
+;|***             }
+; Line 247
+	*** 000224	48 			dec	ax
+	*** 000225	74 29 			je	$SC2620
+	*** 000227	48 			dec	ax
+	*** 000228	75 03 			jne	$JCC552
+	*** 00022a	e9 07 01 		jmp	$L2645
+					$JCC552:
+	*** 00022d	2d fe 00 		sub	ax,254	;00feH
+	*** 000230	73 03 			jae	$JCC560
+	*** 000232	e9 2c 01 		jmp	$SB2609
+					$JCC560:
+	*** 000235	2d 03 00 		sub	ax,3
+	*** 000238	77 03 			ja	$JCC568
+	*** 00023a	e9 0a 01 		jmp	$SC2631
+					$JCC568:
+	*** 00023d	2d fe 00 		sub	ax,254	;00feH
+	*** 000240	73 03 			jae	$JCC576
+	*** 000242	e9 1c 01 		jmp	$SB2609
+					$JCC576:
+	*** 000245	2d 05 00 		sub	ax,5
+	*** 000248	77 03 			ja	$JCC584
+	*** 00024a	e9 05 01 		jmp	$SC2630
+					$JCC584:
+	*** 00024d	e9 11 01 		jmp	$SB2609
+;|***                 case IDOK:
+; Line 177
+					$SC2620:
+;|***                     dw = GetPortAndInt(hDlg);
+;|***                     wNewPort = LOWORD(dw);
+; Line 179
+	*** 000250	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000253	e8 0e ff 		call	GETPORTANDINT
+	*** 000256	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 000259	8b f0 			mov	si,ax
+;|***                     bNewInt  = (BYTE)HIWORD(dw);
+; Line 180
+	*** 00025b	8a 4e fe 		mov	cl,BYTE PTR [bp-2]
+	*** 00025e	88 4e fa 		mov	BYTE PTR [bp-6],cl	;bNewInt
+;|*** 
+;|***                     /*  we don't have a config option for DMA channel */
+;|***                     /*  so use the current setting */
+;|***                     bNewDMAChannel = (BYTE)(HIWORD(InitGetConfiguration())>>8);
+; Line 184
+	*** 000261	8b f8 			mov	di,ax
+	*** 000263	89 4e e4 		mov	WORD PTR [bp-28],cx
+	*** 000266	9a 00 00 00 00 		call	FAR PTR INITGETCONFIGURATION
+	*** 00026b	88 76 fb 		mov	BYTE PTR [bp-5],dh	;bNewDMAChannel
+;|*** 
+;|***                     /*  verify settings - if this fails, DO NOT WRITE INI */
+;|***                     /*  SETTINGS! */
+;|***                     if (LOWORD(dw = InitVerifyConfiguration(wNewPort, bNewInt, bNewDMAChannel)))
+; Line 188
+	*** 00026e	57 			push	di
+	*** 00026f	8a 46 e4 		mov	al,BYTE PTR [bp-28]
+	*** 000272	50 			push	ax
+	*** 000273	8a c6 			mov	al,dh
+	*** 000275	50 			push	ax
+	*** 000276	9a 00 00 00 00 		call	FAR PTR INITVERIFYCONFIGURATION
+	*** 00027b	89 46 fc 		mov	WORD PTR [bp-4],ax	;dw
+	*** 00027e	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 000281	0b c0 			or	ax,ax
+	*** 000283	74 0a 			je	$I2621
+;|***                     {
+;|***                         ConfigErrorMsgBox(hDlg, LOWORD(dw));
+; Line 190
+	*** 000285	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000288	50 			push	ax
+					$L2643:
+	*** 000289	e8 6e fe 		call	CONFIGERRORMSGBOX
+;|***                         break;
+; Line 191
+	*** 00028c	e9 d2 00 		jmp	$SB2609
+;|***                     }
+;|*** 
+;|***                     /*  do NOT allow driver to install on < 2.00 DSP!! */
+;|***                     if (HIWORD(dw) < DSP_VERSION_REQD) {
+; Line 195
+					$I2621:
+	*** 00028f	8b c2 			mov	ax,dx
+	*** 000291	89 56 e2 		mov	WORD PTR [bp-30],dx
+	*** 000294	3d 00 02 		cmp	ax,512	;0200H
+	*** 000297	73 07 			jae	$I2622
+;|***                         /*  display error and DON'T write INI settings - */
+;|***                         /*  this way the driver will never enable */
+;|***                         ConfigErrorMsgBox(hDlg, IDS_ERRBADVERSION);
+; Line 198
+	*** 000299	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 00029c	6a 05 			push	5
+	*** 00029e	eb e9 			jmp	SHORT $L2643
+;|***                         break;
+;|***                     }
+;|*** 
+;|***                     /* high bit set if Thunder Board - warn them */
+;|***                     /* but continue installing */
+;|***                     if (HIWORD(dw) & 0x8000)
+; Line 204
+					$I2622:
+	*** 0002a0	f6 46 e3 80 		test	BYTE PTR [bp-29],128	;0080H
+	*** 0002a4	74 07 			je	$I2623
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNTHUNDER);
+; Line 205
+	*** 0002a6	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 0002a9	6a 12 			push	18	;0012H
+	*** 0002ab	eb 0c 			jmp	SHORT $L2644
+					$I2623:
+	*** 0002ad	81 7e e2 00 03 		cmp	WORD PTR [bp-30],768	;0300H
+	*** 0002b2	72 08 			jb	$I2624
+;|*** 
+;|***                     /*  if installing on a Pro card, warn them */
+;|***                     /*  but continue installing */
+;|***                     else if (HIWORD(dw) >= DSP_VERSION_PRO)
+;|***                         ConfigErrorMsgBox(hDlg, IDS_WARNPROCARD);
+; Line 210
+	*** 0002b4	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 0002b7	6a 11 			push	17	;0011H
+					$L2644:
+	*** 0002b9	e8 3e fe 		call	CONFIGERRORMSGBOX
+;|*** 
+;|***                     /* settings are valid, so write them out */
+;|***                     wsprintf(buf, aszHexFormat, wNewPort);
+; Line 213
+					$I2624:
+	*** 0002bc	56 			push	si
+	*** 0002bd	0e 			push	cs
+	*** 0002be	68 00 00 		push	OFFSET _aszHexFormat
+	*** 0002c1	8d 46 e6 		lea	ax,WORD PTR [bp-26]	;buf
+	*** 0002c4	16 			push	ss
+	*** 0002c5	50 			push	ax
+	*** 0002c6	9a 00 00 00 00 		call	FAR PTR _wsprintf
+	*** 0002cb	83 c4 0a 		add	sp,10	;000aH
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_PORT, buf, STR_INIFILE);
+; Line 214
+	*** 0002ce	68 00 00 		push	SEG _STR_DRIVERNAME
+	*** 0002d1	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 0002d4	68 00 00 		push	SEG _STR_PORT
+	*** 0002d7	68 00 00 		push	OFFSET _STR_PORT
+	*** 0002da	8d 46 e6 		lea	ax,WORD PTR [bp-26]	;buf
+	*** 0002dd	16 			push	ss
+	*** 0002de	50 			push	ax
+	*** 0002df	68 00 00 		push	SEG _STR_INIFILE
+	*** 0002e2	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 0002e5	9a 00 00 00 00 		call	FAR PTR WRITEPRIVATEPROFILESTRING
+;|***                     wsprintf(buf, aszIntFormat, bNewInt);
+; Line 215
+	*** 0002ea	8a 46 fa 		mov	al,BYTE PTR [bp-6]	;bNewInt
+	*** 0002ed	2a e4 			sub	ah,ah
+	*** 0002ef	50 			push	ax
+	*** 0002f0	0e 			push	cs
+	*** 0002f1	68 00 00 		push	OFFSET _aszIntFormat
+	*** 0002f4	8d 46 e6 		lea	ax,WORD PTR [bp-26]	;buf
+	*** 0002f7	16 			push	ss
+	*** 0002f8	50 			push	ax
+	*** 0002f9	9a 00 00 00 00 		call	FAR PTR _wsprintf
+	*** 0002fe	83 c4 0a 		add	sp,10	;000aH
+;|***                     WritePrivateProfileString(STR_DRIVERNAME, STR_INT, buf, STR_INIFILE);
+; Line 216
+	*** 000301	68 00 00 		push	SEG _STR_DRIVERNAME
+	*** 000304	68 00 00 		push	OFFSET _STR_DRIVERNAME
+	*** 000307	68 00 00 		push	SEG _STR_INT
+	*** 00030a	68 00 00 		push	OFFSET _STR_INT
+	*** 00030d	8d 46 e6 		lea	ax,WORD PTR [bp-26]	;buf
+	*** 000310	16 			push	ss
+	*** 000311	50 			push	ax
+	*** 000312	68 00 00 		push	SEG _STR_INIFILE
+	*** 000315	68 00 00 		push	OFFSET _STR_INIFILE
+	*** 000318	9a 00 00 00 00 		call	FAR PTR WRITEPRIVATEPROFILESTRING
+;|*** 
+;|***                     dw = InitGetConfiguration();
+;|***                     if ((wNewPort != LOWORD(dw))||(bNewInt != (BYTE)HIWORD(dw)))
+; Line 219
+	*** 00031d	9a 00 00 00 00 		call	FAR PTR INITGETCONFIGURATION
+	*** 000322	89 46 fc 		mov	WORD PTR [bp-4],ax	;dw
+	*** 000325	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 000328	3b c6 			cmp	ax,si
+	*** 00032a	75 14 			jne	$I2627
+	*** 00032c	8a 46 fa 		mov	al,BYTE PTR [bp-6]	;bNewInt
+	*** 00032f	38 46 fe 		cmp	BYTE PTR [bp-2],al
+	*** 000332	75 0c 			jne	$I2627
+;|***                         EndDialog(hDlg, DRVCNF_RESTART);
+;|***                     else
+;|***                         EndDialog(hDlg, DRVCNF_CANCEL);
+; Line 222
+					$L2645:
+	*** 000334	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000337	6a 00 			push	0
+					$L2646:
+	*** 000339	9a 00 00 00 00 		call	FAR PTR ENDDIALOG
+;|***                     break;
+; Line 223
+	*** 00033e	eb 21 			jmp	SHORT $SB2609
+;|***                     if ((wNewPort != LOWORD(dw))||(bNewInt != (BYTE)HIWORD(dw)))
+; Line 219
+					$I2627:
+;|***                         EndDialog(hDlg, DRVCNF_RESTART);
+; Line 220
+	*** 000340	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000343	6a 02 			push	2
+	*** 000345	eb f2 			jmp	SHORT $L2646
+					$SC2631:
+;|***                     else
+;|***                         EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDCANCEL:
+;|***                     EndDialog(hDlg, DRVCNF_CANCEL);
+;|***                     break;
+;|*** 
+;|***                 case IDC_210:
+;|***                 case IDC_220:
+;|***                 case IDC_230:
+;|***                 case IDC_240:
+;|***                 case IDC_250:
+;|***                 case IDC_260:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, wParam);
+;|***                     break;
+;|*** 
+;|***                 case IDC_2:
+;|***                 case IDC_3:
+;|***                 case IDC_5:
+;|***                 case IDC_7:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, wParam);
+; Line 242
+	*** 000347	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 00034a	68 00 01 		push	256	;0100H
+	*** 00034d	68 03 01 		push	259	;0103H
+	*** 000350	eb 09 			jmp	SHORT $L2647
+;|***                 case IDC_210:
+; Line 229
+					$SC2630:
+;|***                 case IDC_220:
+;|***                 case IDC_230:
+;|***                 case IDC_240:
+;|***                 case IDC_250:
+;|***                 case IDC_260:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTPORT, IDC_LASTPORT, wParam);
+; Line 235
+	*** 000352	ff 76 0e 		push	WORD PTR [bp+14]	;hDlg
+	*** 000355	68 01 02 		push	513	;0201H
+	*** 000358	68 06 02 		push	518	;0206H
+					$L2647:
+	*** 00035b	51 			push	cx
+					$L2642:
+	*** 00035c	9a 00 00 00 00 		call	FAR PTR CHECKRADIOBUTTON
+;|***                     break;
+;|*** 
+;|***                 case IDC_2:
+;|***                 case IDC_3:
+;|***                 case IDC_5:
+;|***                 case IDC_7:
+;|***                     CheckRadioButton(hDlg, IDC_FIRSTINT, IDC_LASTINT, wParam);
+;|***                     break;
+;|*** 
+;|***                 default:
+;|***                     break;
+;|***             }
+;|***             break;
+;|*** 
+;|***         default:
+;|***             return FALSE;
+;|***     }
+; Line 252
+					$SB2609:
+;|*** 
+;|***     return TRUE;
+; Line 254
+	*** 000361	b8 01 00 		mov	ax,1
+;|*** }
+; Line 255
+					$EX2601:
+	*** 000364	1f 			pop	ds
+	*** 000365	5e 			pop	si
+	*** 000366	5f 			pop	di
+	*** 000367	c9 			leave	
+	*** 000368	ca 0a 00 		ret	10	;0000000aH
+	*** 00036b	90 			nop	
+
+CONFIGDLGPROC	ENDP
+INIT	ENDS
+END

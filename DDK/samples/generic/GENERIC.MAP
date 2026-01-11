@@ -1,0 +1,35 @@
+
+ VXD
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000021H _LTEXT                 CODE 32-bit
+ 0001:00000024 000000038H _LDATA                 CODE 32-bit
+ 0002:00000000 000000008H _ITEXT                 ICODE 32-bit
+ 0002:00000008 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000015H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000024 VXD_DDB                 VXD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000008       VXD_Control
+ 0001:00000000       VXD_Create_VM
+ 0001:00000024       VXD_DDB
+ 0002:00000000       VXD_Device_Init
+
+  Address         Publics by Value
+
+ 0001:00000000       VXD_Create_VM
+ 0001:00000008       VXD_Control
+ 0001:00000024       VXD_DDB
+ 0002:00000000       VXD_Device_Init

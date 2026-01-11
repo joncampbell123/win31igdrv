@@ -1,0 +1,1932 @@
+;	Static Name Aliases
+;
+	TITLE   init.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_TEXT	SEGMENT  WORD PUBLIC 'CODE'
+_TEXT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _aszDriverName
+PUBLIC  _aszProductName
+PUBLIC  _aszAdlibDelay
+PUBLIC  _aszSystemIni
+PUBLIC  _aszAdlib
+PUBLIC  _aszMMDebug
+PUBLIC  _wPort
+EXTRN	__acrtused:ABS
+EXTRN	INPORT:FAR
+EXTRN	SETFREQ:FAR
+EXTRN	SNDOUTPUT:FAR
+EXTRN	SNDSAMVIBRHYTHM:FAR
+EXTRN	SNDSNOTESEL:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	GETWINFLAGS:FAR
+EXTRN	GLOBALUNLOCK:FAR
+EXTRN	FINDRESOURCE:FAR
+EXTRN	LOADRESOURCE:FAR
+EXTRN	FREERESOURCE:FAR
+EXTRN	LOCKRESOURCE:FAR
+EXTRN	SIZEOFRESOURCE:FAR
+EXTRN	__aFlshr:FAR
+EXTRN	__aFFalmul:FAR
+EXTRN	__aFFaldiv:FAR
+EXTRN	GETPROFILEINT:FAR
+EXTRN	__aFlmul:FAR
+EXTRN	__aFldiv:FAR
+EXTRN	VADLIBDGETENTRYPOINT:FAR
+EXTRN	VADLIBDACQUIREADLIBSYNTH:FAR
+EXTRN	VADLIBDRELEASEADLIBSYNTH:FAR
+_BSS      SEGMENT
+COMM NEAR	_wDebugLevel:	BYTE:	 2
+COMM NEAR	_fEnabled:	BYTE:	 2
+COMM NEAR	_patches:	 30:	 180
+COMM NEAR	_drumpatch:	 2:	 47
+_BSS      ENDS
+EXTRN	_wWriteDelay:WORD
+EXTRN	_slotRelVolume:BYTE
+EXTRN	_percBits:BYTE
+EXTRN	_amDepth:BYTE
+EXTRN	_vibDepth:BYTE
+EXTRN	_noteSel:BYTE
+EXTRN	_modeWaveSel:BYTE
+EXTRN	_fPercussion:WORD
+EXTRN	_pitchRangeStep:WORD
+EXTRN	_fNumNotes:BYTE
+EXTRN	_fNumFreqPtr:BYTE
+EXTRN	_halfToneOffset:BYTE
+EXTRN	_noteDIV12:BYTE
+EXTRN	_noteMOD12:BYTE
+EXTRN	_offsetSlot:BYTE
+_BSS      SEGMENT
+COMM NEAR	_ghInstance:	BYTE:	 2
+COMM NEAR	_fInit:	BYTE:	 2
+_BSS      ENDS
+_DATA      SEGMENT
+_wPort	DW	0388H
+$SG2559	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2560	DB	'SoundColdInit',  00H
+$SG2565	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2566	DB	'SoundWarmInit',  00H
+$SG2575	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2576	DB	'BoardInstalled',  00H
+$SG2596	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2597	DB	'Set3812',  00H
+$SG2629	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2630	DB	'SoundChut',  00H
+$SG2668	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2669	DB	'Default bank resource not found',  00H
+$SG2672	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2673	DB	'Bank resource not loaded',  00H
+$SG2676	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2677	DB	'Bank resource not locked',  00H
+$SG2679	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2680	DB	'loading patches',  00H
+$SG2686	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2687	DB	'Attempt to read past end of bank resource',  00H
+$SG2699	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2700	DB	'Default drum resource not found',  00H
+$SG2703	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2704	DB	'Drum resource not loaded',  00H
+$SG2707	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2708	DB	'Drum resource not locked',  00H
+$SG2710	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2711	DB	'reading drum data',  00H
+$SG2718	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2719	DB	'Drum patch key out of range',  00H
+$SG2722	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2723	DB	'Attempt to read past end of drum resource',  00H
+$SG2726	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2727	DB	'Enable',  00H
+$SG2730	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2731	DB	'AdLib could NOT be aquired for ENABLE!!!',  00H
+$SG2739	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2740	DB	'AdLib could NOT be RELEASED for ENABLE!!! VERY GOOFY!!',  00H
+$SG2743	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2744	DB	'Disable',  00H
+$SG2748	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2749	DB	'AdLib could NOT be aquired for DISABLE!!!',  00H
+$SG2752	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2753	DB	'AdLib could NOT be RELEASED for DISABLE!!!',  00H
+$SG2764	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2765	DB	'LibMain',  00H
+_DATA      ENDS
+_TEXT      SEGMENT
+	ASSUME	CS: _TEXT
+	PUBLIC	_SoundColdInit
+_SoundColdInit	PROC NEAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   init.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #define  NOSTR                  /* to avoid redefining the strings */
+;|*** #include "adlib.h"
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** void FAR SoundWarmInit(void);
+;|*** 
+;|*** static int  NEAR SoundColdInit(void);
+;|*** /*static void NEAR SoundWarmInit(void); */
+;|*** static int  NEAR BoardInstalled(void);
+;|*** static void NEAR SetMode(BYTE mode);
+;|*** static void NEAR SetGParam(BYTE amD, BYTE vibD, BYTE nSel);
+;|*** static void NEAR Set3812(BYTE state);
+;|*** static void NEAR InitSlotVolume(void);
+;|*** static void NEAR InitFNums(void);
+;|*** static void NEAR SoundChut(BYTE voice);
+;|*** static void NEAR SetPitchRange(WORD pR);
+;|*** static void NEAR SetFNum(NPWORD fNumVec, int num, int den);
+;|*** static long NEAR CalcPremFNum(int numDeltaDemiTon, int denDeltaDemiTon);
+;|*** static int  NEAR PASCAL LoadPatches(void);
+;|*** static int  NEAR PASCAL LoadDrumPatches(void);
+;|*** 
+;|*** /*************************************************************************
+;|*** 
+;|***     public data
+;|*** 
+;|*** *************************************************************************/
+;|*** 
+;|*** WORD      wPort = DEF_PORT;             /* address of sound chip */
+;|*** BOOL      fEnabled;                     /* are we enabled? */
+;|*** TIMBRE    patches[MAXPATCH];            /* patch data  */
+;|*** DRUMPATCH drumpatch[NUMDRUMNOTES];      /* drum kit data */
+;|*** 
+;|*** #ifdef DEBUG
+;|*** WORD      wDebugLevel;                  /* debug level */
+;|*** #endif
+;|*** 
+;|*** /*************************************************************************
+;|*** 
+;|***     strings
+;|*** 
+;|*** *************************************************************************/
+;|*** 
+;|*** #define BCODE _based(_segname("_CODE"))
+;|*** 
+;|*** /*non-localized strings */
+;|*** char BCODE aszDriverName[]  = "adlib.drv";
+;|*** char BCODE aszProductName[] = "Ad Lib";
+;|*** char BCODE aszAdlibDelay[]  = "WriteDelay";
+;|*** char BCODE aszSystemIni[]   = "system.ini";
+;|*** #ifdef DEBUG
+;|***     char BCODE aszAdlib[]   = "adlib";
+;|***     char BCODE aszMMDebug[] = "mmdebug";
+;|*** #endif
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     local data
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** static HANDLE ghInstance;           /* our global instance */
+;|*** static BOOL   fInit;                /* have we initialized yet? */
+;|*** 
+;|*** /* format of drumkit.bin file */
+;|*** typedef struct drumfilepatch_tag {
+;|***     BYTE key;                   /* the key to map */
+;|***     BYTE patch;                 /* the patch to use */
+;|***     BYTE note;                  /* the note to play  */
+;|*** } DRUMFILEPATCH, *NPDRUMFILEPATCH, FAR *LPDRUMFILEPATCH;
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     public functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | SoundColdInit | Must be called for start-up initialization.
+;|***  *
+;|***  * @rdesc Returns a nonzero value if the board is installed and zero otherwise.
+;|***  ***************************************************************************/
+;|*** static int NEAR SoundColdInit(void)
+;|*** {
+; Line 101
+	*** 000000	56 			push	si
+;	register si = hardware
+;|*** int hardware;
+;|*** 
+;|***     D1("SoundColdInit");
+; Line 104
+	*** 000001	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000006	72 12 			jb	$I2558
+	*** 000008	1e 			push	ds
+	*** 000009	68 00 00 		push	OFFSET DGROUP:$SG2559
+	*** 00000c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000011	1e 			push	ds
+	*** 000012	68 00 00 		push	OFFSET DGROUP:$SG2560
+	*** 000015	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     if (hardware = BoardInstalled())
+; Line 106
+					$I2558:
+	*** 00001a	e8 00 00 		call	_BoardInstalled
+	*** 00001d	8b f0 			mov	si,ax
+	*** 00001f	0b f0 			or	si,ax
+	*** 000021	74 04 			je	$I2561
+;|***         SoundWarmInit();
+; Line 107
+	*** 000023	0e 			push	cs
+	*** 000024	e8 00 00 		call	NEAR PTR _SoundWarmInit
+;|***     
+;|***     return hardware;
+; Line 109
+					$I2561:
+	*** 000027	8b c6 			mov	ax,si
+;|*** }
+; Line 110
+	*** 000029	5e 			pop	si
+	*** 00002a	c3 			ret	
+						_aszMMDebug	DB	'mmdebug',  00H
+						_aszAdlib	DB	'adlib',  00H
+						_aszSystemIni	DB	'system.ini',  00H
+						_aszAdlibDelay	DB	'WriteDelay',  00H
+						_aszProductName	DB	'Ad Lib',  00H
+						_aszDriverName	DB	'adlib.drv',  00H
+
+_SoundColdInit	ENDP
+	PUBLIC	_SoundWarmInit
+_SoundWarmInit	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SoundWarmInit | Initializes the chip in melodic mode (mode == 0).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR SoundWarmInit(void)
+;|*** {
+; Line 120
+	*** 000060	c8 02 00 00 		enter	2,0
+;	i = -1
+;|*** BYTE i;
+;|*** 
+;|***     D1("SoundWarmInit");
+; Line 123
+	*** 000064	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000069	72 12 			jb	$I2564
+	*** 00006b	1e 			push	ds
+	*** 00006c	68 00 00 		push	OFFSET DGROUP:$SG2565
+	*** 00006f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000074	1e 			push	ds
+	*** 000075	68 00 00 		push	OFFSET DGROUP:$SG2566
+	*** 000078	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     SetGParam(0, 0, 0);      /* init global parameters */
+; Line 125
+					$I2564:
+	*** 00007d	6a 00 			push	0
+	*** 00007f	6a 00 			push	0
+	*** 000081	6a 00 			push	0
+	*** 000083	e8 00 00 		call	_SetGParam
+	*** 000086	83 c4 06 		add	sp,6
+;|***     InitSlotVolume();        /* sets volume of each slot to MAXVOLUME */
+; Line 126
+	*** 000089	e8 00 00 		call	_InitSlotVolume
+;|***     InitFNums();             /* initializes frequency shift table to no shift */
+; Line 127
+	*** 00008c	e8 00 00 		call	_InitFNums
+;|***     for (i = 0 ; i <= 8; i++)
+; Line 128
+	*** 00008f	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;i
+					$F2567:
+;|***         SoundChut(i);        /* set frequencies of voices 0 - 8 to 0 */
+; Line 129
+	*** 000093	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 000096	50 			push	ax
+	*** 000097	e8 00 00 		call	_SoundChut
+	*** 00009a	5b 			pop	bx
+	*** 00009b	fe 46 ff 		inc	BYTE PTR [bp-1]	;i
+	*** 00009e	80 7e ff 08 		cmp	BYTE PTR [bp-1],8	;i
+	*** 0000a2	76 ef 			jbe	$F2567
+;|***     SetMode(1);              /* percussion mode (melodic mode == 0) */
+; Line 130
+	*** 0000a4	6a 01 			push	1
+	*** 0000a6	e8 00 00 		call	_SetMode
+	*** 0000a9	5b 			pop	bx
+;|***     SetPitchRange(2);        /* GMM pitch range is 2 semitones */
+; Line 131
+	*** 0000aa	6a 02 			push	2
+	*** 0000ac	e8 00 00 		call	_SetPitchRange
+	*** 0000af	5b 			pop	bx
+;|*** 
+;|*** #if 1
+;|***     Set3812(1);              /* sets wave-select parameter */
+; Line 134
+	*** 0000b0	6a 01 			push	1
+	*** 0000b2	e8 00 00 		call	_Set3812
+	*** 0000b5	5b 			pop	bx
+;|*** #else
+;|***     Set3812(0);              /* DOES NOT set wave-select parameter */
+;|*** #endif
+;|*** }
+; Line 138
+	*** 0000b6	c9 			leave	
+	*** 0000b7	cb 			ret	
+
+_SoundWarmInit	ENDP
+	PUBLIC	_BoardInstalled
+_BoardInstalled	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | BoardInstalled | Checks to see if the board is installed.
+;|***  *
+;|***  * @rdesc Returns a nonzero value if the board is installed and zero otherwise.
+;|***  ***************************************************************************/
+;|*** static int NEAR BoardInstalled(void)
+;|*** {
+; Line 148
+	*** 0000b8	c8 02 00 00 		enter	2,0
+;	t1 = -1
+;	t2 = -2
+;	i = -6
+;|*** BYTE t1, t2, i;
+;|*** 
+;|***     D1("BoardInstalled");
+; Line 151
+	*** 0000bc	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000c1	72 12 			jb	$I2574
+	*** 0000c3	1e 			push	ds
+	*** 0000c4	68 00 00 		push	OFFSET DGROUP:$SG2575
+	*** 0000c7	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000cc	1e 			push	ds
+	*** 0000cd	68 00 00 		push	OFFSET DGROUP:$SG2576
+	*** 0000d0	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     SndOutput(4, 0x60);             /* mask T1 & T2 */
+; Line 153
+					$I2574:
+	*** 0000d5	6a 04 			push	4
+	*** 0000d7	6a 60 			push	96	;0060H
+	*** 0000d9	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     SndOutput(4, 0x80);             /* reset IRQ */
+; Line 154
+	*** 0000de	6a 04 			push	4
+	*** 0000e0	68 80 00 		push	128	;0080H
+	*** 0000e3	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     t1 = inport();                  /* read status register */
+; Line 155
+	*** 0000e8	9a 00 00 00 00 		call	FAR PTR INPORT
+	*** 0000ed	88 46 ff 		mov	BYTE PTR [bp-1],al	;t1
+;|***     SndOutput(2, 0xff);             /* set timer - 1 latch */
+; Line 156
+	*** 0000f0	6a 02 			push	2
+	*** 0000f2	68 ff 00 		push	255	;00ffH
+	*** 0000f5	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     SndOutput(4, 0x21);             /* unmask & start T1 */
+; Line 157
+	*** 0000fa	6a 04 			push	4
+	*** 0000fc	6a 21 			push	33	;0021H
+	*** 0000fe	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     for (i = 0; i < 200; i++) {     /* 100 uSec delay for timer - 1 overflow */
+;|*** #ifdef STUPID
+;|***         inport();
+;|*** #else
+;|***         t2 = i;                     /* a delay of some sort... */
+;|*** #endif
+;|***     }
+;|***     t2 = inport();                  /* read status register */
+; Line 165
+	*** 000103	9a 00 00 00 00 		call	FAR PTR INPORT
+	*** 000108	88 46 fe 		mov	BYTE PTR [bp-2],al	;t2
+;|***     SndOutput(4, 0x60);
+; Line 166
+	*** 00010b	6a 04 			push	4
+	*** 00010d	6a 60 			push	96	;0060H
+	*** 00010f	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     SndOutput(4, 0x80);
+; Line 167
+	*** 000114	6a 04 			push	4
+	*** 000116	68 80 00 		push	128	;0080H
+	*** 000119	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     
+;|***     return (t1 & 0xE0) == 0 && (t2 & 0xE0) == 0xC0;
+; Line 169
+	*** 00011e	f6 46 ff e0 		test	BYTE PTR [bp-1],224	;00e0H	;t1
+	*** 000122	75 0e 			jne	$L2773
+	*** 000124	8a 46 fe 		mov	al,BYTE PTR [bp-2]	;t2
+	*** 000127	24 e0 			and	al,224	;00e0H
+	*** 000129	3c c0 			cmp	al,192	;00c0H
+	*** 00012b	75 05 			jne	$L2773
+	*** 00012d	b8 01 00 		mov	ax,1
+	*** 000130	c9 			leave	
+	*** 000131	c3 			ret	
+					$L2773:
+	*** 000132	33 c0 			xor	ax,ax
+;|*** }
+; Line 170
+	*** 000134	c9 			leave	
+	*** 000135	c3 			ret	
+
+_BoardInstalled	ENDP
+	PUBLIC	_SetMode
+_SetMode	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetMode | Puts the chip in melodic mode (mode == 0), or in
+;|***  *     percussive mode (mode != 0).
+;|***  *
+;|***  * @parm BYTE | mode | Specifies which mode to put the chip into.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR SetMode(BYTE mode)
+;|*** {
+; Line 183
+	*** 000136	55 			push	bp
+	*** 000137	8b ec 			mov	bp,sp
+;	mode = 4
+;|***     if (mode) {
+; Line 184
+	*** 000139	80 7e 04 00 		cmp	BYTE PTR [bp+4],0	;mode
+	*** 00013d	74 16 			je	$I2583
+;|***         SetFreq(TOM, TOM_PITCH, 0);        /* set frequency of TOM voice */
+; Line 185
+	*** 00013f	6a 08 			push	8
+	*** 000141	6a 18 			push	24	;0018H
+	*** 000143	6a 00 			push	0
+	*** 000145	9a 00 00 00 00 		call	FAR PTR SETFREQ
+;|***         SetFreq(SD, SD_PITCH, 0);          /* set frequency of SD voice */
+; Line 186
+	*** 00014a	6a 07 			push	7
+	*** 00014c	6a 1f 			push	31	;001fH
+	*** 00014e	6a 00 			push	0
+	*** 000150	9a 00 00 00 00 		call	FAR PTR SETFREQ
+;|***     }
+;|*** 
+;|***     fPercussion = mode;
+; Line 189
+					$I2583:
+	*** 000155	8a 46 04 		mov	al,BYTE PTR [bp+4]	;mode
+	*** 000158	2a e4 			sub	ah,ah
+	*** 00015a	a3 00 00 		mov	WORD PTR _fPercussion,ax
+;|***     percBits = 0;             /* initialize control bits of percussive voices */
+; Line 190
+	*** 00015d	88 26 00 00 		mov	BYTE PTR _percBits,ah
+;|*** 
+;|*** }
+; Line 192
+	*** 000161	c9 			leave	
+	*** 000162	c3 			ret	
+	*** 000163	90 			nop	
+
+_SetMode	ENDP
+	PUBLIC	_SetGParam
+_SetGParam	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetGParam | Sets the 3 global parameters AmDepth, VibDepth 
+;|***  *     and NoteSel.  The change takes place immediately.
+;|***  *
+;|***  * @parm BYTE | amD | The new AmDepth parameter.
+;|***  *
+;|***  * @parm BYTE | vibD | The new VibDepth parameter.
+;|***  *
+;|***  * @parm BYTE | nSel | The new NoteSel parameter.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR SetGParam(BYTE amD, BYTE vibD, BYTE nSel)
+;|*** {
+; Line 209
+	*** 000164	55 			push	bp
+	*** 000165	8b ec 			mov	bp,sp
+;	amD = 4
+;	vibD = 6
+;	nSel = 8
+;|***     amDepth = amD;
+; Line 210
+	*** 000167	8a 46 04 		mov	al,BYTE PTR [bp+4]	;amD
+	*** 00016a	a2 00 00 		mov	BYTE PTR _amDepth,al
+;|***     vibDepth = vibD;
+; Line 211
+	*** 00016d	8a 46 06 		mov	al,BYTE PTR [bp+6]	;vibD
+	*** 000170	a2 00 00 		mov	BYTE PTR _vibDepth,al
+;|***     noteSel = nSel;
+; Line 212
+	*** 000173	8a 46 08 		mov	al,BYTE PTR [bp+8]	;nSel
+	*** 000176	a2 00 00 		mov	BYTE PTR _noteSel,al
+;|*** 
+;|***     SndSAmVibRhythm();
+; Line 214
+	*** 000179	9a 00 00 00 00 		call	FAR PTR SNDSAMVIBRHYTHM
+;|***     SndSNoteSel();
+; Line 215
+	*** 00017e	9a 00 00 00 00 		call	FAR PTR SNDSNOTESEL
+;|*** }
+; Line 216
+	*** 000183	c9 			leave	
+	*** 000184	c3 			ret	
+	*** 000185	90 			nop	
+
+_SetGParam	ENDP
+	PUBLIC	_Set3812
+_Set3812	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | Set3812 | Enables (state != 0) or disables (state == 0) the
+;|***  *     wave-select parameters.
+;|***  *
+;|***  * @parm BYTE | state | Indicates whether to enable or disable the wave-select
+;|***  *     parameters.
+;|***  *
+;|***  * @comm If you do not want to use the wave-select parameters, call this
+;|***  *     function with a value of 0 AFTER calling SoundColdInit() or
+;|***  *     SoundWarmInit().
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR Set3812(BYTE state)
+;|*** {
+; Line 234
+	*** 000186	c8 02 00 00 		enter	2,0
+;	state = 4
+;	i = -1
+;|*** BYTE i;
+;|*** 
+;|***     D1("Set3812");
+; Line 237
+	*** 00018a	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00018f	72 12 			jb	$I2595
+	*** 000191	1e 			push	ds
+	*** 000192	68 00 00 		push	OFFSET DGROUP:$SG2596
+	*** 000195	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00019a	1e 			push	ds
+	*** 00019b	68 00 00 		push	OFFSET DGROUP:$SG2597
+	*** 00019e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     /* set waveform for each of the 18 slots to sine wave */
+;|***     for (i = 0; i < 18; i++)
+; Line 240
+					$I2595:
+	*** 0001a3	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;i
+					$F2598:
+;|***         SndOutput((BYTE)(0xE0 | offsetSlot[i]), 0);
+; Line 241
+	*** 0001a7	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;i
+	*** 0001aa	2a ff 			sub	bh,bh
+	*** 0001ac	8a 87 00 00 		mov	al,BYTE PTR _offsetSlot[bx]
+	*** 0001b0	0c e0 			or	al,224	;00e0H
+	*** 0001b2	50 			push	ax
+	*** 0001b3	6a 00 			push	0
+	*** 0001b5	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+	*** 0001ba	fe 46 ff 		inc	BYTE PTR [bp-1]	;i
+	*** 0001bd	80 7e ff 12 		cmp	BYTE PTR [bp-1],18	;0012H	;i
+	*** 0001c1	72 e4 			jb	$F2598
+;|*** 
+;|***     /* enable/disable the wave-select parameters */
+;|***     modeWaveSel = (BYTE)(state ? 0x20 : 0);
+;|***     SndOutput(1, modeWaveSel);
+; Line 245
+	*** 0001c3	6a 01 			push	1
+	*** 0001c5	80 7e 04 01 		cmp	BYTE PTR [bp+4],1	;state
+	*** 0001c9	f5 			cmc	
+	*** 0001ca	1a c0 			sbb	al,al
+	*** 0001cc	24 20 			and	al,32	;0020H
+	*** 0001ce	a2 00 00 		mov	BYTE PTR _modeWaveSel,al
+	*** 0001d1	50 			push	ax
+	*** 0001d2	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 246
+	*** 0001d7	c9 			leave	
+	*** 0001d8	c3 			ret	
+	*** 0001d9	90 			nop	
+
+_Set3812	ENDP
+	PUBLIC	_InitSlotVolume
+_InitSlotVolume	PROC NEAR
+;|*** 
+;|*** #if 0 /* never used */
+;|*** static void NEAR InitSlotParams(void);
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | InitSlotParams | In melodic mode, this function initializes all
+;|***  *     voices to electric-pianos.  In percussive mode, it initializes the 6
+;|***  *     melodic voices to electric-pianos and the 5 percussive voices to their
+;|***  *     default timbres.
+;|***  *
+;|***  * @comm This function is pointless because the timbre of each voice gets
+;|***  *     set as soon as the voice is allocated, so it's commented out. 
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR InitSlotParams(void)
+;|*** {
+;|*** /* definition of default melodic(electric piano) and percussive voices: */
+;|*** static BYTE pianoOpr0[] = { 1,  1, 3, 15,  5, 0, 1,  3, 15, 0, 0, 0, 1, 0 };
+;|*** static BYTE pianoOpr1[] = { 0,  1, 1, 15,  7, 0, 2,  4,  0, 0, 0, 1, 0, 0 };
+;|*** static BYTE bdOpr0[]    = { 0,  0, 0, 10,  4, 0, 8, 12, 11, 0, 0, 0, 1, 0 };
+;|*** static BYTE bdOpr1[]    = { 0,  0, 0, 13,  4, 0, 6, 15,  0, 0, 0, 0, 1, 0 };
+;|*** static BYTE sdOpr[]     = { 0, 12, 0, 15, 11, 0, 8,  5,  0, 0, 0, 0, 0, 0 };
+;|*** static BYTE tomOpr[]    = { 0,  4, 0, 15, 11, 0, 7,  5,  0, 0, 0, 0, 0, 0 };
+;|*** static BYTE cymbOpr[]   = { 0,  1, 0, 15, 11, 0, 5,  5,  0, 0, 0, 0, 0, 0 };
+;|*** static BYTE hhOpr[]     = { 0,  1, 0, 15, 11, 0, 7,  5,  0, 0, 0, 0, 0, 0 };
+;|*** 
+;|*** BYTE i;
+;|***         
+;|***     for (i = 0; i < 18; i++)
+;|***         if (operSlot[i])
+;|***             SetSlotParam(i, pianoOpr1, 0);
+;|***         else
+;|***             SetSlotParam(i, pianoOpr0, 0);
+;|***             
+;|***     if (fPercussion) {
+;|***         SetSlotParam(12, bdOpr0, 0);
+;|***         SetSlotParam(15, bdOpr1, 0);
+;|***         SetSlotParam(16, sdOpr, 0);
+;|***         SetSlotParam(14, tomOpr, 0);
+;|***         SetSlotParam(17, cymbOpr, 0);
+;|***         SetSlotParam(13, hhOpr, 0);
+;|***     }
+;|*** }
+;|*** #endif
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | InitSlotVolume | Sets the volume values in the <t slotRelVolume>
+;|***  *     array to MAXVOLUME.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR InitSlotVolume(void)
+;|*** {
+; Line 303
+	*** 0001da	57 			push	di
+;	i = -2
+	*** 0001db	b8 7f 7f 		mov	ax,32639	;7f7fH
+	*** 0001de	bb 00 00 		mov	bx,OFFSET _slotRelVolume
+	*** 0001e1	b9 09 00 		mov	cx,9
+	*** 0001e4	8b fb 			mov	di,bx
+	*** 0001e6	1e 			push	ds
+	*** 0001e7	07 			pop	es
+	*** 0001e8	f3 			rep
+	*** 0001e9	ab 			stosw
+;|*** int i;
+;|*** 
+;|***     for (i = 0; i < 18; i++)
+;|***         slotRelVolume[i] = MAXVOLUME;
+;|*** }
+; Line 308
+	*** 0001ea	5f 			pop	di
+	*** 0001eb	c3 			ret	
+
+_InitSlotVolume	ENDP
+	PUBLIC	_InitFNums
+_InitFNums	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | InitFNums | Initializes all lines of the frequency table
+;|***  *     (the <p fNumNotes> array). Each line represents 12 half-tones shifted
+;|***  *     by (n / NR_STEP_PITCH), where 'n' is the line number and ranges from
+;|***  *     1 to NR_STEP_PITCH.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR InitFNums(void)
+;|*** {
+; Line 321
+	*** 0001ec	c8 06 00 00 		enter	6,0
+	*** 0001f0	57 			push	di
+	*** 0001f1	56 			push	si
+;	i = -6
+;	j = -2
+;	k = -4
+;	register si = num
+;	numStep = -4
+;	row = -12
+;|*** WORD i, j, k;
+;|*** WORD num;           /* numerator */
+;|*** WORD numStep;       /* step value for numerator */
+;|*** WORD row;           /* row in the frequency table */
+;|*** 
+;|***     /* calculate each row in the fNumNotes table */
+;|***     numStep = 100 / NR_STEP_PITCH;
+; Line 328
+	*** 0001f2	c7 46 fc 04 00 		mov	WORD PTR [bp-4],4	;k
+;|***     for (num = row = 0; row < NR_STEP_PITCH; row++, num += numStep)
+; Line 329
+	*** 0001f7	33 f6 			xor	si,si
+	*** 0001f9	bf 00 00 		mov	di,OFFSET _fNumNotes
+	*** 0001fc	c7 46 fe 19 00 		mov	WORD PTR [bp-2],25	;0019H	;j
+					$F2613:
+;|***         SetFNum(fNumNotes[row], num, 100);
+; Line 330
+	*** 000201	6a 64 			push	100	;0064H
+	*** 000203	56 			push	si
+	*** 000204	57 			push	di
+	*** 000205	e8 00 00 		call	_SetFNum
+	*** 000208	83 c4 06 		add	sp,6
+	*** 00020b	83 c7 18 		add	di,24	;0018H
+;|***     for (num = row = 0; row < NR_STEP_PITCH; row++, num += numStep)
+; Line 329
+	*** 00020e	83 c6 04 		add	si,4
+	*** 000211	ff 4e fe 		dec	WORD PTR [bp-2]	;j
+	*** 000214	75 eb 			jne	$F2613
+;|***         SetFNum(fNumNotes[row], num, 100);
+; Line 330
+	*** 000216	33 c0 			xor	ax,ax
+	*** 000218	bb 00 00 		mov	bx,OFFSET _halfToneOffset
+	*** 00021b	b9 0b 00 		mov	cx,11	;000bH
+	*** 00021e	8b fb 			mov	di,bx
+	*** 000220	1e 			push	ds
+	*** 000221	07 			pop	es
+	*** 000222	f3 			rep
+	*** 000223	ab 			stosw
+	*** 000224	b8 00 00 		mov	ax,OFFSET _fNumNotes
+	*** 000227	bb 00 00 		mov	bx,OFFSET _fNumFreqPtr
+	*** 00022a	b9 0b 00 		mov	cx,11	;000bH
+	*** 00022d	8b fb 			mov	di,bx
+	*** 00022f	f3 			rep
+	*** 000230	ab 			stosw
+;|***         
+;|***     /* fNumFreqPtr has an element for each voice, pointing to the  */
+;|***     /* appropriate row in the fNumNotes table.  They're all initialized */
+;|***     /* to the first row, which represents no pitch shift. */
+;|***     for (i = 0; i < 11; i++) {
+;|***         fNumFreqPtr[i] = fNumNotes[0];
+;|***         halfToneOffset[i] = 0;
+;|***     }
+;|*** 
+;|***     /* just for optimization */
+;|***     for (i = 0, k = 0; i < 8; i++)
+; Line 341
+	*** 000231	33 db 			xor	bx,bx
+	*** 000233	89 5e fc 		mov	WORD PTR [bp-4],bx	;k
+					$F2619:
+;|***         for (j = 0; j < 12; j++, k++) {
+; Line 342
+	*** 000236	c7 46 fe 00 00 		mov	WORD PTR [bp-2],0	;j
+	*** 00023b	8b c3 			mov	ax,bx
+	*** 00023d	8b 76 fc 		mov	si,WORD PTR [bp-4]	;k
+	*** 000240	b9 06 00 		mov	cx,6
+	*** 000243	8d bc 00 00 		lea	di,WORD PTR _noteDIV12[si]
+	*** 000247	1e 			push	ds
+	*** 000248	07 			pop	es
+	*** 000249	8a e0 			mov	ah,al
+	*** 00024b	f3 			rep
+	*** 00024c	ab 			stosw
+	*** 00024d	89 5e fa 		mov	WORD PTR [bp-6],bx	;i
+	*** 000250	8b 5e fe 		mov	bx,WORD PTR [bp-2]	;j
+					$F2622:
+;|***             noteDIV12[k] = (BYTE)i;
+;|***             noteMOD12[k] = (BYTE)j;
+; Line 344
+	*** 000253	88 9c 00 00 		mov	BYTE PTR _noteMOD12[si],bl
+;|***         for (j = 0; j < 12; j++, k++) {
+; Line 342
+	*** 000257	46 			inc	si
+	*** 000258	43 			inc	bx
+	*** 000259	83 fb 0c 		cmp	bx,12	;000cH
+	*** 00025c	72 f5 			jb	$F2622
+	*** 00025e	89 76 fc 		mov	WORD PTR [bp-4],si	;k
+;|***     for (i = 0, k = 0; i < 8; i++)
+; Line 341
+	*** 000261	8b 5e fa 		mov	bx,WORD PTR [bp-6]	;i
+	*** 000264	43 			inc	bx
+	*** 000265	83 fb 08 		cmp	bx,8
+	*** 000268	72 cc 			jb	$F2619
+;|***         for (j = 0; j < 12; j++, k++) {
+;|***             noteDIV12[k] = (BYTE)i;
+;|***             noteMOD12[k] = (BYTE)j;
+;|***         }
+;|*** }
+; Line 346
+	*** 00026a	5e 			pop	si
+	*** 00026b	5f 			pop	di
+	*** 00026c	c9 			leave	
+	*** 00026d	c3 			ret	
+
+_InitFNums	ENDP
+	PUBLIC	_SoundChut
+_SoundChut	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SoundChut | Sets the frequency of voice <p voice> to 0 Hz.
+;|***  *
+;|***  * @parm BYTE | voice | Specifies which voice to set.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR SoundChut(BYTE voice)
+;|*** {
+; Line 358
+	*** 00026e	55 			push	bp
+	*** 00026f	8b ec 			mov	bp,sp
+;	voice = 4
+;|***     D1("SoundChut");
+; Line 359
+	*** 000271	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000276	72 12 			jb	$I2628
+	*** 000278	1e 			push	ds
+	*** 000279	68 00 00 		push	OFFSET DGROUP:$SG2629
+	*** 00027c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000281	1e 			push	ds
+	*** 000282	68 00 00 		push	OFFSET DGROUP:$SG2630
+	*** 000285	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     SndOutput((BYTE)(0xA0 | voice), 0);
+; Line 361
+					$I2628:
+	*** 00028a	8a 46 04 		mov	al,BYTE PTR [bp+4]	;voice
+	*** 00028d	0c a0 			or	al,160	;00a0H
+	*** 00028f	50 			push	ax
+	*** 000290	6a 00 			push	0
+	*** 000292	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|***     SndOutput((BYTE)(0xB0 | voice), 0);
+; Line 362
+	*** 000297	8a 46 04 		mov	al,BYTE PTR [bp+4]	;voice
+	*** 00029a	0c b0 			or	al,176	;00b0H
+	*** 00029c	50 			push	ax
+	*** 00029d	6a 00 			push	0
+	*** 00029f	9a 00 00 00 00 		call	FAR PTR SNDOUTPUT
+;|*** }
+; Line 363
+	*** 0002a4	c9 			leave	
+	*** 0002a5	c3 			ret	
+
+_SoundChut	ENDP
+	PUBLIC	_SetPitchRange
+_SetPitchRange	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetPitchRange | This routine changes the global pitch bend
+;|***  *      range value.
+;|***  *
+;|***  * @parm WORD | pR | The new pitch bend range.
+;|***  *
+;|***  * @comm The value can be from 1 to 12 (in half-tones).  For example, the
+;|***  *     value 12 means that the pitch bend will range from -12 (pitchBend == 0,
+;|***  *     see <f xSetVoicePitch>) to +12 (pitchBend == 0x3fff) half-tones.  The
+;|***  *     change will be effective as of the next call to <f xSetVoicePitch>.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR SetPitchRange(WORD pR)
+;|*** {
+; Line 381
+	*** 0002a6	55 			push	bp
+	*** 0002a7	8b ec 			mov	bp,sp
+;	pR = 4
+	*** 0002a9	8b 5e 04 		mov	bx,WORD PTR [bp+4]	;pR
+;|***     if (pR > 12)
+; Line 382
+	*** 0002ac	83 fb 0c 		cmp	bx,12	;000cH
+	*** 0002af	76 03 			jbe	$I2634
+;|***         pR = 12;
+; Line 383
+	*** 0002b1	bb 0c 00 		mov	bx,12	;000cH
+;|***     if (pR < 1)
+; Line 384
+					$I2634:
+	*** 0002b4	83 fb 01 		cmp	bx,1
+	*** 0002b7	73 03 			jae	$I2635
+;|***         pR = 1;
+; Line 385
+	*** 0002b9	bb 01 00 		mov	bx,1
+;|***     pitchRangeStep = pR * NR_STEP_PITCH;
+; Line 386
+					$I2635:
+	*** 0002bc	6b c3 19 		imul	ax,bx,25	;0019H
+	*** 0002bf	a3 00 00 		mov	WORD PTR _pitchRangeStep,ax
+;|*** }
+; Line 387
+	*** 0002c2	c9 			leave	
+	*** 0002c3	c3 			ret	
+
+_SetPitchRange	ENDP
+	PUBLIC	_SetFNum
+_SetFNum	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | SetFNum | Initializes a line in the frequency table with
+;|***  *     shifted frequency values.  The values are shifted a fraction (num/den)
+;|***  *     of a half-tone.
+;|***  *
+;|***  * @parm NPWORD | fNumVec | The line from the frequency table.
+;|***  *
+;|***  * @parm int | num | Numerator.
+;|***  *
+;|***  * @parm int | den | Denominator.
+;|***  *
+;|***  * @xref CalcPremFNum
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR SetFNum(NPWORD fNumVec, int num, int den)
+;|*** {
+; Line 407
+	*** 0002c4	c8 04 00 00 		enter	4,0
+	*** 0002c8	57 			push	di
+	*** 0002c9	56 			push	si
+;	fNumVec = 4
+;	num = 6
+;	den = 8
+;	i = -2
+;	val = -4
+	*** 0002ca	8b 76 04 		mov	si,WORD PTR [bp+4]	;fNumVec
+;|*** int  i;
+;|*** long val;
+;|*** 
+;|***     *fNumVec++ = (WORD)((4 + (val = CalcPremFNum(num, den))) >> 3);
+; Line 411
+	*** 0002cd	ff 76 08 		push	WORD PTR [bp+8]	;den
+	*** 0002d0	ff 76 06 		push	WORD PTR [bp+6]	;num
+	*** 0002d3	e8 00 00 		call	_CalcPremFNum
+	*** 0002d6	83 c4 04 		add	sp,4
+	*** 0002d9	89 46 fc 		mov	WORD PTR [bp-4],ax	;val
+	*** 0002dc	89 56 fe 		mov	WORD PTR [bp-2],dx	;i
+	*** 0002df	05 04 00 		add	ax,4
+	*** 0002e2	83 d2 00 		adc	dx,0
+	*** 0002e5	b1 03 			mov	cl,3
+	*** 0002e7	9a 00 00 00 00 		call	FAR PTR __aFlshr
+	*** 0002ec	89 04 			mov	WORD PTR [si],ax
+	*** 0002ee	46 			inc	si
+	*** 0002ef	46 			inc	si
+	*** 0002f0	bf 0b 00 		mov	di,11	;000bH
+;|***     for (i = 1; i < 12; i++) {
+; Line 412
+					$F2645:
+;|***         val *= 106;
+; Line 413
+	*** 0002f3	6a 00 			push	0
+	*** 0002f5	6a 6a 			push	106	;006aH
+	*** 0002f7	8d 46 fc 		lea	ax,WORD PTR [bp-4]	;val
+	*** 0002fa	16 			push	ss
+	*** 0002fb	50 			push	ax
+	*** 0002fc	9a 00 00 00 00 		call	FAR PTR __aFFalmul
+;|***         *fNumVec++ = (WORD)((4 + (val /= 100)) >> 3);
+; Line 414
+	*** 000301	6a 00 			push	0
+	*** 000303	6a 64 			push	100	;0064H
+	*** 000305	8d 46 fc 		lea	ax,WORD PTR [bp-4]	;val
+	*** 000308	16 			push	ss
+	*** 000309	50 			push	ax
+	*** 00030a	9a 00 00 00 00 		call	FAR PTR __aFFaldiv
+	*** 00030f	8b c8 			mov	cx,ax
+	*** 000311	8b da 			mov	bx,dx
+	*** 000313	05 04 00 		add	ax,4
+	*** 000316	83 d2 00 		adc	dx,0
+	*** 000319	b1 03 			mov	cl,3
+	*** 00031b	9a 00 00 00 00 		call	FAR PTR __aFlshr
+	*** 000320	89 04 			mov	WORD PTR [si],ax
+	*** 000322	46 			inc	si
+	*** 000323	46 			inc	si
+	*** 000324	4f 			dec	di
+	*** 000325	75 cc 			jne	$F2645
+;|***     }
+;|*** }
+; Line 416
+	*** 000327	5e 			pop	si
+	*** 000328	5f 			pop	di
+	*** 000329	c9 			leave	
+	*** 00032a	c3 			ret	
+	*** 00032b	90 			nop	
+
+_SetFNum	ENDP
+	PUBLIC	_CalcPremFNum
+_CalcPremFNum	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api long | CalcPremFNum | Calculates some magic number that is used in
+;|***  *     setting the values in the <p fNumNotes> table.
+;|***  *
+;|***  * @parm int | numDeltaDemiTon | Numerator (-100 to +100).
+;|***  *
+;|***  * @parm int | denDeltaDemiTon | Denominator (1 to 100).
+;|***  *
+;|***  * @comm If the numerator (numDeltaDemiTon) is positive, the frequency is
+;|***  *     increased; if negative, it is decreased.  The function calculates:
+;|***  *         f8 = Fb(1 + 0.06 num /den)          (where Fb = 26044 * 2 / 25)
+;|***  *         fNum8 = f8 * 65536 * 72 / 3.58e6
+;|***  *
+;|***  * @rdesc Returns fNum8, which is the binary value of the frequency 260.44 (C)
+;|***  *     shifted by +/- <p numdeltaDemiTon> / <p denDeltaDemiTon> * 8.
+;|***  ***************************************************************************/
+;|*** static long NEAR CalcPremFNum(int numDeltaDemiTon, int denDeltaDemiTon)
+;|*** {
+; Line 437
+	*** 00032c	55 			push	bp
+	*** 00032d	8b ec 			mov	bp,sp
+	*** 00032f	57 			push	di
+	*** 000330	56 			push	si
+;	numDeltaDemiTon = 4
+;	denDeltaDemiTon = 6
+;	f8 = -4
+;	fNum8 = -8
+;	d100 = -12
+	*** 000331	8b 76 06 		mov	si,WORD PTR [bp+6]	;denDeltaDemiTon
+;|*** long f8;
+;|*** long fNum8;
+;|*** long d100;
+;|*** 
+;|***     d100 = denDeltaDemiTon * 100;
+;|***     f8 = (d100 + 6 * numDeltaDemiTon) * (26044L * 2L);
+;|***     f8 /= d100 * 25;
+;|*** 
+;|***     fNum8 = f8 * 16384;
+;|***     fNum8 *= 9L;
+;|***     fNum8 /= 179L * 625L;
+;|*** 
+;|***     return fNum8;
+; Line 450
+	*** 000334	6a 01 			push	1
+	*** 000336	68 03 b5 		push	-19197	;b503H
+	*** 000339	6a 02 			push	2
+	*** 00033b	68 00 40 		push	16384	;4000H
+	*** 00033e	6a 00 			push	0
+	*** 000340	6a 19 			push	25	;0019H
+	*** 000342	6b c6 64 		imul	ax,si,100	;0064H
+	*** 000345	99 			cwd	
+	*** 000346	52 			push	dx
+	*** 000347	50 			push	ax
+	*** 000348	8b f0 			mov	si,ax
+	*** 00034a	8b fa 			mov	di,dx
+	*** 00034c	9a 00 00 00 00 		call	FAR PTR __aFlmul
+	*** 000351	52 			push	dx
+	*** 000352	50 			push	ax
+	*** 000353	6a 00 			push	0
+	*** 000355	68 78 cb 		push	-13448	;cb78H
+	*** 000358	6b 46 04 06 		imul	ax,WORD PTR [bp+4],6	;numDeltaDemiTon
+	*** 00035c	99 			cwd	
+	*** 00035d	03 f0 			add	si,ax
+	*** 00035f	13 fa 			adc	di,dx
+	*** 000361	57 			push	di
+	*** 000362	56 			push	si
+	*** 000363	9a 00 00 00 00 		call	FAR PTR __aFlmul
+	*** 000368	52 			push	dx
+	*** 000369	50 			push	ax
+	*** 00036a	9a 00 00 00 00 		call	FAR PTR __aFldiv
+	*** 00036f	52 			push	dx
+	*** 000370	50 			push	ax
+	*** 000371	9a 00 00 00 00 		call	FAR PTR __aFlmul
+	*** 000376	52 			push	dx
+	*** 000377	50 			push	ax
+	*** 000378	9a 00 00 00 00 		call	FAR PTR __aFldiv
+;|*** }
+; Line 451
+	*** 00037d	5e 			pop	si
+	*** 00037e	5f 			pop	di
+	*** 00037f	c9 			leave	
+	*** 000380	c3 			ret	
+	*** 000381	90 			nop	
+
+_CalcPremFNum	ENDP
+	PUBLIC	LOADPATCHES
+LOADPATCHES	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | LoadPatches | Reads the patch set from the BANK resource and
+;|***  *     builds the <p patches> array.
+;|***  *
+;|***  * @rdesc Returns the number of patches loaded, or 0 if an error occurs.
+;|***  ***************************************************************************/
+;|*** static int NEAR PASCAL LoadPatches(void)
+;|*** {
+; Line 462
+	*** 000382	c8 12 00 00 		enter	18,0
+	*** 000386	57 			push	di
+	*** 000387	56 			push	si
+;	register si = hResInfo
+;	hResData = -18
+;	lpRes = -12
+;	iPatches = -8
+;	dwOffset = -4
+;	dwResSize = -16
+;	lpBankTimbre = -22
+;	lpPatchTimbre = -26
+;	lpBankHdr = -30
+;|*** HANDLE hResInfo;
+;|*** HANDLE hResData;
+;|*** LPSTR  lpRes;
+;|*** int    iPatches;
+;|*** DWORD  dwOffset;
+;|*** DWORD  dwResSize;
+;|*** LPTIMBRE  lpBankTimbre;
+;|*** LPTIMBRE  lpPatchTimbre;
+;|*** LPBANKHDR lpBankHdr;
+;|*** 
+;|***     /* find resource and get its size */
+;|***     hResInfo = FindResource(ghInstance, MAKEINTRESOURCE(DEFAULTBANK), MAKEINTRESOURCE(RT_BANK));
+;|***     if (!hResInfo) {
+; Line 475
+	*** 000388	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 00038c	6a 00 			push	0
+	*** 00038e	6a 01 			push	1
+	*** 000390	6a 00 			push	0
+	*** 000392	68 00 01 		push	256	;0100H
+	*** 000395	9a 00 00 00 00 		call	FAR PTR FINDRESOURCE
+	*** 00039a	8b f0 			mov	si,ax
+	*** 00039c	0b f0 			or	si,ax
+	*** 00039e	75 1e 			jne	$I2666
+;|***         D1("Default bank resource not found");
+; Line 476
+	*** 0003a0	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0003a5	72 12 			jb	$I2667
+	*** 0003a7	1e 			push	ds
+	*** 0003a8	68 00 00 		push	OFFSET DGROUP:$SG2668
+	*** 0003ab	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003b0	1e 			push	ds
+	*** 0003b1	68 00 00 		push	OFFSET DGROUP:$SG2669
+					$L2815:
+	*** 0003b4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return 0;
+; Line 477
+					$I2667:
+	*** 0003b9	33 c0 			xor	ax,ax
+	*** 0003bb	e9 0c 01 		jmp	$EX2656
+;|***     }
+;|***     dwResSize = (DWORD)SizeofResource(ghInstance, hResInfo);
+; Line 479
+					$I2666:
+	*** 0003be	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 0003c2	56 			push	si
+	*** 0003c3	9a 00 00 00 00 		call	FAR PTR SIZEOFRESOURCE
+	*** 0003c8	89 46 f0 		mov	WORD PTR [bp-16],ax	;dwResSize
+	*** 0003cb	89 56 f2 		mov	WORD PTR [bp-14],dx
+;|*** 
+;|***     /* load and lock resource */
+;|***     hResData = LoadResource(ghInstance, hResInfo);
+;|***     if (!hResData) {
+; Line 483
+	*** 0003ce	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 0003d2	56 			push	si
+	*** 0003d3	9a 00 00 00 00 		call	FAR PTR LOADRESOURCE
+	*** 0003d8	8b f8 			mov	di,ax
+	*** 0003da	0b f8 			or	di,ax
+	*** 0003dc	75 16 			jne	$I2670
+;|***         D1("Bank resource not loaded");
+; Line 484
+	*** 0003de	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0003e3	72 d4 			jb	$I2667
+	*** 0003e5	1e 			push	ds
+	*** 0003e6	68 00 00 		push	OFFSET DGROUP:$SG2672
+	*** 0003e9	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003ee	1e 			push	ds
+	*** 0003ef	68 00 00 		push	OFFSET DGROUP:$SG2673
+	*** 0003f2	eb c0 			jmp	SHORT $L2815
+;|***         return 0;
+;|***     }
+;|***     lpRes = LockResource(hResData);
+; Line 487
+					$I2670:
+;|***     if (!lpRes) {
+; Line 488
+	*** 0003f4	57 			push	di
+	*** 0003f5	9a 00 00 00 00 		call	FAR PTR LOCKRESOURCE
+	*** 0003fa	89 56 f6 		mov	WORD PTR [bp-10],dx
+	*** 0003fd	0b d0 			or	dx,ax
+	*** 0003ff	75 16 			jne	$L2805
+;|***         D1("Bank resource not locked");
+; Line 489
+	*** 000401	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000406	72 b1 			jb	$I2667
+	*** 000408	1e 			push	ds
+	*** 000409	68 00 00 		push	OFFSET DGROUP:$SG2676
+	*** 00040c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000411	1e 			push	ds
+	*** 000412	68 00 00 		push	OFFSET DGROUP:$SG2677
+	*** 000415	eb 9d 			jmp	SHORT $L2815
+					$L2805:
+	*** 000417	89 7e ee 		mov	WORD PTR [bp-18],di	;hResData
+	*** 00041a	89 46 f4 		mov	WORD PTR [bp-12],ax	;lpRes
+;|***         return 0;
+;|***     }
+;|*** 
+;|***     /* read the bank resource, loading patches as we find them */
+;|*** 
+;|***     D1("loading patches");
+; Line 495
+	*** 00041d	8b f8 			mov	di,ax
+	*** 00041f	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000424	72 12 			jb	$I2678
+	*** 000426	1e 			push	ds
+	*** 000427	68 00 00 		push	OFFSET DGROUP:$SG2679
+	*** 00042a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00042f	1e 			push	ds
+	*** 000430	68 00 00 		push	OFFSET DGROUP:$SG2680
+	*** 000433	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     lpBankHdr = (LPBANKHDR)lpRes;
+; Line 496
+					$I2678:
+;|***     dwOffset = lpBankHdr->offsetTimbre;                /* point to first one */
+; Line 497
+	*** 000438	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 00043b	26 8b 45 10 		mov	ax,WORD PTR es:[di+16]
+	*** 00043f	26 8b 55 12 		mov	dx,WORD PTR es:[di+18]
+	*** 000443	89 46 fc 		mov	WORD PTR [bp-4],ax	;dwOffset
+	*** 000446	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|*** 
+;|***     for (iPatches = 0; iPatches < MAXPATCH; iPatches++) {
+; Line 499
+	*** 000449	c7 46 f8 00 00 		mov	WORD PTR [bp-8],0	;iPatches
+	*** 00044e	c7 46 fa 00 00 		mov	WORD PTR [bp-6],OFFSET DGROUP:_patches
+					$F2681:
+;|*** 
+;|***         lpBankTimbre = (LPTIMBRE)(lpRes + dwOffset);
+;|***         lpPatchTimbre = &patches[iPatches];
+;|***         *lpPatchTimbre = *lpBankTimbre;
+; Line 503
+	*** 000453	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;dwOffset
+	*** 000456	03 46 f4 		add	ax,WORD PTR [bp-12]	;lpRes
+	*** 000459	8b 56 f6 		mov	dx,WORD PTR [bp-10]
+	*** 00045c	8b 5e fa 		mov	bx,WORD PTR [bp-6]
+	*** 00045f	1e 			push	ds
+	*** 000460	8b fb 			mov	di,bx
+	*** 000462	8b f0 			mov	si,ax
+	*** 000464	1e 			push	ds
+	*** 000465	07 			pop	es
+	*** 000466	8e da 			mov	ds,dx
+	ASSUME DS: NOTHING
+	*** 000468	b9 0f 00 		mov	cx,15	;000fH
+	*** 00046b	f3 			rep
+	*** 00046c	a5 			movsw
+	*** 00046d	1f 			pop	ds
+	ASSUME DS: DGROUP
+;|*** 
+;|***         dwOffset += sizeof(TIMBRE);
+;|***         if (dwOffset + sizeof(TIMBRE) > dwResSize) {
+; Line 506
+	*** 00046e	83 46 fc 1e 		add	WORD PTR [bp-4],30	;001eH	;dwOffset
+	*** 000472	83 56 fe 00 		adc	WORD PTR [bp-2],0
+	*** 000476	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;dwOffset
+	*** 000479	8b 56 fe 		mov	dx,WORD PTR [bp-2]
+	*** 00047c	05 1e 00 		add	ax,30	;001eH
+	*** 00047f	83 d2 00 		adc	dx,0
+	*** 000482	3b 56 f2 		cmp	dx,WORD PTR [bp-14]
+	*** 000485	77 17 			ja	$L2802
+	*** 000487	72 05 			jb	$L2806
+	*** 000489	3b 46 f0 		cmp	ax,WORD PTR [bp-16]	;dwResSize
+	*** 00048c	77 10 			ja	$L2802
+					$L2806:
+;|***     for (iPatches = 0; iPatches < MAXPATCH; iPatches++) {
+; Line 499
+	*** 00048e	83 46 fa 1e 		add	WORD PTR [bp-6],30	;001eH
+	*** 000492	ff 46 f8 		inc	WORD PTR [bp-8]	;iPatches
+	*** 000495	81 7e f8 b4 00 		cmp	WORD PTR [bp-8],180	;00b4H	;iPatches
+	*** 00049a	7c b7 			jl	$F2681
+	*** 00049c	eb 19 			jmp	SHORT $FB2683
+					$L2802:
+;|*** 
+;|***         lpBankTimbre = (LPTIMBRE)(lpRes + dwOffset);
+;|***         lpPatchTimbre = &patches[iPatches];
+;|***         *lpPatchTimbre = *lpBankTimbre;
+;|*** 
+;|***         dwOffset += sizeof(TIMBRE);
+;|***         if (dwOffset + sizeof(TIMBRE) > dwResSize) {
+;|***             D1("Attempt to read past end of bank resource");
+; Line 507
+	*** 00049e	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0004a3	72 12 			jb	$FB2683
+	*** 0004a5	1e 			push	ds
+	*** 0004a6	68 00 00 		push	OFFSET DGROUP:$SG2686
+	*** 0004a9	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0004ae	1e 			push	ds
+	*** 0004af	68 00 00 		push	OFFSET DGROUP:$SG2687
+	*** 0004b2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             break;
+;|***         }
+;|***     }
+; Line 510
+					$FB2683:
+;|*** 
+;|***     UnlockResource(hResData);
+; Line 512
+	*** 0004b7	ff 76 ee 		push	WORD PTR [bp-18]	;hResData
+	*** 0004ba	9a 00 00 00 00 		call	FAR PTR GLOBALUNLOCK
+;|***     FreeResource(hResData);
+; Line 513
+	*** 0004bf	ff 76 ee 		push	WORD PTR [bp-18]	;hResData
+	*** 0004c2	9a 00 00 00 00 		call	FAR PTR FREERESOURCE
+;|*** 
+;|***     return iPatches;
+; Line 515
+	*** 0004c7	8b 46 f8 		mov	ax,WORD PTR [bp-8]	;iPatches
+;|*** }
+; Line 516
+					$EX2656:
+	*** 0004ca	5e 			pop	si
+	*** 0004cb	5f 			pop	di
+	*** 0004cc	c9 			leave	
+	*** 0004cd	c3 			ret	
+
+LOADPATCHES	ENDP
+	PUBLIC	LOADDRUMPATCHES
+LOADDRUMPATCHES	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | LoadDrumPatches | Reads the drum kit patch set from the 
+;|***  *     DRUMKIT resource and builds the <p drumpatch> array. 
+;|***  *
+;|***  * @comm Each entry of the <t drumpatch> array (representing a key number
+;|***  *     from the "drum patch") consists of a patch number and note number
+;|***  *     from some other patch.
+;|***  *
+;|***  * @rdesc Returns the number of patches loaded, or 0 if an error occurs.
+;|***  ***************************************************************************/
+;|*** static int NEAR PASCAL LoadDrumPatches(void)
+;|*** {
+; Line 531
+	*** 0004ce	c8 14 00 00 		enter	20,0
+	*** 0004d2	57 			push	di
+	*** 0004d3	56 			push	si
+;	register si = hResInfo
+;	hResData = -20
+;	lpRes = -14
+;	iPatches = -10
+;	register cx = key
+;	dwOffset = -8
+;	dwResSize = -18
+;	lpResPatch = -4
+;|*** HANDLE hResInfo;
+;|*** HANDLE hResData;
+;|*** LPSTR  lpRes;
+;|*** int    iPatches;
+;|*** int    key;
+;|*** DWORD  dwOffset;
+;|*** DWORD  dwResSize;
+;|*** LPDRUMFILEPATCH lpResPatch;
+;|*** 
+;|***     /* find resource and get its size */
+;|***     hResInfo = FindResource(ghInstance, MAKEINTRESOURCE(DEFAULTDRUMKIT), MAKEINTRESOURCE(RT_DRUMKIT));
+;|***     if (!hResInfo) {
+; Line 543
+	*** 0004d4	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 0004d8	6a 00 			push	0
+	*** 0004da	6a 01 			push	1
+	*** 0004dc	6a 00 			push	0
+	*** 0004de	68 01 01 		push	257	;0101H
+	*** 0004e1	9a 00 00 00 00 		call	FAR PTR FINDRESOURCE
+	*** 0004e6	8b f0 			mov	si,ax
+	*** 0004e8	0b f0 			or	si,ax
+	*** 0004ea	75 1e 			jne	$I2697
+;|***         D1("Default drum resource not found");
+; Line 544
+	*** 0004ec	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0004f1	72 12 			jb	$I2698
+	*** 0004f3	1e 			push	ds
+	*** 0004f4	68 00 00 		push	OFFSET DGROUP:$SG2699
+	*** 0004f7	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0004fc	1e 			push	ds
+	*** 0004fd	68 00 00 		push	OFFSET DGROUP:$SG2700
+					$L2816:
+	*** 000500	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return 0;
+; Line 545
+					$I2698:
+	*** 000505	33 c0 			xor	ax,ax
+	*** 000507	e9 26 01 		jmp	$EX2688
+;|***     }
+;|***     dwResSize = (DWORD)SizeofResource(ghInstance, hResInfo);
+; Line 547
+					$I2697:
+	*** 00050a	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 00050e	56 			push	si
+	*** 00050f	9a 00 00 00 00 		call	FAR PTR SIZEOFRESOURCE
+	*** 000514	89 46 ee 		mov	WORD PTR [bp-18],ax	;dwResSize
+	*** 000517	89 56 f0 		mov	WORD PTR [bp-16],dx
+;|*** 
+;|***     /* load and lock resource */
+;|***     hResData = LoadResource(ghInstance, hResInfo);
+;|***     if (!hResData) {
+; Line 551
+	*** 00051a	ff 36 00 00 		push	WORD PTR _ghInstance
+	*** 00051e	56 			push	si
+	*** 00051f	9a 00 00 00 00 		call	FAR PTR LOADRESOURCE
+	*** 000524	8b f8 			mov	di,ax
+	*** 000526	0b f8 			or	di,ax
+	*** 000528	75 16 			jne	$I2701
+;|***         D1("Drum resource not loaded");
+; Line 552
+	*** 00052a	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00052f	72 d4 			jb	$I2698
+	*** 000531	1e 			push	ds
+	*** 000532	68 00 00 		push	OFFSET DGROUP:$SG2703
+	*** 000535	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00053a	1e 			push	ds
+	*** 00053b	68 00 00 		push	OFFSET DGROUP:$SG2704
+	*** 00053e	eb c0 			jmp	SHORT $L2816
+;|***         return 0;
+;|***     }
+;|***     lpRes = LockResource(hResData);
+; Line 555
+					$I2701:
+;|***     if (!lpRes) {
+; Line 556
+	*** 000540	57 			push	di
+	*** 000541	9a 00 00 00 00 		call	FAR PTR LOCKRESOURCE
+	*** 000546	89 46 f2 		mov	WORD PTR [bp-14],ax	;lpRes
+	*** 000549	89 56 f4 		mov	WORD PTR [bp-12],dx
+	*** 00054c	0b d0 			or	dx,ax
+	*** 00054e	75 16 			jne	$L2812
+;|***         D1("Drum resource not locked");
+; Line 557
+	*** 000550	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000555	72 ae 			jb	$I2698
+	*** 000557	1e 			push	ds
+	*** 000558	68 00 00 		push	OFFSET DGROUP:$SG2707
+	*** 00055b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000560	1e 			push	ds
+	*** 000561	68 00 00 		push	OFFSET DGROUP:$SG2708
+	*** 000564	eb 9a 			jmp	SHORT $L2816
+					$L2812:
+	*** 000566	89 7e ec 		mov	WORD PTR [bp-20],di	;hResData
+;|***         return 0;
+;|***     }
+;|*** 
+;|***     /* read the drum resource, loading patches as we find them */
+;|*** 
+;|***     D1("reading drum data");
+; Line 563
+	*** 000569	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00056e	72 12 			jb	$I2709
+	*** 000570	1e 			push	ds
+	*** 000571	68 00 00 		push	OFFSET DGROUP:$SG2710
+	*** 000574	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000579	1e 			push	ds
+	*** 00057a	68 00 00 		push	OFFSET DGROUP:$SG2711
+	*** 00057d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     dwOffset = 0;
+; Line 564
+					$I2709:
+	*** 000582	2b c0 			sub	ax,ax
+	*** 000584	89 46 fa 		mov	WORD PTR [bp-6],ax
+	*** 000587	89 46 f8 		mov	WORD PTR [bp-8],ax	;dwOffset
+;|***     for (iPatches = 0; iPatches < NUMDRUMNOTES; iPatches++) {
+; Line 565
+	*** 00058a	33 ff 			xor	di,di
+					$F2712:
+;|*** 
+;|***         lpResPatch = (LPDRUMFILEPATCH)(lpRes + dwOffset);
+; Line 567
+	*** 00058c	8b 46 f8 		mov	ax,WORD PTR [bp-8]	;dwOffset
+	*** 00058f	03 46 f2 		add	ax,WORD PTR [bp-14]	;lpRes
+	*** 000592	8b 56 f4 		mov	dx,WORD PTR [bp-12]
+	*** 000595	8b f0 			mov	si,ax
+;|***         key = lpResPatch->key;
+; Line 568
+	*** 000597	8b d8 			mov	bx,ax
+	*** 000599	8e c2 			mov	es,dx
+	*** 00059b	26 8a 0f 		mov	cl,BYTE PTR es:[bx]
+	*** 00059e	2a ed 			sub	ch,ch
+;|***         if ((key >= FIRSTDRUMNOTE) && (key <= LASTDRUMNOTE)) {
+; Line 569
+	*** 0005a0	83 f9 23 		cmp	cx,35	;0023H
+	*** 0005a3	7c 1b 			jl	$I2715
+	*** 0005a5	83 f9 51 		cmp	cx,81	;0051H
+	*** 0005a8	7f 16 			jg	$I2715
+;|***             drumpatch[key - FIRSTDRUMNOTE].patch = lpResPatch->patch;
+; Line 570
+	*** 0005aa	26 8a 44 01 		mov	al,BYTE PTR es:[si+1]
+	*** 0005ae	8b d9 			mov	bx,cx
+	*** 0005b0	03 d9 			add	bx,cx
+	*** 0005b2	88 87 ba ff 		mov	BYTE PTR _drumpatch[bx-70],al
+;|***             drumpatch[key - FIRSTDRUMNOTE].note = lpResPatch->note;
+; Line 571
+	*** 0005b6	26 8a 44 02 		mov	al,BYTE PTR es:[si+2]
+	*** 0005ba	88 87 bb ff 		mov	BYTE PTR _drumpatch[bx-69],al
+;|***         }
+;|***         else {
+; Line 573
+	*** 0005be	eb 19 			jmp	SHORT $I2716
+					$I2715:
+;|***             D1("Drum patch key out of range");
+; Line 574
+	*** 0005c0	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0005c5	72 12 			jb	$I2716
+	*** 0005c7	1e 			push	ds
+	*** 0005c8	68 00 00 		push	OFFSET DGROUP:$SG2718
+	*** 0005cb	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0005d0	1e 			push	ds
+	*** 0005d1	68 00 00 		push	OFFSET DGROUP:$SG2719
+	*** 0005d4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         }
+; Line 575
+					$I2716:
+;|*** 
+;|***         dwOffset += sizeof(DRUMFILEPATCH);
+;|***         if (dwOffset + sizeof(DRUMFILEPATCH) > dwResSize) {
+; Line 578
+	*** 0005d9	83 46 f8 03 		add	WORD PTR [bp-8],3	;dwOffset
+	*** 0005dd	83 56 fa 00 		adc	WORD PTR [bp-6],0
+	*** 0005e1	8b 46 f8 		mov	ax,WORD PTR [bp-8]	;dwOffset
+	*** 0005e4	8b 56 fa 		mov	dx,WORD PTR [bp-6]
+	*** 0005e7	05 03 00 		add	ax,3
+	*** 0005ea	83 d2 00 		adc	dx,0
+	*** 0005ed	3b 56 f0 		cmp	dx,WORD PTR [bp-16]
+	*** 0005f0	77 11 			ja	$L2811
+	*** 0005f2	72 05 			jb	$L2814
+	*** 0005f4	3b 46 ee 		cmp	ax,WORD PTR [bp-18]	;dwResSize
+	*** 0005f7	77 0a 			ja	$L2811
+					$L2814:
+	*** 0005f9	47 			inc	di
+	*** 0005fa	83 ff 2f 		cmp	di,47	;002fH
+	*** 0005fd	7c 8d 			jl	$F2712
+	*** 0005ff	8b f7 			mov	si,di
+	*** 000601	eb 1b 			jmp	SHORT $FB2714
+					$L2811:
+	*** 000603	8b f7 			mov	si,di
+;|***             D1("Attempt to read past end of drum resource");
+; Line 579
+	*** 000605	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00060a	72 12 			jb	$FB2714
+	*** 00060c	1e 			push	ds
+	*** 00060d	68 00 00 		push	OFFSET DGROUP:$SG2722
+	*** 000610	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000615	1e 			push	ds
+	*** 000616	68 00 00 		push	OFFSET DGROUP:$SG2723
+	*** 000619	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             break;
+;|***         }
+;|***     }
+; Line 582
+					$FB2714:
+;|*** 
+;|***     UnlockResource(hResData);
+; Line 584
+	*** 00061e	ff 76 ec 		push	WORD PTR [bp-20]	;hResData
+	*** 000621	9a 00 00 00 00 		call	FAR PTR GLOBALUNLOCK
+;|***     FreeResource(hResData);
+; Line 585
+	*** 000626	ff 76 ec 		push	WORD PTR [bp-20]	;hResData
+	*** 000629	9a 00 00 00 00 		call	FAR PTR FREERESOURCE
+;|*** 
+;|***     return iPatches;
+; Line 587
+	*** 00062e	8b c6 			mov	ax,si
+;|*** }
+; Line 588
+					$EX2688:
+	*** 000630	5e 			pop	si
+	*** 000631	5f 			pop	di
+	*** 000632	c9 			leave	
+	*** 000633	c3 			ret	
+
+LOADDRUMPATCHES	ENDP
+	PUBLIC	ENABLE
+ENABLE	PROC NEAR
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     public functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api BOOL | Enable | Enables the card.  If we haven't yet enabled in
+;|***  *     this session, it will do a cold restart of the card and load the
+;|***  *     patches; otherwise it will do a warm restart.
+;|***  *
+;|***  * @rdesc Returns TRUE if successful and false otherwise.
+;|***  ***************************************************************************/
+;|*** BOOL NEAR PASCAL Enable(void)
+;|*** {
+;|***     D1("Enable");
+; Line 607
+	*** 000634	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000639	72 12 			jb	$I2725
+	*** 00063b	1e 			push	ds
+	*** 00063c	68 00 00 		push	OFFSET DGROUP:$SG2726
+	*** 00063f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000644	1e 			push	ds
+	*** 000645	68 00 00 		push	OFFSET DGROUP:$SG2727
+	*** 000648	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     if (vadlibdAcquireAdLibSynth()) {
+; Line 609
+					$I2725:
+	*** 00064d	9a 00 00 00 00 		call	FAR PTR VADLIBDACQUIREADLIBSYNTH
+	*** 000652	0b c0 			or	ax,ax
+	*** 000654	74 1c 			je	$I2728
+;|***         D1("AdLib could NOT be aquired for ENABLE!!!");
+; Line 610
+	*** 000656	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00065b	72 12 			jb	$I2729
+	*** 00065d	1e 			push	ds
+	*** 00065e	68 00 00 		push	OFFSET DGROUP:$SG2730
+	*** 000661	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000666	1e 			push	ds
+	*** 000667	68 00 00 		push	OFFSET DGROUP:$SG2731
+	*** 00066a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return FALSE;
+; Line 611
+					$I2729:
+	*** 00066f	33 c0 			xor	ax,ax
+	*** 000671	c3 			ret	
+;|***     }
+;|*** 
+;|***     if (!fInit) {                        /* if we haven't initialized yet */
+; Line 614
+					$I2728:
+	*** 000672	83 3e 00 00 00 		cmp	WORD PTR _fInit,0
+	*** 000677	75 17 			jne	$I2732
+;|*** 
+;|***         if (!SoundColdInit())            /* if we can't find a card */
+; Line 616
+	*** 000679	e8 84 f9 		call	_SoundColdInit
+	*** 00067c	0b c0 			or	ax,ax
+	*** 00067e	74 ef 			je	$I2729
+;|***             return FALSE;                /* keep fInit set to FALSE */
+;|*** 
+;|***         if (!LoadPatches())              /* load the melodic patches */
+; Line 619
+	*** 000680	e8 ff fc 		call	LOADPATCHES
+	*** 000683	0b c0 			or	ax,ax
+	*** 000685	74 e8 			je	$I2729
+;|***             return FALSE;
+;|*** 
+;|***         if (!LoadDrumPatches())          /* load the drum kit information */
+; Line 622
+	*** 000687	e8 44 fe 		call	LOADDRUMPATCHES
+	*** 00068a	0b c0 			or	ax,ax
+	*** 00068c	75 06 			jne	$I2736
+	*** 00068e	eb df 			jmp	SHORT $I2729
+;|***             return FALSE;
+;|*** 
+;|***     }
+;|***     else {                               /* we've already initialized */
+; Line 626
+					$I2732:
+;|***         SoundWarmInit();                 /* so do a warm restart */
+; Line 627
+	*** 000690	0e 			push	cs
+	*** 000691	e8 00 00 		call	NEAR PTR _SoundWarmInit
+;|***     }
+; Line 628
+					$I2736:
+;|***         
+;|***     fInit = TRUE;                        /* say that we have initialized once */
+;|***     fEnabled = TRUE;                     /* say that we're enabled */
+; Line 631
+	*** 000694	b8 01 00 		mov	ax,1
+	*** 000697	a3 00 00 		mov	WORD PTR _fInit,ax
+	*** 00069a	a3 00 00 		mov	WORD PTR _fEnabled,ax
+;|***     
+;|***     if (vadlibdReleaseAdLibSynth())
+; Line 633
+	*** 00069d	9a 00 00 00 00 		call	FAR PTR VADLIBDRELEASEADLIBSYNTH
+	*** 0006a2	0b c0 			or	ax,ax
+	*** 0006a4	74 19 			je	$I2737
+;|***         D1("AdLib could NOT be RELEASED for ENABLE!!! VERY GOOFY!!");
+; Line 634
+	*** 0006a6	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0006ab	72 12 			jb	$I2737
+	*** 0006ad	1e 			push	ds
+	*** 0006ae	68 00 00 		push	OFFSET DGROUP:$SG2739
+	*** 0006b1	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0006b6	1e 			push	ds
+	*** 0006b7	68 00 00 		push	OFFSET DGROUP:$SG2740
+	*** 0006ba	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     return TRUE;
+; Line 636
+					$I2737:
+	*** 0006bf	b8 01 00 		mov	ax,1
+;|*** }
+; Line 637
+	*** 0006c2	c3 			ret	
+	*** 0006c3	90 			nop	
+
+ENABLE	ENDP
+	PUBLIC	DISABLE
+DISABLE	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | Disable | Since this function is called either when a
+;|***  *     Windows session ends or when we switch to a DOS box (in 286 mode),
+;|***  *     we'll reset the card in preparation for someone else to use it.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL Disable(void)
+;|*** {
+;|***     D1("Disable");
+; Line 650
+	*** 0006c4	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0006c9	72 12 			jb	$I2742
+	*** 0006cb	1e 			push	ds
+	*** 0006cc	68 00 00 		push	OFFSET DGROUP:$SG2743
+	*** 0006cf	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0006d4	1e 			push	ds
+	*** 0006d5	68 00 00 		push	OFFSET DGROUP:$SG2744
+	*** 0006d8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     if (fInit) {                /* if we have a card */
+; Line 652
+					$I2742:
+	*** 0006dd	83 3e 00 00 00 		cmp	WORD PTR _fInit,0
+	*** 0006e2	74 48 			je	$I2745
+;|***         if (vadlibdAcquireAdLibSynth())
+; Line 653
+	*** 0006e4	9a 00 00 00 00 		call	FAR PTR VADLIBDACQUIREADLIBSYNTH
+	*** 0006e9	0b c0 			or	ax,ax
+	*** 0006eb	74 19 			je	$I2746
+;|***             D1("AdLib could NOT be aquired for DISABLE!!!");
+; Line 654
+	*** 0006ed	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0006f2	72 12 			jb	$I2746
+	*** 0006f4	1e 			push	ds
+	*** 0006f5	68 00 00 		push	OFFSET DGROUP:$SG2748
+	*** 0006f8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0006fd	1e 			push	ds
+	*** 0006fe	68 00 00 		push	OFFSET DGROUP:$SG2749
+	*** 000701	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***         SoundWarmInit();        /* reset card to be good */
+; Line 656
+					$I2746:
+	*** 000706	0e 			push	cs
+	*** 000707	e8 00 00 		call	NEAR PTR _SoundWarmInit
+;|*** 
+;|***         if (vadlibdReleaseAdLibSynth())
+; Line 658
+	*** 00070a	9a 00 00 00 00 		call	FAR PTR VADLIBDRELEASEADLIBSYNTH
+	*** 00070f	0b c0 			or	ax,ax
+	*** 000711	74 19 			je	$I2745
+;|***             D1("AdLib could NOT be RELEASED for DISABLE!!!");
+; Line 659
+	*** 000713	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000718	72 12 			jb	$I2745
+	*** 00071a	1e 			push	ds
+	*** 00071b	68 00 00 		push	OFFSET DGROUP:$SG2752
+	*** 00071e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000723	1e 			push	ds
+	*** 000724	68 00 00 		push	OFFSET DGROUP:$SG2753
+	*** 000727	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     }
+;|*** 
+;|***     fEnabled = FALSE;           /* say that we're not enabled */
+; Line 662
+					$I2745:
+	*** 00072c	c7 06 00 00 00 00 	mov	WORD PTR _fEnabled,0
+;|*** }
+; Line 663
+	*** 000732	c3 			ret	
+	*** 000733	90 			nop	
+
+DISABLE	ENDP
+	PUBLIC	LIBMAIN
+LIBMAIN	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api int | LibMain | Library initialization code.
+;|***  *
+;|***  * @parm HANDLE | hInstance | Our instance handle.
+;|***  *
+;|***  * @parm WORD | wHeapSize | The heap size from the .def file.
+;|***  *
+;|***  * @parm LPSTR | lpCmdLine | The command line.
+;|***  *
+;|***  * @rdesc Returns 1 if the initialization was successful and 0 otherwise.
+;|***  ***************************************************************************/
+;|*** 
+;|*** #define DEF286WRITEDELAY    8       /* 25MHz 286 */
+;|*** #define DEF386WRITEDELAY    14      /* 50MHz 386 */
+;|*** #define DEF486WRITEDELAY    41      /* 50MHz 486 */
+;|*** 
+;|*** int NEAR PASCAL LibMain(HANDLE hInstance, WORD wHeapSize, LPSTR lpCmdLine)
+;|*** {
+; Line 684
+	*** 000734	c8 04 00 00 		enter	4,0
+;	hInstance = 10
+;	wHeapSize = 8
+;	lpCmdLine = 4
+;	dwWinFlags = -4
+;|*** extern WORD wWriteDelay;
+;|*** DWORD dwWinFlags;
+;|*** 
+;|*** #ifdef DEBUG
+;|***     /* get debug level - default is 0 */
+;|***     wDebugLevel = GetProfileInt(aszMMDebug, aszAdlib, 0);
+; Line 690
+	*** 000738	0e 			push	cs
+	*** 000739	68 00 00 		push	OFFSET _aszMMDebug
+	*** 00073c	0e 			push	cs
+	*** 00073d	68 00 00 		push	OFFSET _aszAdlib
+	*** 000740	6a 00 			push	0
+	*** 000742	9a 00 00 00 00 		call	FAR PTR GETPROFILEINT
+	*** 000747	a3 00 00 		mov	WORD PTR _wDebugLevel,ax
+;|*** #endif
+;|***     
+;|***     D1("LibMain");
+; Line 693
+	*** 00074a	3d 01 00 		cmp	ax,1
+	*** 00074d	72 12 			jb	$I2763
+	*** 00074f	1e 			push	ds
+	*** 000750	68 00 00 		push	OFFSET DGROUP:$SG2764
+	*** 000753	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000758	1e 			push	ds
+	*** 000759	68 00 00 		push	OFFSET DGROUP:$SG2765
+	*** 00075c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     ghInstance = hInstance;         /* save our instance */
+; Line 695
+					$I2763:
+	*** 000761	8b 46 0a 		mov	ax,WORD PTR [bp+10]	;hInstance
+	*** 000764	a3 00 00 		mov	WORD PTR _ghInstance,ax
+;|*** 
+;|***     dwWinFlags = GetWinFlags();
+;|*** 
+;|***     if (dwWinFlags & WF_CPU286)
+; Line 699
+	*** 000767	9a 00 00 00 00 		call	FAR PTR GETWINFLAGS
+	*** 00076c	89 46 fc 		mov	WORD PTR [bp-4],ax	;dwWinFlags
+	*** 00076f	a8 02 			test	al,2
+	*** 000771	74 08 			je	$I2766
+;|***         wWriteDelay = DEF286WRITEDELAY;
+; Line 700
+	*** 000773	c7 06 00 00 08 00 	mov	WORD PTR _wWriteDelay,8
+;|***     else if (dwWinFlags & WF_CPU386)
+; Line 701
+	*** 000779	eb 1a 			jmp	SHORT $I2767
+					$I2766:
+	*** 00077b	f6 46 fc 04 		test	BYTE PTR [bp-4],4	;dwWinFlags
+	*** 00077f	74 08 			je	$I2768
+;|***         wWriteDelay = DEF386WRITEDELAY;
+; Line 702
+	*** 000781	c7 06 00 00 0e 00 	mov	WORD PTR _wWriteDelay,14	;000eH
+;|***     else if (dwWinFlags & WF_CPU486)
+; Line 703
+	*** 000787	eb 0c 			jmp	SHORT $I2767
+					$I2768:
+	*** 000789	f6 46 fc 08 		test	BYTE PTR [bp-4],8	;dwWinFlags
+	*** 00078d	74 06 			je	$I2767
+;|***         wWriteDelay = DEF486WRITEDELAY;
+; Line 704
+	*** 00078f	c7 06 00 00 29 00 	mov	WORD PTR _wWriteDelay,41	;0029H
+;|*** 
+;|***     vadlibdGetEntryPoint();
+; Line 706
+					$I2767:
+	*** 000795	9a 00 00 00 00 		call	FAR PTR VADLIBDGETENTRYPOINT
+;|*** 
+;|***     return 1;                       /* exit ok */
+; Line 708
+	*** 00079a	b8 01 00 		mov	ax,1
+;|*** }
+; Line 709
+	*** 00079d	c9 			leave	
+	*** 00079e	c2 08 00 		ret	8
+	*** 0007a1	90 			nop	
+
+LIBMAIN	ENDP
+_TEXT	ENDS
+END

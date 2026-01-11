@@ -1,0 +1,53 @@
+
+ VITD
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000020AH _LTEXT                 CODE 32-bit
+ 0001:0000020C 000000154H _LDATA                 CODE 32-bit
+ 0002:00000000 000000095H _ITEXT                 ICODE 32-bit
+ 0002:00000098 00000000EH _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:0000020C VITD_DDB                VITD_DDB
+
+  Address         Publics by Name
+
+ 0001:000000B0       Update_Access_Byte
+ 0001:00000155       VITD_Cancel
+ 0001:0000002D       VITD_Control
+ 0001:00000057       VITD_Count
+ 0001:00000000       VITD_Create_VM
+ 0001:0000020C       VITD_DDB
+ 0001:00000018       VITD_Destroy_VM
+ 0002:00000041       VITD_Device_Init
+ 0002:00000098       VITD_IO_Table
+ 0001:000001EA       VITD_Reflect_Int
+ 0001:000000C9       VITD_State
+ 0002:00000000       VITD_Sys_Crit_Init
+ 0001:00000190       VITD_Timeout_Proc
+
+  Address         Publics by Value
+
+ 0001:00000000       VITD_Create_VM
+ 0001:00000018       VITD_Destroy_VM
+ 0001:0000002D       VITD_Control
+ 0001:00000057       VITD_Count
+ 0001:000000B0       Update_Access_Byte
+ 0001:000000C9       VITD_State
+ 0001:00000155       VITD_Cancel
+ 0001:00000190       VITD_Timeout_Proc
+ 0001:000001EA       VITD_Reflect_Int
+ 0001:0000020C       VITD_DDB
+ 0002:00000000       VITD_Sys_Crit_Init
+ 0002:00000041       VITD_Device_Init
+ 0002:00000098       VITD_IO_Table

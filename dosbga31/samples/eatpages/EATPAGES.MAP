@@ -1,0 +1,35 @@
+
+ EATPAGES
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000005BH _LTEXT                 CODE 32-bit
+ 0001:0000005C 000000065H _LDATA                 CODE 32-bit
+ 0002:00000000 00000009CH _ITEXT                 ICODE 32-bit
+ 0002:0000009C 000000044H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:0000005C EATPAGES_DDB            EATPAGES_DDB
+
+  Address         Publics by Name
+
+ 0001:00000042       EATPAGES_Control
+ 0001:0000005C       EATPAGES_DDB
+ 0002:00000000       EATPAGES_Init_Complete
+ 0001:00000000       EATPAGES_System_Exit
+
+  Address         Publics by Value
+
+ 0001:00000000       EATPAGES_System_Exit
+ 0001:00000042       EATPAGES_Control
+ 0001:0000005C       EATPAGES_DDB
+ 0002:00000000       EATPAGES_Init_Complete

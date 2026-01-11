@@ -1,0 +1,1362 @@
+
+ DISPLAY
+
+ Start     Length     Name                   Class
+ 0001:0000 02FBEH     _TEXT                  CODE
+ 0002:0000 021E9H     _REAL                  CODE
+ 0003:0000 0230DH     _PROTECT               CODE
+ 0004:0000 0035AH     _FEIGHT                CODE
+ 0005:0000 0040AH     _FFOUR                 CODE
+ 0006:0000 004B4H     _INIT                  CODE
+ 0007:0000 01C8DH     _DIB                   CODE
+ 0008:0000 00106H     _ENUM                  CODE
+ 0009:0000 00DC7H     _DEIGHT                CODE
+ 000A:0000 00C31H     _DFOUR                 CODE
+ 000B:0000 00682H     _OUTPUT                CODE
+ 000C:0000 0029BH     _SCANLR                CODE
+ 000D:0000 0193CH     _DATA                  DATA
+
+ Origin   Group
+ 000D:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:0916 BitBlt                  BitBlt
+ 0001:2518 CheckCursor             CheckCursor
+ 0001:2F25 ColorInfo               ColorInfo
+ 0001:1B1C Control                 Control
+ 0001:1E31 CreateBitmap            CreateBitmap
+ 0001:1DDC DeviceBitmap            DeviceBitmap
+ 0001:1E1B DeviceMode              DeviceMode
+ 0006:03B7 Disable                 Disable
+ 0006:030E Enable                  Enable
+ 0008:00F0 EnumDFonts              EnumDFonts
+ 0008:0019 EnumObj                 EnumObj
+ 0001:1230 ExtTextOut              ExtTextOut
+ 0003:0000 ExtTextOutP             ExtTextOutP
+ 0002:0000 ExtTextOutR             ExtTextOutR
+ 0001:1E06 FastBorder              FastBorder
+ 0001:113C GetCharWidth            GetCharWidth
+ 0006:02BE GetDriverResourceID     GetDriverResourceID
+ 0009:041B GetPalette              GetPalette
+ 0009:03A4 GetPalTrans             GetPalTrans
+ 0006:0423 Inquire                 Inquire
+ 0007:0000 MemoryDIBBits           MemoryDIBBits
+ 000A:0562 MemoryPolyline4         MemoryPolyline4
+ 0009:0762 MemoryPolyline8         MemoryPolyline8
+ 000A:0306 MemoryScanline4         MemoryScanline4
+ 0009:0575 MemoryScanline8         MemoryScanline8
+ 0001:249A MoveCursor              MoveCursor
+ 000B:04D6 Output                  Output
+ 0007:00CE PhysicalDIBBits         PhysicalDIBBits
+ 000B:0008 Pixel                   Pixel
+ 000A:0008 Pixel4                  Pixel4
+ 0009:0008 Pixel8                  Pixel8
+ 0005:00D4 ReadScreenColor4        ReadScreenColor4
+ 0005:02D4 ReadScreenColor4_386    ReadScreenColor4_386
+ 0004:00BA ReadScreenColor8        ReadScreenColor8
+ 0004:026B ReadScreenColor8_386    ReadScreenColor8_386
+ 0001:1718 RealizeObject           RealizeObject
+ 0001:2764 SaveScreenBitmap        SaveScreenBitmap
+ 000C:0008 ScanLR                  ScanLR
+ 0001:1DF1 SetAttribute            SetAttribute
+ 0001:1B8A SetCursor               SetCursor
+ 0009:03D4 SetPalette              SetPalette
+ 0009:0325 SetPalTrans             SetPalTrans
+ 0001:1E3F Spare2                  Spare2
+ 0001:1E4D Spare3                  Spare3
+ 0001:1243 StrBlt                  StrBlt
+ 0009:01F2 UpdateColors            UpdateColors
+ 0001:26CC UserRepaintDisable      UserRepaintDisable
+ 0005:0000 WriteScreenColor4       WriteScreenColor4
+ 0005:01C2 WriteScreenColor4_386   WriteScreenColor4_386
+ 0004:0000 WriteScreenColor8       WriteScreenColor8
+ 0004:0174 WriteScreenColor8_386   WriteScreenColor8_386
+
+  Address         Publics by Name
+
+ 0007:0341       ALIGNDESTBITMAP
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSTOCSAlias     (KERNEL.171)
+ 0000:0000  Imp  AllocSector          (KERNEL.175)
+ 0000:0000  Imp  ALLOCSELECTOR        (KERNEL.175)
+ 000D:18F3       BackgroundMix
+ 0001:0201       BBCallBLT
+ 0001:01F5       BBDetermineBLTType
+ 0001:0203       BBDone
+ 0001:0529       BBECRead
+ 0001:0513       BBECWrite
+ 0001:050D       BBExcludeCursor
+ 0001:012D       BBGetOperands
+ 0001:0064       BBGotRop
+ 0001:009F       BBNMultiPassRop
+ 0001:009A       BBNoAction
+ 0001:0091       BBSaveRopCount
+ 0001:03DF       BIDNoManagement
+ 0001:03B9       BIDUseManagement
+ 000D:18EC       BigCacheDisabled
+ 000D:12E4       BigFontInfoTable
+ 000D:18E6       BigFontLRU
+ 000D:18EA       BigFontWritePlane
+ 000D:18E4       BigFontXOrg
+ 000D:0736       BigOldFaceName
+ 000D:0798       BigOldFaceNameLength
+ 000D:0776       BigOldFontHdr
+ 0001:0916       BitBlt
+ 0001:0B68       BITBLT_EXIT
+ 0002:0C55       BITMAP_OPAQUE
+ 0001:056C       BITMASK_TBL1
+ 0001:0574       BITMASK_TBL2
+ 000D:03B7       BitsPixel
+ 000D:07A3       bLines
+ 0001:2234       BlockMove
+ 0001:207C       BlockWrite
+ 0001:1C79       BLOCK_MOVE_CURSOR_AREA
+ 000A:0C15       Bm4_Diagonal_1Q
+ 000A:0BC9       Bm4_Diagonal_4Q
+ 000A:0B28       Bm4_Negative_Y
+ 000A:0B90       Bm4_Positive_X
+ 000A:0B74       Bm4_Positive_Y
+ 0009:0DAB       Bm8_Diagonal_1Q
+ 0009:0D79       Bm8_Diagonal_4Q
+ 0009:0D11       Bm8_Negative_Y
+ 0009:0D5D       Bm8_Positive_X
+ 0009:0D41       Bm8_Positive_Y
+ 0001:1D10       BMCA_COMMON
+ 0001:1C92       BMCA_GET_X_SIZE
+ 0001:1C9C       BMCA_LEAVE
+ 0001:1CA0       BMCA_MOVE_CURSOR
+ 0001:1CD4       BMCA_RESTORE_SCREEN
+ 0001:1CF4       BMCA_SAVE_SCREEN
+ 0001:1CC3       BMCA_SET_EXTENTS
+ 0001:1CB1       BMCA_SET_FUNCTION
+ 0001:1CBC       BMCA_SET_MODE
+ 0007:16EC       BmpComputeY
+ 0001:000C       BoardBlt
+ 0001:0004       BoardBltFar
+ 0001:0373       BoardIsDest
+ 000A:0137       BOARDPIXELOPERATION
+ 000D:0680       BrushCopy
+ 0007:04AB       BUILDCOLORINFO
+ 0007:050E       BUILDCOLORINFO4
+ 0007:05C9       BUILDCOLORINFO_4
+ 0007:0890       BUILDCOLORTABLE_4
+ 0002:0F2C       BUILD_STRING
+ 0001:221A       BW_COLOUR
+ 0001:20C0       BW_DISPATCH
+ 0001:20E8       BW_Error_exit
+ 0001:20EC       BW_MONO
+ 0001:0E6A       CBLT
+ 0001:105E       CBLT_6000
+ 0001:2E1C       CBPatterned
+ 0001:2E39       CBSolid
+ 0002:0573       CharWidthStrBlt
+ 0001:2518       CheckCursor
+ 000B:0432       ClipLinePoints
+ 0002:1FFC       CMSBACExit
+ 0002:1FAA       CMSBAdjustCoordinates
+ 0002:1FFF       CMSBBLTDownDest
+ 0002:207C       CMSBComputeDeltas
+ 0002:2124       CMSBDoStrBLT
+ 0002:20A6       CMSBGetClipRect
+ 0002:20E8       CMSBGetOpaqueingRect
+ 0002:208B       CMSBMakeBaseRect
+ 0002:2186       CMSBReadBack
+ 0002:216E       CMSBRestoreClipRect
+ 0002:2156       CMSBRestoreOpaqueRect
+ 0002:21E0       CMSExit
+ 0001:150F       ColorDither
+ 000D:046C       ColorFlagTable
+ 0001:2F25       ColorInfo
+ 0001:1A2C       ColourDither
+ 0001:2E58       ColourTranslate
+ 0007:037B       COMPUTEPARAMETERS
+ 0001:13A1       ComputePColor
+ 0001:14E1       ComputePIndex
+ 0001:133C       ComputeSubSpace
+ 0001:131F       ComputeSymmetry
+ 0001:1369       ComputeTransform
+ 0002:0C0C       COMP_BYTE_INTERVAL
+ 0001:1B1C       Control
+ 0001:2DEE       CONVERTBRUSH
+ 0001:2984       CopyRect
+ 0001:1E31       CreateBitmap
+ 0001:259A       CursorExclude
+ 0001:2606       CursorUnExclude
+ 0000:0001  Abs  CURSOR_DISABLED
+ 0000:0002  Abs  CURSOR_DRAW_BUSY
+ 000D:18F8       CURSOR_ENABLED_FLAG
+ 000D:190C       CURSOR_EXCLUDE_FLAG
+ 000D:190A       CURSOR_MOVED_FLAG
+ 0000:0003  Abs  CURSOR_ON_VACATION
+ 000D:1902       CURSOR_X_COORDINATE
+ 000D:18F9       CURSOR_X_SIZE
+ 000D:1904       CURSOR_Y_COORDINATE
+ 000D:18FB       CURSOR_Y_SIZE
+ 0002:0603       CWSBGetCharOffset
+ 0002:0598       CWSBLoop
+ 0007:13E0       DecodeMemory
+ 0001:043B       DecodeRasterOp
+ 0007:19DF       DecodeRLE4
+ 0007:1931       DecodeRLE8
+ 0000:0030  Abs  DefaultLength
+ 0001:04B4       DestOp
+ 0001:1DDC       DeviceBitmap
+ 0007:0220       DeviceBitmapBits
+ 0001:1E1B       DeviceMode
+ 0002:1A9E       DEV_OBWNC_FOUR_CHAR
+ 0003:2048       DEV_OBWNC_FOUR_CHAR_P
+ 0002:1A20       DEV_OBWNC_ONE_CHAR
+ 0003:1FB9       DEV_OBWNC_ONE_CHAR_P
+ 0002:1A60       DEV_OBWNC_THREE_CHAR
+ 0003:2001       DEV_OBWNC_THREE_CHAR_P
+ 0002:1A38       DEV_OBWNC_TWO_CHAR
+ 0003:1FD3       DEV_OBWNC_TWO_CHAR_P
+ 0001:033A       DHODirectBLT
+ 0001:032C       DHODoBLT
+ 0001:0343       DHOExit
+ 0001:02D2       DHOManageX
+ 0001:02DB       DHOMXLoop
+ 0001:031D       DHONoManagement
+ 0007:02A7       DIBDOFIXUP
+ 0007:0D8A       DIBToScreen
+ 0006:03B7       Disable
+ 0001:1C66       DISABLE_CURSOR
+ 0001:1A4E       Dither
+ 0001:26A7       DMC_BL_BIT_LOOP
+ 0001:26A0       DMC_BYTE_LOOP
+ 0001:2693       DMC_DRAW_BITMAP
+ 0001:269D       DMC_LINE_LOOP
+ 0001:16AE       DOCOLORPATTERN
+ 0001:0BE6       DOITTHEHARDWAY
+ 0007:1594       DoNormalEOLStuff
+ 000B:029C       DrawInterior
+ 000B:0644       DRAWMODELEN
+ 000B:0624       DrawModeTbl
+ 000A:025E       DRAWMODETBL4
+ 0009:04E2       DRAWMODETBL8
+ 0001:1E60       DrawOpaqueRect
+ 000D:190B       DRAW_BUSY_FLAG
+ 0003:0D3C       DRAW_CHAR_STRING
+ 0001:264A       DRAW_MONO_BITMAP
+ 0006:024B       DRIVER_INITIALIZATION
+ 0001:044D       DROBinaryOp
+ 0001:049A       DROCheckComplementRop
+ 0001:048F       DRODest
+ 0001:0441       DROLoop
+ 0001:0459       DROPattern
+ 0001:0470       DROPCallHandleBrush
+ 0007:0A79       DSESSWAP
+ 0007:180B       DumpToBmp1
+ 0007:1771       DumpToBmp4
+ 0007:1742       DumpToBmp8
+ 0007:18E3       DumpToScreen
+ 0001:1C55       EC_DRAW_CURSOR
+ 0007:0CDB       EIGHTTO248
+ 0007:0A27       EIGHTTOONEFOUREIGHT8
+ 0006:030E       Enable
+ 0001:1C3B       ENABLE_CURSOR
+ 0007:1292       EncodeMemory
+ 0007:1B79       EncodeRLE4
+ 0007:1605       EncodeRLE8
+ 0006:03AC       ENExit
+ 0006:0388       ENInitBoard
+ 0006:0320       ENReturnGDIInfo
+ 0008:00F0       EnumDFonts
+ 0008:007B       EnumerateBrush
+ 0008:00AD       EnumerateBrushesLoop
+ 0008:0040       EnumeratePen
+ 0008:0043       EnumeratePensLoop
+ 0008:0019       EnumObj
+ 0001:1D52       EXC_SET_FUNCTION
+ 0001:1D5E       EXC_SET_MODE
+ 0001:1D38       EXPAND_CURSOR
+ 000D:03D0       ExtraColors
+ 0000:000C  Abs  ExtraPalLength
+ 0001:1230       ExtTextOut
+ 0003:0000       ExtTextOutP
+ 0002:0000       ExtTextOutR
+ 000D:1926       F96DPI
+ 0001:1E06       FastBorder
+ 0001:1F01       FillRect4BitsPixel
+ 0001:1FB2       FillRect8BitsPixel
+ 000D:079E       FontFreeSpaceXOrg
+ 000D:079D       FontFreeSpaceYOrg
+ 000D:07A4       FontInfoTable
+ 0000:0300  Abs  FontInfoTableLength
+ 000D:18F2       ForgroundMix
+ 0007:05D3       FOURTOONEFOUREIGHT
+ 0007:081B       FOURTOTWENTYFOUR
+ 0002:18A8       FOUR_CHAR_SETUP
+ 0000:0000  Imp  FreeSector           (KERNEL.176)
+ 000D:038C       FreeSpaceyExt
+ 000D:038A       FreeSpaceyOrg
+ 000D:038E       FullScreenClip
+ 0006:0446       GDIInfoDataStructure
+ 0001:042B       GDOBBlockMove
+ 0001:040E       GDOBBlockWrite
+ 0001:199F       GenerateXlateTable
+ 0002:19AC       GEN_CL_FOUR_CHAR
+ 0003:1F35       GEN_CL_FOUR_CHAR_P
+ 0002:19E6       GEN_CL_N_CHAR
+ 0003:1F77       GEN_CL_N_CHAR_P
+ 0002:195A       GEN_CL_ONE_CHAR
+ 0003:1EDB       GEN_CL_ONE_CHAR_P
+ 0002:1986       GEN_CL_THREE_CHAR
+ 0003:1F0B       GEN_CL_THREE_CHAR_P
+ 0002:196C       GEN_CL_TWO_CHAR
+ 0003:1EEE       GEN_CL_TWO_CHAR_P
+ 0002:18D5       GEN_NC_FOUR_CHAR
+ 0003:1E45       GEN_NC_FOUR_CHAR_P
+ 0002:1920       GEN_NC_N_CHAR
+ 0003:1E99       GEN_NC_N_CHAR_P
+ 0002:1822       GEN_NC_ONE_CHAR
+ 0003:1D7B       GEN_NC_ONE_CHAR_P
+ 0002:1882       GEN_NC_THREE_CHAR
+ 0003:1DE7       GEN_NC_THREE_CHAR_P
+ 0002:1848       GEN_NC_TWO_CHAR
+ 0003:1DA5       GEN_NC_TWO_CHAR_P
+ 0001:1EDB       GetBitmapPointer
+ 0001:113C       GetCharWidth
+ 0007:14F4       GetColorTable4
+ 0007:1485       GetColorTable8
+ 0001:1B5E       GetColourTable
+ 0001:03E3       GetDestOntoBoard
+ 000A:02C6       GetDrawModeParams4
+ 0009:0537       GetDrawModeParams8
+ 0006:02BE       GetDriverResourceID
+ 0000:0000  Imp  GetExePtr            (KERNEL.133)
+ 0001:0543       GetFreeRect
+ 0006:0000       GetHardwareConfig
+ 0001:2220       GetHugeBitmapParams
+ 0001:2E7B       GetIndexOfRGB
+ 0001:2E70       GetIndexOfRGBFar
+ 0000:0000  Imp  GETMODULEHANDLE      (KERNEL.47)
+ 0009:041B       GetPalette
+ 0009:03A4       GetPalTrans
+ 0007:15AC       GetPhysicalRLE
+ 0000:0000  Imp  GETPRIVATEPROFILEINT (KERNEL.127)
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0001:2F87       GetRGBOfIndex
+ 0008:0000       GetSystemColors
+ 0002:0E1C       GET_DEVICE_DATA
+ 0002:08E6       GET_MODE
+ 0001:056A       GFRExit
+ 0000:0000  Imp  GLOBALALLOC          (KERNEL.15)
+ 0000:0000  Imp  GLOBALFIX            (KERNEL.197)
+ 0000:0000  Imp  GLOBALFREE           (KERNEL.17)
+ 0000:0000  Imp  GLOBALLOCK           (KERNEL.18)
+ 0000:0000  Imp  GLOBALUNLOCK         (KERNEL.19)
+ 0000:0000  Imp  GLOBALWIRE           (KERNEL.111)
+ 0007:1BDB       GP4Absolute
+ 0007:1C8C       GP4Done
+ 0007:1BD1       GP4EndOfBitmap
+ 0007:1BBA       GP4EndOfLine
+ 0007:1BEB       GP4EnterAbsolute
+ 0007:1B7D       GP4MainLoop
+ 0007:1BB3       GP4RunComplete
+ 0007:1BE0       GP4StoreCurrentRun
+ 0007:1B98       GP4SubsequentPixel
+ 0007:1C0A       GPA4AbsoluteModeLoop
+ 0007:1C5A       GPA4EndOfLine
+ 0007:1BE9       GPA4EndOfLineNode
+ 0007:1C7C       GPA4RunComplete
+ 0007:167C       GPAAbsoluteModeLoop
+ 0007:162D       GPAbsolute
+ 0007:1C35       GPAEndAbsolute
+ 0007:16B7       GPAEndOfLine
+ 0007:16A9       GPARunComplete
+ 0007:16C7       GPDone
+ 0007:1657       GPEndOfBitmap
+ 0007:1646       GPEndOfLine
+ 0007:1667       GPEnterAbsolute
+ 0007:1609       GPMainLoop
+ 0007:161C       GPNextRun
+ 0007:1660       GPRunComplete
+ 0007:1615       GPSubsequentPixel
+ 0001:2B34       HandleBrush
+ 0001:1250       HandleBrushFar
+ 000B:012D       HandleDrawMode
+ 0001:29C0       HARDWAREENABLE
+ 000D:06CF       HardwarePaletteRead
+ 0001:16E0       HatchPatterns
+ 0001:2B4D       HBDithered
+ 0001:2D1E       HBPatterned
+ 0001:2DA9       HBPBLoop
+ 0001:2D5C       HBPBSetFunction
+ 0001:2D3D       HBPBSetMono
+ 0001:2D68       HBPBSetupLoop
+ 0001:0D16       HBPCALLBOARDBLT
+ 0001:0CF4       HBPDOMONOBLT
+ 0001:0D74       HBPEXIT
+ 0001:2CEE       HBSBDrawRect
+ 0001:2CD8       HBSBSetFunc
+ 0001:2CE7       HBSBSetMode
+ 0001:2CC0       HBSolid
+ 0001:2B3E       HBWaitForQueue
+ 0001:0B60       HERE_WE_ARE
+ 0001:0235       HIDCheckForSourceCopy
+ 0001:02C3       HIDExit
+ 0001:02C0       HIDNoManagement
+ 0001:022A       HIDStopCursor
+ 0001:0292       HIDUMLoop
+ 0001:0251       HIDUseManagement
+ 0001:0246       HIDUseOffScreenMemory
+ 0001:0BA2       HIRESBLTPROCESSING
+ 0006:01C4       HOOK_INT_2FH
+ 0001:02C4       HostBLTManagement
+ 0001:0344       HostBLTOperation
+ 0001:0214       HostIsDest
+ 0006:0423       Inquire
+ 0001:1B4F       InquireControlCaps
+ 0007:157B       InsertAbsCount
+ 0001:205F       IntersectLines
+ 0001:202B       IntersectRect
+ 0001:2027       IntersectRect_far
+ 000D:0396       InvisibleScreenClip
+ 000D:0580       ITranslateTable
+ 0003:179E       JC_CHECK_DUMMY
+ 0003:1639       JUSTIFIED_TEXT
+ 0002:1C27       LFLoop
+ 0006:018C       LUTInit
+ 0001:13E2       MakeColorCntTable
+ 0007:04E0       MAKECOLORTABLE8
+ 0001:1482       MakeDitherBitmap
+ 0007:0000       MemoryDIBBits
+ 000B:04F3       MemoryOutput
+ 000D:0705       MemoryPolyline
+ 000A:0562       MemoryPolyline4
+ 0009:0762       MemoryPolyline8
+ 000D:0701       MemoryScanline
+ 000A:0306       MemoryScanline4
+ 0009:0575       MemoryScanline8
+ 000B:0502       MemOutPolyline
+ 0002:0C50       MONO_BITMAP_OPAQUE
+ 0001:249A       MoveCursor
+ 0001:1DAC       MY_CHECK_STACK
+ 0000:0014  Abs  NbrofColours
+ 0000:0004  Abs  NbrofXColors
+ 0001:04D0       NegateResult
+ 000D:06D1       NewDrawMode
+ 0003:1549       NON_JUSTIFIED_TEXT
+ 0001:1A8A       not_base_pattern
+ 0002:190F       N_CHAR_SETUP
+ 0001:16DA       ObjectSizeTable
+ 000D:0716       OldFaceName
+ 000D:0796       OldFaceNameLength
+ 000D:0756       OldFontHdr
+ 0007:091E       ONEFOUREIGHTTOEIGHT8
+ 0007:0647       ONEFOUREIGHTTOFOUR
+ 0007:0958       ONEFOUREIGHTTOONE8
+ 0007:0CFE       ONETO248
+ 0007:09B8       ONETOONEFOUREIGHT8
+ 0002:1816       ONE_CHAR_SETUP
+ 000B:05D6       OTBExit
+ 000B:05C6       OTBGoodExit
+ 000B:059A       OTBPolygon
+ 000B:05B3       OTBPolyline
+ 000B:058C       OTBPolys
+ 000B:05BE       OTBRectangle
+ 000B:0582       OTBScanlines
+ 000B:04D6       Output
+ 000B:0654       OUTPUTSEG_CHECK_STACK
+ 000B:053C       OutputToBoard
+ 0002:0CDE       OUTPUT_O_RECT
+ 0003:1A47       PAD_LEFT_HAND_SIDE
+ 0003:1A82       PAD_RIGHT_HAND_SIDE
+ 000D:03B8       Palette
+ 000D:06D0       PaletteFlags
+ 0000:003C  Abs  PaletteLength
+ 0007:0AE2       PARTIAL148TO1
+ 0007:0776       PARTIAL148TO4
+ 0007:0AA4       PARTIAL148TO8
+ 0007:0B9C       PARTIAL1TO148
+ 0007:0C67       PARTIAL1TO24
+ 0007:0C33       PARTIAL24TO1
+ 0007:07DE       PARTIAL24TO4
+ 0007:0C0F       PARTIAL24TO8
+ 0007:06AB       PARTIAL4TO148
+ 0007:0723       PARTIAL4TO24
+ 0007:0B46       PARTIAL8TO148
+ 0007:0CAA       PARTIAL8TO24
+ 0003:0093       PBoardStrBlt
+ 0003:057B       PCharWidthStrBlt
+ 0003:211A       PCMSBACExit
+ 0003:20C8       PCMSBAdjustCoordinates
+ 0003:211D       PCMSBBLTDownDest
+ 0003:219A       PCMSBComputeDeltas
+ 0003:2242       PCMSBDoStrBLT
+ 0003:21C4       PCMSBGetClipRect
+ 0003:2206       PCMSBGetOpaqueingRect
+ 0003:21A9       PCMSBMakeBaseRect
+ 0003:22AA       PCMSBReadBack
+ 0003:2292       PCMSBRestoreClipRect
+ 0003:227A       PCMSBRestoreOpaqueRect
+ 0003:2304       PCMSExit
+ 0003:2088       PColourMemoryStrBlt
+ 0003:0610       PCWSBGetCharOffset
+ 0003:05A5       PCWSBLoop
+ 0003:0AA7       PDrawFont
+ 0003:07ED       pDrawMegaGlyph
+ 000D:06F1       PenCopy
+ 0001:057C       PHASE_TBL1
+ 0007:00CE       PhysicalDIBBits
+ 000D:0430       PhysicalIndexTable
+ 0007:1ADB       PhysicalRLE
+ 000B:0008       Pixel
+ 000A:0008       Pixel4
+ 0009:0008       Pixel8
+ 000D:06FD       PixelAddress
+ 0003:099F       PLFLoop
+ 000B:034F       PLGetCursorExcludeArea
+ 000B:0372       PLGetPen
+ 000B:03B2       PLLoop
+ 0003:0A61       PLoadCharacter
+ 0003:0848       PLoadFont
+ 0003:0B3C       PLoadHugeFont
+ 000B:037C       PLSetRop2
+ 000B:03A6       PLSetupLoop
+ 000B:0332       Polylines
+ 0002:17D4       PRESET_PRO_TEXT
+ 0000:0000  Imp  PrestoChangoSelector (KERNEL.177)
+ 0007:172F       PreviousSegment
+ 0003:1AB9       PROCESS_STACK_DATA
+ 0003:148B       PSETUPBUILDSTRING
+ 0003:1CA6       PSMARTPRO
+ 0003:0CEE       PStrMem
+ 0003:2154       PxBandLoop
+ 0003:22E2       PxBandLoopBottom
+ 0003:213A       PyBandLoop
+ 0003:114E       P_BITMAP_OPAQUE
+ 0003:1434       P_BUILD_STRING
+ 0003:1105       P_COMP_BYTE_INTERVAL
+ 0003:1E11       P_FOUR_CHAR_SETUP
+ 0003:1321       P_GET_DEVICE_DATA
+ 0003:0DC2       P_GET_MODE
+ 0003:1149       P_MONO_BITMAP_OPAQUE
+ 0003:1E87       P_N_CHAR_SETUP
+ 0003:1D6E       P_ONE_CHAR_SETUP
+ 0003:11D7       P_OUTPUT_O_RECT
+ 0003:1D2C       P_PRESET_PRO_TEXT
+ 0003:1DC2       P_THREE_CHAR_SETUP
+ 0003:1D8E       P_TWO_CHAR_SETUP
+ 0003:1056       P_WORST_CASE_EXT
+ 0002:008B       RBoardStrBlt
+ 0002:1F6A       RColourMemoryStrBlt
+ 0002:1D2C       RDrawFont
+ 0002:07BE       rDrawMegaGlyph
+ 0007:0A82       READDIB
+ 0007:1541       ReadPixel
+ 0007:1B68       ReadPixel4
+ 0001:22D4       ReadScreen
+ 000D:06F9       ReadScreenColor
+ 0005:00D4       ReadScreenColor4
+ 0005:02D4       ReadScreenColor4_386
+ 0004:00BA       ReadScreenColor8
+ 0004:026B       ReadScreenColor8_386
+ 0001:233E       ReadScreenMono
+ 0001:1718       RealizeObject
+ 0001:16CE       RealizeObjectDispatchTable
+ 000D:03F4       RealPalette
+ 0003:1434       REAL_BUILD_STRING
+ 000B:0178       Rectangle
+ 0006:0225       RESTORE_INT_2FH
+ 000D:0711       Ring0ToRing3
+ 000D:070D       Ring3ToRing0
+ 0007:1224       RLEBitmap
+ 0002:1CE8       RLoadCharacter
+ 0002:1AD6       RLoadFont
+ 0002:1DB9       RLoadHugeFont
+ 0001:1732       RODispatch
+ 0001:183A       ROHatchedBrush
+ 0001:178E       ROHollowBrush
+ 000D:03A6       Rop2TranslateTable
+ 0001:1882       ROPatternedBrush
+ 0001:18D5       ROPBColour
+ 0001:1894       ROPBMonochrome
+ 0001:058C       ROPTABLE
+ 0001:1780       RORealizeBrush
+ 0001:175B       RORealizePen
+ 0001:174E       ROReturnObjectSizes
+ 0001:1790       ROSolidBrush
+ 0001:19D6       RotateMonoPattern
+ 000B:0000       ROT_BIT_TBL
+ 000A:0000       ROT_BIT_TBL4
+ 0009:0000       ROT_BIT_TBL8
+ 0001:2332       RSCallRoutine
+ 0004:0104       RSCCheckStatus
+ 0004:02CD       RSCCheckStatus_386
+ 0004:016F       RSCEndLoop
+ 0004:0345       RSCEndLoop_386
+ 0004:00DE       RSCLoop
+ 0004:02A2       RSCLoop_386
+ 0004:014A       RSCNextLine
+ 0004:0317       RSCNextLine_386
+ 0005:015A       RSCOddTransfer
+ 0005:0375       RSCOddTransfer_386
+ 0004:011C       RSCTranslate
+ 0004:02E7       RSCTranslate_386
+ 0001:2305       RSSaveBitmapParams
+ 0002:0818       RStrMem
+ 000B:02D0       RTCallHandleBrush
+ 000B:0217       RTCheckBrush
+ 000B:0222       RTDrawInterior
+ 000B:022B       RTDrawOutline
+ 000B:01E6       RTGetCoordinates
+ 000B:02BE       RTSetRop2
+ 000B:01C0       RTUseClipRect
+ 000D:1929       SaveInUse
+ 0001:2764       SaveScreenBitmap
+ 000D:192C       SaveSpaceyExt
+ 000D:192A       SaveSpaceyOrg
+ 0001:2283       SBMDetermineDirection
+ 0001:2277       SBMSetExtents
+ 0001:2245       SBMSetFunction
+ 0001:2268       SBMSetMode
+ 0001:2297       SBMSetStartingX
+ 0001:22BB       SBMSetStartingY
+ 000B:001C       Scanlines
+ 000C:0008       ScanLR
+ 000C:01C8       SCANLR_COLOUR
+ 0001:04B1       SCCallRoutine
+ 000B:00BD       SCCommon
+ 000B:012B       SCEnd
+ 000B:0061       SCGetDitheredBrush
+ 000B:004A       SCGetPattern
+ 000B:00A8       SCGetPatternedBrush
+ 000B:0093       SCGetPen
+ 000B:005D       SCGetSolidBrush
+ 000B:0102       SCLoop
+ 000B:0129       SCLoopEnd
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0001:26F8       SCREEN_SWITCH_HOOK
+ 000C:026F       SC_DO_SCAN
+ 000C:0266       SC_GET_DIRECTION
+ 0001:1DF1       SetAttribute
+ 0007:14AB       SetColorTable4
+ 0007:1468       SetColorTable8
+ 0001:1B8A       SetCursor
+ 0006:0297       SETMULTIRESSETTING
+ 0009:03D4       SetPalette
+ 0009:0325       SetPalTrans
+ 0001:2558       SetScreenClip
+ 0001:2554       SetScreenClipFar
+ 0007:118E       SETUP8514RECT
+ 0002:0F83       SETUPBUILDSTRING
+ 000C:0203       SETUPPOINTERS
+ 000D:1928       ShadowMemoryTrashed
+ 0000:0020  Abs  SMALLFONTLIMIT
+ 0002:174E       SMARTPRO
+ 0001:1423       SortColorCntTable
+ 0001:04A5       SourceCopy
+ 0001:1E3F       Spare2
+ 0001:1E4D       Spare3
+ 0001:2913       SSB_COMMON
+ 0001:2979       SSB_END
+ 0001:285B       SSB_ERROR_EXIT
+ 0001:2971       SSB_EXIT
+ 0001:27B5       SSB_GET_RECT
+ 0001:2860       SSB_GOOD_EXIT
+ 0001:27DE       SSB_RESTORE
+ 0001:2863       SSB_SAVE
+ 0001:28A9       SSB_SAVE_OK
+ 0001:2596       SSCDontDraw
+ 0001:2597       SSCExit
+ 0000:000E  Abs  STACK_BOT
+ 0000:000C  Abs  STACK_MIN
+ 0000:000A  Abs  STACK_TOP
+ 0007:11DB       START8514
+ 0007:15A1       StoreCountAndIndex
+ 0007:1B55       StoreCountAndIndex4
+ 0007:0A93       STOREDIB
+ 0007:154A       StorePixel
+ 0001:1243       StrBlt
+ 0001:2742       SWITCH_TO_BACKGROUND
+ 0001:273A       SWITCH_TO_FOREGROUND
+ 000D:079C       SystemFontEndPlane
+ 000D:0DA4       SystemFontInfoTable
+ 000D:07A2       SystemFontLoaded
+ 000D:079A       SystemFontPointSize
+ 000D:07A0       SystemFontyExt
+ 000D:06F4       SystemPaletteColors
+ 000D:1938       SZGDI
+ 000D:0388       TEMPSELECTOR
+ 000D:0709       TextOutFunction
+ 0002:1862       THREE_CHAR_SETUP
+ 0001:1639       TranslateBrush
+ 0001:168D       TRANSLATEDITHERPATTERN
+ 0001:15E8       TranslateDrawMode
+ 0001:15A4       TRANSLATEPEN
+ 000D:0480       TranslateTable
+ 0007:0D53       TWENTYFOURTO18
+ 0007:0D35       TWENTYFOURTO88
+ 0007:0858       TWENTYFOURTOFOUR
+ 0002:1834       TWO_CHAR_SETUP
+ 000D:1906       UNDONE_X_COORDINATE
+ 000D:1908       UNDONE_Y_COORDINATE
+ 0009:01F2       UpdateColors
+ 0001:26CC       UserRepaintDisable
+ 0007:16D9       VerifyDestAndCnt
+ 000D:039E       VisibleScreenClip
+ 0003:19B6       WCC_CHECK_DUMMY
+ 0003:1801       WORST_CASE
+ 0002:0B61       WORST_CASE_EXT
+ 000D:03B6       WRITEENABLE
+ 000D:06F5       WriteScreenColor
+ 0005:0000       WriteScreenColor4
+ 0005:01C2       WriteScreenColor4_386
+ 0004:0000       WriteScreenColor8
+ 0004:0174       WriteScreenColor8_386
+ 0002:2036       xBandLoop
+ 0002:21BE       xBandLoopBottom
+ 000D:18FD       X_HOT_SPOT
+ 0002:201C       yBandLoop
+ 000D:18FF       Y_HOT_SPOT
+ 0001:0917       _cstods
+ 0000:0000  Imp  __AHIncr             (KERNEL.114)
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+
+  Address         Publics by Value
+
+ 0000:0000  Imp  __AHIncr             (KERNEL.114)
+ 0000:0000  Imp  ALLOCSELECTOR        (KERNEL.175)
+ 0000:0000  Imp  GLOBALFREE           (KERNEL.17)
+ 0000:0000  Imp  PrestoChangoSelector (KERNEL.177)
+ 0000:0000  Imp  GLOBALFIX            (KERNEL.197)
+ 0000:0000  Imp  AllocCSToDSAlias     (KERNEL.170)
+ 0000:0000  Imp  AllocDSTOCSAlias     (KERNEL.171)
+ 0000:0000  Imp  GetExePtr            (KERNEL.133)
+ 0000:0000  Imp  GLOBALLOCK           (KERNEL.18)
+ 0000:0000  Imp  GLOBALWIRE           (KERNEL.111)
+ 0000:0000  Imp  GLOBALALLOC          (KERNEL.15)
+ 0000:0000  Imp  GetProcAddress       (KERNEL.50)
+ 0000:0000  Imp  FreeSector           (KERNEL.176)
+ 0000:0000  Imp  GLOBALUNLOCK         (KERNEL.19)
+ 0000:0000  Imp  __WinFlags           (KERNEL.178)
+ 0000:0000  Imp  GETMODULEHANDLE      (KERNEL.47)
+ 0000:0000  Imp  ScreenSwitchEnable   (KEYBOARD.100)
+ 0000:0000  Imp  GETPRIVATEPROFILEINT (KERNEL.127)
+ 0000:0000  Imp  AllocSector          (KERNEL.175)
+ 0000:0001  Abs  CURSOR_DISABLED
+ 0000:0002  Abs  CURSOR_DRAW_BUSY
+ 0000:0003  Abs  CURSOR_ON_VACATION
+ 0000:0004  Abs  NbrofXColors
+ 0000:000A  Abs  STACK_TOP
+ 0000:000C  Abs  STACK_MIN
+ 0000:000C  Abs  ExtraPalLength
+ 0000:000E  Abs  STACK_BOT
+ 0000:0014  Abs  NbrofColours
+ 0000:0020  Abs  SMALLFONTLIMIT
+ 0000:0030  Abs  DefaultLength
+ 0000:003C  Abs  PaletteLength
+ 0000:0300  Abs  FontInfoTableLength
+ 0001:0004       BoardBltFar
+ 0001:000C       BoardBlt
+ 0001:0064       BBGotRop
+ 0001:0091       BBSaveRopCount
+ 0001:009A       BBNoAction
+ 0001:009F       BBNMultiPassRop
+ 0001:012D       BBGetOperands
+ 0001:01F5       BBDetermineBLTType
+ 0001:0201       BBCallBLT
+ 0001:0203       BBDone
+ 0001:0214       HostIsDest
+ 0001:022A       HIDStopCursor
+ 0001:0235       HIDCheckForSourceCopy
+ 0001:0246       HIDUseOffScreenMemory
+ 0001:0251       HIDUseManagement
+ 0001:0292       HIDUMLoop
+ 0001:02C0       HIDNoManagement
+ 0001:02C3       HIDExit
+ 0001:02C4       HostBLTManagement
+ 0001:02D2       DHOManageX
+ 0001:02DB       DHOMXLoop
+ 0001:031D       DHONoManagement
+ 0001:032C       DHODoBLT
+ 0001:033A       DHODirectBLT
+ 0001:0343       DHOExit
+ 0001:0344       HostBLTOperation
+ 0001:0373       BoardIsDest
+ 0001:03B9       BIDUseManagement
+ 0001:03DF       BIDNoManagement
+ 0001:03E3       GetDestOntoBoard
+ 0001:040E       GDOBBlockWrite
+ 0001:042B       GDOBBlockMove
+ 0001:043B       DecodeRasterOp
+ 0001:0441       DROLoop
+ 0001:044D       DROBinaryOp
+ 0001:0459       DROPattern
+ 0001:0470       DROPCallHandleBrush
+ 0001:048F       DRODest
+ 0001:049A       DROCheckComplementRop
+ 0001:04A5       SourceCopy
+ 0001:04B1       SCCallRoutine
+ 0001:04B4       DestOp
+ 0001:04D0       NegateResult
+ 0001:050D       BBExcludeCursor
+ 0001:0513       BBECWrite
+ 0001:0529       BBECRead
+ 0001:0543       GetFreeRect
+ 0001:056A       GFRExit
+ 0001:056C       BITMASK_TBL1
+ 0001:0574       BITMASK_TBL2
+ 0001:057C       PHASE_TBL1
+ 0001:058C       ROPTABLE
+ 0001:0916       BitBlt
+ 0001:0917       _cstods
+ 0001:0B60       HERE_WE_ARE
+ 0001:0B68       BITBLT_EXIT
+ 0001:0BA2       HIRESBLTPROCESSING
+ 0001:0BE6       DOITTHEHARDWAY
+ 0001:0CF4       HBPDOMONOBLT
+ 0001:0D16       HBPCALLBOARDBLT
+ 0001:0D74       HBPEXIT
+ 0001:0E6A       CBLT
+ 0001:105E       CBLT_6000
+ 0001:113C       GetCharWidth
+ 0001:1230       ExtTextOut
+ 0001:1243       StrBlt
+ 0001:1250       HandleBrushFar
+ 0001:131F       ComputeSymmetry
+ 0001:133C       ComputeSubSpace
+ 0001:1369       ComputeTransform
+ 0001:13A1       ComputePColor
+ 0001:13E2       MakeColorCntTable
+ 0001:1423       SortColorCntTable
+ 0001:1482       MakeDitherBitmap
+ 0001:14E1       ComputePIndex
+ 0001:150F       ColorDither
+ 0001:15A4       TRANSLATEPEN
+ 0001:15E8       TranslateDrawMode
+ 0001:1639       TranslateBrush
+ 0001:168D       TRANSLATEDITHERPATTERN
+ 0001:16AE       DOCOLORPATTERN
+ 0001:16CE       RealizeObjectDispatchTable
+ 0001:16DA       ObjectSizeTable
+ 0001:16E0       HatchPatterns
+ 0001:1718       RealizeObject
+ 0001:1732       RODispatch
+ 0001:174E       ROReturnObjectSizes
+ 0001:175B       RORealizePen
+ 0001:1780       RORealizeBrush
+ 0001:178E       ROHollowBrush
+ 0001:1790       ROSolidBrush
+ 0001:183A       ROHatchedBrush
+ 0001:1882       ROPatternedBrush
+ 0001:1894       ROPBMonochrome
+ 0001:18D5       ROPBColour
+ 0001:199F       GenerateXlateTable
+ 0001:19D6       RotateMonoPattern
+ 0001:1A2C       ColourDither
+ 0001:1A4E       Dither
+ 0001:1A8A       not_base_pattern
+ 0001:1B1C       Control
+ 0001:1B4F       InquireControlCaps
+ 0001:1B5E       GetColourTable
+ 0001:1B8A       SetCursor
+ 0001:1C3B       ENABLE_CURSOR
+ 0001:1C55       EC_DRAW_CURSOR
+ 0001:1C66       DISABLE_CURSOR
+ 0001:1C79       BLOCK_MOVE_CURSOR_AREA
+ 0001:1C92       BMCA_GET_X_SIZE
+ 0001:1C9C       BMCA_LEAVE
+ 0001:1CA0       BMCA_MOVE_CURSOR
+ 0001:1CB1       BMCA_SET_FUNCTION
+ 0001:1CBC       BMCA_SET_MODE
+ 0001:1CC3       BMCA_SET_EXTENTS
+ 0001:1CD4       BMCA_RESTORE_SCREEN
+ 0001:1CF4       BMCA_SAVE_SCREEN
+ 0001:1D10       BMCA_COMMON
+ 0001:1D38       EXPAND_CURSOR
+ 0001:1D52       EXC_SET_FUNCTION
+ 0001:1D5E       EXC_SET_MODE
+ 0001:1DAC       MY_CHECK_STACK
+ 0001:1DDC       DeviceBitmap
+ 0001:1DF1       SetAttribute
+ 0001:1E06       FastBorder
+ 0001:1E1B       DeviceMode
+ 0001:1E31       CreateBitmap
+ 0001:1E3F       Spare2
+ 0001:1E4D       Spare3
+ 0001:1E60       DrawOpaqueRect
+ 0001:1EDB       GetBitmapPointer
+ 0001:1F01       FillRect4BitsPixel
+ 0001:1FB2       FillRect8BitsPixel
+ 0001:2027       IntersectRect_far
+ 0001:202B       IntersectRect
+ 0001:205F       IntersectLines
+ 0001:207C       BlockWrite
+ 0001:20C0       BW_DISPATCH
+ 0001:20E8       BW_Error_exit
+ 0001:20EC       BW_MONO
+ 0001:221A       BW_COLOUR
+ 0001:2220       GetHugeBitmapParams
+ 0001:2234       BlockMove
+ 0001:2245       SBMSetFunction
+ 0001:2268       SBMSetMode
+ 0001:2277       SBMSetExtents
+ 0001:2283       SBMDetermineDirection
+ 0001:2297       SBMSetStartingX
+ 0001:22BB       SBMSetStartingY
+ 0001:22D4       ReadScreen
+ 0001:2305       RSSaveBitmapParams
+ 0001:2332       RSCallRoutine
+ 0001:233E       ReadScreenMono
+ 0001:249A       MoveCursor
+ 0001:2518       CheckCursor
+ 0001:2554       SetScreenClipFar
+ 0001:2558       SetScreenClip
+ 0001:2596       SSCDontDraw
+ 0001:2597       SSCExit
+ 0001:259A       CursorExclude
+ 0001:2606       CursorUnExclude
+ 0001:264A       DRAW_MONO_BITMAP
+ 0001:2693       DMC_DRAW_BITMAP
+ 0001:269D       DMC_LINE_LOOP
+ 0001:26A0       DMC_BYTE_LOOP
+ 0001:26A7       DMC_BL_BIT_LOOP
+ 0001:26CC       UserRepaintDisable
+ 0001:26F8       SCREEN_SWITCH_HOOK
+ 0001:273A       SWITCH_TO_FOREGROUND
+ 0001:2742       SWITCH_TO_BACKGROUND
+ 0001:2764       SaveScreenBitmap
+ 0001:27B5       SSB_GET_RECT
+ 0001:27DE       SSB_RESTORE
+ 0001:285B       SSB_ERROR_EXIT
+ 0001:2860       SSB_GOOD_EXIT
+ 0001:2863       SSB_SAVE
+ 0001:28A9       SSB_SAVE_OK
+ 0001:2913       SSB_COMMON
+ 0001:2971       SSB_EXIT
+ 0001:2979       SSB_END
+ 0001:2984       CopyRect
+ 0001:29C0       HARDWAREENABLE
+ 0001:2B34       HandleBrush
+ 0001:2B3E       HBWaitForQueue
+ 0001:2B4D       HBDithered
+ 0001:2CC0       HBSolid
+ 0001:2CD8       HBSBSetFunc
+ 0001:2CE7       HBSBSetMode
+ 0001:2CEE       HBSBDrawRect
+ 0001:2D1E       HBPatterned
+ 0001:2D3D       HBPBSetMono
+ 0001:2D5C       HBPBSetFunction
+ 0001:2D68       HBPBSetupLoop
+ 0001:2DA9       HBPBLoop
+ 0001:2DEE       CONVERTBRUSH
+ 0001:2E1C       CBPatterned
+ 0001:2E39       CBSolid
+ 0001:2E58       ColourTranslate
+ 0001:2E70       GetIndexOfRGBFar
+ 0001:2E7B       GetIndexOfRGB
+ 0001:2F25       ColorInfo
+ 0001:2F87       GetRGBOfIndex
+ 0002:0000       ExtTextOutR
+ 0002:008B       RBoardStrBlt
+ 0002:0573       CharWidthStrBlt
+ 0002:0598       CWSBLoop
+ 0002:0603       CWSBGetCharOffset
+ 0002:07BE       rDrawMegaGlyph
+ 0002:0818       RStrMem
+ 0002:08E6       GET_MODE
+ 0002:0B61       WORST_CASE_EXT
+ 0002:0C0C       COMP_BYTE_INTERVAL
+ 0002:0C50       MONO_BITMAP_OPAQUE
+ 0002:0C55       BITMAP_OPAQUE
+ 0002:0CDE       OUTPUT_O_RECT
+ 0002:0E1C       GET_DEVICE_DATA
+ 0002:0F2C       BUILD_STRING
+ 0002:0F83       SETUPBUILDSTRING
+ 0002:174E       SMARTPRO
+ 0002:17D4       PRESET_PRO_TEXT
+ 0002:1816       ONE_CHAR_SETUP
+ 0002:1822       GEN_NC_ONE_CHAR
+ 0002:1834       TWO_CHAR_SETUP
+ 0002:1848       GEN_NC_TWO_CHAR
+ 0002:1862       THREE_CHAR_SETUP
+ 0002:1882       GEN_NC_THREE_CHAR
+ 0002:18A8       FOUR_CHAR_SETUP
+ 0002:18D5       GEN_NC_FOUR_CHAR
+ 0002:190F       N_CHAR_SETUP
+ 0002:1920       GEN_NC_N_CHAR
+ 0002:195A       GEN_CL_ONE_CHAR
+ 0002:196C       GEN_CL_TWO_CHAR
+ 0002:1986       GEN_CL_THREE_CHAR
+ 0002:19AC       GEN_CL_FOUR_CHAR
+ 0002:19E6       GEN_CL_N_CHAR
+ 0002:1A20       DEV_OBWNC_ONE_CHAR
+ 0002:1A38       DEV_OBWNC_TWO_CHAR
+ 0002:1A60       DEV_OBWNC_THREE_CHAR
+ 0002:1A9E       DEV_OBWNC_FOUR_CHAR
+ 0002:1AD6       RLoadFont
+ 0002:1C27       LFLoop
+ 0002:1CE8       RLoadCharacter
+ 0002:1D2C       RDrawFont
+ 0002:1DB9       RLoadHugeFont
+ 0002:1F6A       RColourMemoryStrBlt
+ 0002:1FAA       CMSBAdjustCoordinates
+ 0002:1FFC       CMSBACExit
+ 0002:1FFF       CMSBBLTDownDest
+ 0002:201C       yBandLoop
+ 0002:2036       xBandLoop
+ 0002:207C       CMSBComputeDeltas
+ 0002:208B       CMSBMakeBaseRect
+ 0002:20A6       CMSBGetClipRect
+ 0002:20E8       CMSBGetOpaqueingRect
+ 0002:2124       CMSBDoStrBLT
+ 0002:2156       CMSBRestoreOpaqueRect
+ 0002:216E       CMSBRestoreClipRect
+ 0002:2186       CMSBReadBack
+ 0002:21BE       xBandLoopBottom
+ 0002:21E0       CMSExit
+ 0003:0000       ExtTextOutP
+ 0003:0093       PBoardStrBlt
+ 0003:057B       PCharWidthStrBlt
+ 0003:05A5       PCWSBLoop
+ 0003:0610       PCWSBGetCharOffset
+ 0003:07ED       pDrawMegaGlyph
+ 0003:0848       PLoadFont
+ 0003:099F       PLFLoop
+ 0003:0A61       PLoadCharacter
+ 0003:0AA7       PDrawFont
+ 0003:0B3C       PLoadHugeFont
+ 0003:0CEE       PStrMem
+ 0003:0D3C       DRAW_CHAR_STRING
+ 0003:0DC2       P_GET_MODE
+ 0003:1056       P_WORST_CASE_EXT
+ 0003:1105       P_COMP_BYTE_INTERVAL
+ 0003:1149       P_MONO_BITMAP_OPAQUE
+ 0003:114E       P_BITMAP_OPAQUE
+ 0003:11D7       P_OUTPUT_O_RECT
+ 0003:1321       P_GET_DEVICE_DATA
+ 0003:1434       P_BUILD_STRING
+ 0003:1434       REAL_BUILD_STRING
+ 0003:148B       PSETUPBUILDSTRING
+ 0003:1549       NON_JUSTIFIED_TEXT
+ 0003:1639       JUSTIFIED_TEXT
+ 0003:179E       JC_CHECK_DUMMY
+ 0003:1801       WORST_CASE
+ 0003:19B6       WCC_CHECK_DUMMY
+ 0003:1A47       PAD_LEFT_HAND_SIDE
+ 0003:1A82       PAD_RIGHT_HAND_SIDE
+ 0003:1AB9       PROCESS_STACK_DATA
+ 0003:1CA6       PSMARTPRO
+ 0003:1D2C       P_PRESET_PRO_TEXT
+ 0003:1D6E       P_ONE_CHAR_SETUP
+ 0003:1D7B       GEN_NC_ONE_CHAR_P
+ 0003:1D8E       P_TWO_CHAR_SETUP
+ 0003:1DA5       GEN_NC_TWO_CHAR_P
+ 0003:1DC2       P_THREE_CHAR_SETUP
+ 0003:1DE7       GEN_NC_THREE_CHAR_P
+ 0003:1E11       P_FOUR_CHAR_SETUP
+ 0003:1E45       GEN_NC_FOUR_CHAR_P
+ 0003:1E87       P_N_CHAR_SETUP
+ 0003:1E99       GEN_NC_N_CHAR_P
+ 0003:1EDB       GEN_CL_ONE_CHAR_P
+ 0003:1EEE       GEN_CL_TWO_CHAR_P
+ 0003:1F0B       GEN_CL_THREE_CHAR_P
+ 0003:1F35       GEN_CL_FOUR_CHAR_P
+ 0003:1F77       GEN_CL_N_CHAR_P
+ 0003:1FB9       DEV_OBWNC_ONE_CHAR_P
+ 0003:1FD3       DEV_OBWNC_TWO_CHAR_P
+ 0003:2001       DEV_OBWNC_THREE_CHAR_P
+ 0003:2048       DEV_OBWNC_FOUR_CHAR_P
+ 0003:2088       PColourMemoryStrBlt
+ 0003:20C8       PCMSBAdjustCoordinates
+ 0003:211A       PCMSBACExit
+ 0003:211D       PCMSBBLTDownDest
+ 0003:213A       PyBandLoop
+ 0003:2154       PxBandLoop
+ 0003:219A       PCMSBComputeDeltas
+ 0003:21A9       PCMSBMakeBaseRect
+ 0003:21C4       PCMSBGetClipRect
+ 0003:2206       PCMSBGetOpaqueingRect
+ 0003:2242       PCMSBDoStrBLT
+ 0003:227A       PCMSBRestoreOpaqueRect
+ 0003:2292       PCMSBRestoreClipRect
+ 0003:22AA       PCMSBReadBack
+ 0003:22E2       PxBandLoopBottom
+ 0003:2304       PCMSExit
+ 0004:0000       WriteScreenColor8
+ 0004:00BA       ReadScreenColor8
+ 0004:00DE       RSCLoop
+ 0004:0104       RSCCheckStatus
+ 0004:011C       RSCTranslate
+ 0004:014A       RSCNextLine
+ 0004:016F       RSCEndLoop
+ 0004:0174       WriteScreenColor8_386
+ 0004:026B       ReadScreenColor8_386
+ 0004:02A2       RSCLoop_386
+ 0004:02CD       RSCCheckStatus_386
+ 0004:02E7       RSCTranslate_386
+ 0004:0317       RSCNextLine_386
+ 0004:0345       RSCEndLoop_386
+ 0005:0000       WriteScreenColor4
+ 0005:00D4       ReadScreenColor4
+ 0005:015A       RSCOddTransfer
+ 0005:01C2       WriteScreenColor4_386
+ 0005:02D4       ReadScreenColor4_386
+ 0005:0375       RSCOddTransfer_386
+ 0006:0000       GetHardwareConfig
+ 0006:018C       LUTInit
+ 0006:01C4       HOOK_INT_2FH
+ 0006:0225       RESTORE_INT_2FH
+ 0006:024B       DRIVER_INITIALIZATION
+ 0006:0297       SETMULTIRESSETTING
+ 0006:02BE       GetDriverResourceID
+ 0006:030E       Enable
+ 0006:0320       ENReturnGDIInfo
+ 0006:0388       ENInitBoard
+ 0006:03AC       ENExit
+ 0006:03B7       Disable
+ 0006:0423       Inquire
+ 0006:0446       GDIInfoDataStructure
+ 0007:0000       MemoryDIBBits
+ 0007:00CE       PhysicalDIBBits
+ 0007:0220       DeviceBitmapBits
+ 0007:02A7       DIBDOFIXUP
+ 0007:0341       ALIGNDESTBITMAP
+ 0007:037B       COMPUTEPARAMETERS
+ 0007:04AB       BUILDCOLORINFO
+ 0007:04E0       MAKECOLORTABLE8
+ 0007:050E       BUILDCOLORINFO4
+ 0007:05C9       BUILDCOLORINFO_4
+ 0007:05D3       FOURTOONEFOUREIGHT
+ 0007:0647       ONEFOUREIGHTTOFOUR
+ 0007:06AB       PARTIAL4TO148
+ 0007:0723       PARTIAL4TO24
+ 0007:0776       PARTIAL148TO4
+ 0007:07DE       PARTIAL24TO4
+ 0007:081B       FOURTOTWENTYFOUR
+ 0007:0858       TWENTYFOURTOFOUR
+ 0007:0890       BUILDCOLORTABLE_4
+ 0007:091E       ONEFOUREIGHTTOEIGHT8
+ 0007:0958       ONEFOUREIGHTTOONE8
+ 0007:09B8       ONETOONEFOUREIGHT8
+ 0007:0A27       EIGHTTOONEFOUREIGHT8
+ 0007:0A79       DSESSWAP
+ 0007:0A82       READDIB
+ 0007:0A93       STOREDIB
+ 0007:0AA4       PARTIAL148TO8
+ 0007:0AE2       PARTIAL148TO1
+ 0007:0B46       PARTIAL8TO148
+ 0007:0B9C       PARTIAL1TO148
+ 0007:0C0F       PARTIAL24TO8
+ 0007:0C33       PARTIAL24TO1
+ 0007:0C67       PARTIAL1TO24
+ 0007:0CAA       PARTIAL8TO24
+ 0007:0CDB       EIGHTTO248
+ 0007:0CFE       ONETO248
+ 0007:0D35       TWENTYFOURTO88
+ 0007:0D53       TWENTYFOURTO18
+ 0007:0D8A       DIBToScreen
+ 0007:118E       SETUP8514RECT
+ 0007:11DB       START8514
+ 0007:1224       RLEBitmap
+ 0007:1292       EncodeMemory
+ 0007:13E0       DecodeMemory
+ 0007:1468       SetColorTable8
+ 0007:1485       GetColorTable8
+ 0007:14AB       SetColorTable4
+ 0007:14F4       GetColorTable4
+ 0007:1541       ReadPixel
+ 0007:154A       StorePixel
+ 0007:157B       InsertAbsCount
+ 0007:1594       DoNormalEOLStuff
+ 0007:15A1       StoreCountAndIndex
+ 0007:15AC       GetPhysicalRLE
+ 0007:1605       EncodeRLE8
+ 0007:1609       GPMainLoop
+ 0007:1615       GPSubsequentPixel
+ 0007:161C       GPNextRun
+ 0007:162D       GPAbsolute
+ 0007:1646       GPEndOfLine
+ 0007:1657       GPEndOfBitmap
+ 0007:1660       GPRunComplete
+ 0007:1667       GPEnterAbsolute
+ 0007:167C       GPAAbsoluteModeLoop
+ 0007:16A9       GPARunComplete
+ 0007:16B7       GPAEndOfLine
+ 0007:16C7       GPDone
+ 0007:16D9       VerifyDestAndCnt
+ 0007:16EC       BmpComputeY
+ 0007:172F       PreviousSegment
+ 0007:1742       DumpToBmp8
+ 0007:1771       DumpToBmp4
+ 0007:180B       DumpToBmp1
+ 0007:18E3       DumpToScreen
+ 0007:1931       DecodeRLE8
+ 0007:19DF       DecodeRLE4
+ 0007:1ADB       PhysicalRLE
+ 0007:1B55       StoreCountAndIndex4
+ 0007:1B68       ReadPixel4
+ 0007:1B79       EncodeRLE4
+ 0007:1B7D       GP4MainLoop
+ 0007:1B98       GP4SubsequentPixel
+ 0007:1BB3       GP4RunComplete
+ 0007:1BBA       GP4EndOfLine
+ 0007:1BD1       GP4EndOfBitmap
+ 0007:1BDB       GP4Absolute
+ 0007:1BE0       GP4StoreCurrentRun
+ 0007:1BE9       GPA4EndOfLineNode
+ 0007:1BEB       GP4EnterAbsolute
+ 0007:1C0A       GPA4AbsoluteModeLoop
+ 0007:1C35       GPAEndAbsolute
+ 0007:1C5A       GPA4EndOfLine
+ 0007:1C7C       GPA4RunComplete
+ 0007:1C8C       GP4Done
+ 0008:0000       GetSystemColors
+ 0008:0019       EnumObj
+ 0008:0040       EnumeratePen
+ 0008:0043       EnumeratePensLoop
+ 0008:007B       EnumerateBrush
+ 0008:00AD       EnumerateBrushesLoop
+ 0008:00F0       EnumDFonts
+ 0009:0000       ROT_BIT_TBL8
+ 0009:0008       Pixel8
+ 0009:01F2       UpdateColors
+ 0009:0325       SetPalTrans
+ 0009:03A4       GetPalTrans
+ 0009:03D4       SetPalette
+ 0009:041B       GetPalette
+ 0009:04E2       DRAWMODETBL8
+ 0009:0537       GetDrawModeParams8
+ 0009:0575       MemoryScanline8
+ 0009:0762       MemoryPolyline8
+ 0009:0D11       Bm8_Negative_Y
+ 0009:0D41       Bm8_Positive_Y
+ 0009:0D5D       Bm8_Positive_X
+ 0009:0D79       Bm8_Diagonal_4Q
+ 0009:0DAB       Bm8_Diagonal_1Q
+ 000A:0000       ROT_BIT_TBL4
+ 000A:0008       Pixel4
+ 000A:0137       BOARDPIXELOPERATION
+ 000A:025E       DRAWMODETBL4
+ 000A:02C6       GetDrawModeParams4
+ 000A:0306       MemoryScanline4
+ 000A:0562       MemoryPolyline4
+ 000A:0B28       Bm4_Negative_Y
+ 000A:0B74       Bm4_Positive_Y
+ 000A:0B90       Bm4_Positive_X
+ 000A:0BC9       Bm4_Diagonal_4Q
+ 000A:0C15       Bm4_Diagonal_1Q
+ 000B:0000       ROT_BIT_TBL
+ 000B:0008       Pixel
+ 000B:001C       Scanlines
+ 000B:004A       SCGetPattern
+ 000B:005D       SCGetSolidBrush
+ 000B:0061       SCGetDitheredBrush
+ 000B:0093       SCGetPen
+ 000B:00A8       SCGetPatternedBrush
+ 000B:00BD       SCCommon
+ 000B:0102       SCLoop
+ 000B:0129       SCLoopEnd
+ 000B:012B       SCEnd
+ 000B:012D       HandleDrawMode
+ 000B:0178       Rectangle
+ 000B:01C0       RTUseClipRect
+ 000B:01E6       RTGetCoordinates
+ 000B:0217       RTCheckBrush
+ 000B:0222       RTDrawInterior
+ 000B:022B       RTDrawOutline
+ 000B:029C       DrawInterior
+ 000B:02BE       RTSetRop2
+ 000B:02D0       RTCallHandleBrush
+ 000B:0332       Polylines
+ 000B:034F       PLGetCursorExcludeArea
+ 000B:0372       PLGetPen
+ 000B:037C       PLSetRop2
+ 000B:03A6       PLSetupLoop
+ 000B:03B2       PLLoop
+ 000B:0432       ClipLinePoints
+ 000B:04D6       Output
+ 000B:04F3       MemoryOutput
+ 000B:0502       MemOutPolyline
+ 000B:053C       OutputToBoard
+ 000B:0582       OTBScanlines
+ 000B:058C       OTBPolys
+ 000B:059A       OTBPolygon
+ 000B:05B3       OTBPolyline
+ 000B:05BE       OTBRectangle
+ 000B:05C6       OTBGoodExit
+ 000B:05D6       OTBExit
+ 000B:0624       DrawModeTbl
+ 000B:0644       DRAWMODELEN
+ 000B:0654       OUTPUTSEG_CHECK_STACK
+ 000C:0008       ScanLR
+ 000C:01C8       SCANLR_COLOUR
+ 000C:0203       SETUPPOINTERS
+ 000C:0266       SC_GET_DIRECTION
+ 000C:026F       SC_DO_SCAN
+ 000D:0388       TEMPSELECTOR
+ 000D:038A       FreeSpaceyOrg
+ 000D:038C       FreeSpaceyExt
+ 000D:038E       FullScreenClip
+ 000D:0396       InvisibleScreenClip
+ 000D:039E       VisibleScreenClip
+ 000D:03A6       Rop2TranslateTable
+ 000D:03B6       WRITEENABLE
+ 000D:03B7       BitsPixel
+ 000D:03B8       Palette
+ 000D:03D0       ExtraColors
+ 000D:03F4       RealPalette
+ 000D:0430       PhysicalIndexTable
+ 000D:046C       ColorFlagTable
+ 000D:0480       TranslateTable
+ 000D:0580       ITranslateTable
+ 000D:0680       BrushCopy
+ 000D:06CF       HardwarePaletteRead
+ 000D:06D0       PaletteFlags
+ 000D:06D1       NewDrawMode
+ 000D:06F1       PenCopy
+ 000D:06F4       SystemPaletteColors
+ 000D:06F5       WriteScreenColor
+ 000D:06F9       ReadScreenColor
+ 000D:06FD       PixelAddress
+ 000D:0701       MemoryScanline
+ 000D:0705       MemoryPolyline
+ 000D:0709       TextOutFunction
+ 000D:070D       Ring3ToRing0
+ 000D:0711       Ring0ToRing3
+ 000D:0716       OldFaceName
+ 000D:0736       BigOldFaceName
+ 000D:0756       OldFontHdr
+ 000D:0776       BigOldFontHdr
+ 000D:0796       OldFaceNameLength
+ 000D:0798       BigOldFaceNameLength
+ 000D:079A       SystemFontPointSize
+ 000D:079C       SystemFontEndPlane
+ 000D:079D       FontFreeSpaceYOrg
+ 000D:079E       FontFreeSpaceXOrg
+ 000D:07A0       SystemFontyExt
+ 000D:07A2       SystemFontLoaded
+ 000D:07A3       bLines
+ 000D:07A4       FontInfoTable
+ 000D:0DA4       SystemFontInfoTable
+ 000D:12E4       BigFontInfoTable
+ 000D:18E4       BigFontXOrg
+ 000D:18E6       BigFontLRU
+ 000D:18EA       BigFontWritePlane
+ 000D:18EC       BigCacheDisabled
+ 000D:18F2       ForgroundMix
+ 000D:18F3       BackgroundMix
+ 000D:18F8       CURSOR_ENABLED_FLAG
+ 000D:18F9       CURSOR_X_SIZE
+ 000D:18FB       CURSOR_Y_SIZE
+ 000D:18FD       X_HOT_SPOT
+ 000D:18FF       Y_HOT_SPOT
+ 000D:1902       CURSOR_X_COORDINATE
+ 000D:1904       CURSOR_Y_COORDINATE
+ 000D:1906       UNDONE_X_COORDINATE
+ 000D:1908       UNDONE_Y_COORDINATE
+ 000D:190A       CURSOR_MOVED_FLAG
+ 000D:190B       DRAW_BUSY_FLAG
+ 000D:190C       CURSOR_EXCLUDE_FLAG
+ 000D:1926       F96DPI
+ 000D:1928       ShadowMemoryTrashed
+ 000D:1929       SaveInUse
+ 000D:192A       SaveSpaceyOrg
+ 000D:192C       SaveSpaceyExt
+ 000D:1938       SZGDI
+
+Program entry point at 0006:024B

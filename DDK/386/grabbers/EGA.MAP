@@ -1,0 +1,316 @@
+
+ GRABBER
+
+ Start     Length     Name                   Class
+ 0001:0000 02F68H     _TEXT                  CODE
+ 0002:0000 00000H     _DATA                  DATA
+
+ Origin   Group
+ 0002:0   DGROUP
+
+ Address   Export                  Alias
+
+ 0001:1EF0 AdjustInitEndPt         AdjustInitEndPt
+ 0001:1E52 BeginSelection          BeginSelection
+ 0001:2E93 CheckGRBVersion         CheckGRBVersion
+ 0001:2066 ConsSelecRec            ConsSelecRec
+ 0001:2DDE CursorOff               CursorOff
+ 0001:2DA9 CursorOn                CursorOn
+ 0001:2E23 CursorPosit             CursorPosit
+ 0001:1EBF EndSelection            EndSelection
+ 0001:00D3 GetDisplayUpd           GetDisplayUpd
+ 0001:2D17 GetFontList             GetFontList
+ 0001:20CA GrabComplete            GrabComplete
+ 0001:2BD6 GrabEvent               GrabEvent
+ 0001:2F02 GrbGetTextColor         GrbGetTextColor
+ 0001:2D72 GrbUnlockApp            GrbUnlockApp
+ 0001:2095 InvertSelection         InvertSelection
+ 0001:1F40 KeySelection            KeySelection
+ 0001:2011 MakeSelctRect           MakeSelctRect
+ 0001:0000 PaintScreen             PaintScreen
+ 0001:21D6 RenderSelection         RenderSelection
+ 0001:2BED ScreenFree              ScreenFree
+ 0001:2C04 SetPaintFnt             SetPaintFnt
+ 0001:2E55 TranslateWinToFScreen   TranslateWinToFScreen
+ 0001:017C UpdateScreen            UpdateScreen
+ 0001:2F52 WEP                     WEP
+
+  Address         Publics by Name
+
+ 0001:1EF0       AdjustInitEndPt
+ 0001:1724       AdjustSelGrxMax
+ 0001:14A5       AdjustSelText
+ 0001:174F       AdjustSelTextMax
+ 0001:0C47       AllocCommonRes
+ 0001:0820       AllocExtraRes
+ 0001:1E52       BeginSelection
+ 0000:0000  Imp  BitBlt               (GDI.34)
+ 0001:282A       BuildDIBHdr
+ 0001:0B2E       BuildDisplayRect
+ 0001:1820       CheckCtrlState
+ 0001:2E93       CheckGRBVersion
+ 0001:0A9F       CheckMode
+ 0001:1CA7       ClearVidSel
+ 0001:15BF       ComputeSelTextrect
+ 0001:2066       ConsSelecRec
+ 0000:0000  Imp  CreateBitmap         (GDI.48)
+ 0000:0000  Imp  CreateCaret          (USER.163)
+ 0000:0000  Imp  CreateCompatibleBitmap (GDI.51)
+ 0000:0000  Imp  CreateCompatibleDC   (GDI.52)
+ 0001:11D3       CreateOverScanBrGrx
+ 0001:152C       CreateOverScanBrTxt
+ 0000:0000  Imp  CreateSolidBrush     (GDI.66)
+ 0001:2DDE       CursorOff
+ 0001:2DA9       CursorOn
+ 0001:1CEC       CursorPos
+ 0001:2E23       CursorPosit
+ 0001:0C8C       DeAllocAllRes
+ 0001:147F       DeAllocResText
+ 0000:0000  Imp  DeleteDC             (GDI.68)
+ 0000:0000  Imp  DeleteObject         (GDI.69)
+ 0000:0000  Imp  DestroyCaret         (USER.164)
+ 0001:1044       DisplayMap
+ 0001:1EBF       EndSelection
+ 0001:0A72       GetBkMaskDEF10
+ 0000:0000  Imp  GetDC                (USER.66)
+ 0001:00D3       GetDisplayUpd
+ 0001:0D3D       GetDwordDataEF10
+ 0001:2D17       GetFontList
+ 0000:0000  Imp  GetNearestColor      (GDI.154)
+ 0001:04BB       GetPageBitmap
+ 0000:0000  Imp  GetPrivateProfileString (KERNEL.128)
+ 0001:210E       GetSelectionSiz
+ 0001:177A       GetTextWidHgt
+ 0000:0000  Imp  GetUpdateRect        (USER.190)
+ 0001:1949       GetVidSel
+ 0001:07F8       GetWinRGB
+ 0001:1572       GetWinRGbText
+ 0001:0D9C       GetWordDataD
+ 0000:0000  Imp  GlobalAlloc          (KERNEL.15)
+ 0000:0000  Imp  GlobalFree           (KERNEL.17)
+ 0000:0000  Imp  GlobalLock           (KERNEL.18)
+ 0000:0000  Imp  GlobalUnlock         (KERNEL.19)
+ 0001:268C       GMGLineDoneDEF10
+ 0001:2587       GMGMode45Line
+ 0001:25BA       GMGNextDword4
+ 0001:2652       GMGPlaneGrx
+ 0001:20CA       GrabComplete
+ 0001:2BD6       GrabEvent
+ 0001:2F02       GrbGetTextColor
+ 0001:2D72       GrbUnlockApp
+ 0001:0A82       InitFrameVars
+ 0001:2F55       InitGrabber
+ 0001:12C1       InitTextFrameVars
+ 0000:0000  Imp  InvertRect           (USER.82)
+ 0001:2095       InvertSelection
+ 0001:1602       InvSel
+ 0001:168C       InvSel2
+ 0001:1F40       KeySelection
+ 0001:1D61       LineBlt
+ 0001:1194       LineDoneDEF10
+ 0001:151A       LineNum
+ 0001:1C04       LookupPalette
+ 0001:18A5       MakeNewCursor
+ 0001:2011       MakeSelctRect
+ 0001:0EC1       Mode45Line
+ 0001:0FF1       Mode6Line
+ 0001:0DDD       ModeGrfx
+ 0001:1228       ModeText
+ 0001:0388       NoScrollx
+ 0001:14FC       Outline
+ 0001:0491       PaintClientRect
+ 0001:13D5       PaintExtraAreaText
+ 0001:0000       PaintScreen
+ 0001:00A5       PaintWindowBlack
+ 0000:0000  Imp  PatBlt               (GDI.29)
+ 0001:0AF1       PatBltOverScanColor
+ 0001:090C       PixelDoubleModeD
+ 0001:1124       PlaneGrx
+ 0001:06BB       PrepPnt
+ 0001:2AA4       ProcessByteD
+ 0001:2944       ProcessByteE10
+ 0001:2903       ProcessDwordE10
+ 0001:2A7E       ProcessWordD
+ 0001:292E       ProcessWordE10
+ 0000:0000  Imp  ReleaseDC            (USER.68)
+ 0001:2490       RenderRectGrxDisplay
+ 0001:2BCC       RenderRectGrxMono
+ 0001:23FC       RenderRectText
+ 0001:21D6       RenderSelection
+ 0001:07B8       RGBTable
+ 0001:04A8       SavePaintRect
+ 0001:17AA       ScreenAdjust
+ 0001:2BED       ScreenFree
+ 0001:066D       ScrollWin
+ 0000:0000  Imp  ScrollWindow         (USER.61)
+ 0000:0000  Imp  SelectObject         (GDI.45)
+ 0001:1397       SelectTextFont
+ 0001:1588       SetBitBit
+ 0000:0000  Imp  SetBitmapBits        (GDI.106)
+ 0001:0861       SetBkBitsMode4
+ 0000:0000  Imp  SetBkColor           (GDI.1)
+ 0000:0000  Imp  SetCaretPos          (USER.165)
+ 0000:0000  Imp  SetDIBits            (GDI.440)
+ 0001:08A9       SetMonoBits
+ 0001:141F       SetNewBkFg
+ 0001:2C04       SetPaintFnt
+ 0001:0BDC       SetParamsCGAMode
+ 0001:0C14       SetParamsMode11
+ 0001:0CE9       SetParamsPlanarMode
+ 0001:12DE       SetParamsText
+ 0001:26E5       SetScreenBMBits
+ 0000:0000  Imp  SetTextColor         (GDI.9)
+ 0001:0D2B       SetupLineBits
+ 0001:0C33       SkipBkBits
+ 0001:051C       stallBS
+ 0001:1B64       StandardPal
+ 0000:0000  Imp  TextOut              (GDI.33)
+ 0001:0516       TextScroll
+ 0001:0368       TextUpdate
+ 0001:2E55       TranslateWinToFScreen
+ 0001:017C       UpdateScreen
+ 0000:0000  Imp  UpdateWindow         (USER.124)
+ 0001:06B8       UpdWinOver
+ 0001:2F52       WEP
+ 0001:26CD       XferMonoBits
+
+  Address         Publics by Value
+
+ 0000:0000  Imp  GlobalUnlock         (KERNEL.19)
+ 0000:0000  Imp  CreateBitmap         (GDI.48)
+ 0000:0000  Imp  InvertRect           (USER.82)
+ 0000:0000  Imp  SetCaretPos          (USER.165)
+ 0000:0000  Imp  TextOut              (GDI.33)
+ 0000:0000  Imp  GlobalFree           (KERNEL.17)
+ 0000:0000  Imp  SetTextColor         (GDI.9)
+ 0000:0000  Imp  PatBlt               (GDI.29)
+ 0000:0000  Imp  GlobalLock           (KERNEL.18)
+ 0000:0000  Imp  GetDC                (USER.66)
+ 0000:0000  Imp  BitBlt               (GDI.34)
+ 0000:0000  Imp  CreateCompatibleDC   (GDI.52)
+ 0000:0000  Imp  SelectObject         (GDI.45)
+ 0000:0000  Imp  UpdateWindow         (USER.124)
+ 0000:0000  Imp  SetDIBits            (GDI.440)
+ 0000:0000  Imp  ScrollWindow         (USER.61)
+ 0000:0000  Imp  CreateCaret          (USER.163)
+ 0000:0000  Imp  DeleteObject         (GDI.69)
+ 0000:0000  Imp  GetUpdateRect        (USER.190)
+ 0000:0000  Imp  GetNearestColor      (GDI.154)
+ 0000:0000  Imp  GetPrivateProfileString (KERNEL.128)
+ 0000:0000  Imp  SetBkColor           (GDI.1)
+ 0000:0000  Imp  ReleaseDC            (USER.68)
+ 0000:0000  Imp  SetBitmapBits        (GDI.106)
+ 0000:0000  Imp  DeleteDC             (GDI.68)
+ 0000:0000  Imp  DestroyCaret         (USER.164)
+ 0000:0000  Imp  GlobalAlloc          (KERNEL.15)
+ 0000:0000  Imp  CreateSolidBrush     (GDI.66)
+ 0000:0000  Imp  CreateCompatibleBitmap (GDI.51)
+ 0001:0000       PaintScreen
+ 0001:00A5       PaintWindowBlack
+ 0001:00D3       GetDisplayUpd
+ 0001:017C       UpdateScreen
+ 0001:0368       TextUpdate
+ 0001:0388       NoScrollx
+ 0001:0491       PaintClientRect
+ 0001:04A8       SavePaintRect
+ 0001:04BB       GetPageBitmap
+ 0001:0516       TextScroll
+ 0001:051C       stallBS
+ 0001:066D       ScrollWin
+ 0001:06B8       UpdWinOver
+ 0001:06BB       PrepPnt
+ 0001:07B8       RGBTable
+ 0001:07F8       GetWinRGB
+ 0001:0820       AllocExtraRes
+ 0001:0861       SetBkBitsMode4
+ 0001:08A9       SetMonoBits
+ 0001:090C       PixelDoubleModeD
+ 0001:0A72       GetBkMaskDEF10
+ 0001:0A82       InitFrameVars
+ 0001:0A9F       CheckMode
+ 0001:0AF1       PatBltOverScanColor
+ 0001:0B2E       BuildDisplayRect
+ 0001:0BDC       SetParamsCGAMode
+ 0001:0C14       SetParamsMode11
+ 0001:0C33       SkipBkBits
+ 0001:0C47       AllocCommonRes
+ 0001:0C8C       DeAllocAllRes
+ 0001:0CE9       SetParamsPlanarMode
+ 0001:0D2B       SetupLineBits
+ 0001:0D3D       GetDwordDataEF10
+ 0001:0D9C       GetWordDataD
+ 0001:0DDD       ModeGrfx
+ 0001:0EC1       Mode45Line
+ 0001:0FF1       Mode6Line
+ 0001:1044       DisplayMap
+ 0001:1124       PlaneGrx
+ 0001:1194       LineDoneDEF10
+ 0001:11D3       CreateOverScanBrGrx
+ 0001:1228       ModeText
+ 0001:12C1       InitTextFrameVars
+ 0001:12DE       SetParamsText
+ 0001:1397       SelectTextFont
+ 0001:13D5       PaintExtraAreaText
+ 0001:141F       SetNewBkFg
+ 0001:147F       DeAllocResText
+ 0001:14A5       AdjustSelText
+ 0001:14FC       Outline
+ 0001:151A       LineNum
+ 0001:152C       CreateOverScanBrTxt
+ 0001:1572       GetWinRGbText
+ 0001:1588       SetBitBit
+ 0001:15BF       ComputeSelTextrect
+ 0001:1602       InvSel
+ 0001:168C       InvSel2
+ 0001:1724       AdjustSelGrxMax
+ 0001:174F       AdjustSelTextMax
+ 0001:177A       GetTextWidHgt
+ 0001:17AA       ScreenAdjust
+ 0001:1820       CheckCtrlState
+ 0001:18A5       MakeNewCursor
+ 0001:1949       GetVidSel
+ 0001:1B64       StandardPal
+ 0001:1C04       LookupPalette
+ 0001:1CA7       ClearVidSel
+ 0001:1CEC       CursorPos
+ 0001:1D61       LineBlt
+ 0001:1E52       BeginSelection
+ 0001:1EBF       EndSelection
+ 0001:1EF0       AdjustInitEndPt
+ 0001:1F40       KeySelection
+ 0001:2011       MakeSelctRect
+ 0001:2066       ConsSelecRec
+ 0001:2095       InvertSelection
+ 0001:20CA       GrabComplete
+ 0001:210E       GetSelectionSiz
+ 0001:21D6       RenderSelection
+ 0001:23FC       RenderRectText
+ 0001:2490       RenderRectGrxDisplay
+ 0001:2587       GMGMode45Line
+ 0001:25BA       GMGNextDword4
+ 0001:2652       GMGPlaneGrx
+ 0001:268C       GMGLineDoneDEF10
+ 0001:26CD       XferMonoBits
+ 0001:26E5       SetScreenBMBits
+ 0001:282A       BuildDIBHdr
+ 0001:2903       ProcessDwordE10
+ 0001:292E       ProcessWordE10
+ 0001:2944       ProcessByteE10
+ 0001:2A7E       ProcessWordD
+ 0001:2AA4       ProcessByteD
+ 0001:2BCC       RenderRectGrxMono
+ 0001:2BD6       GrabEvent
+ 0001:2BED       ScreenFree
+ 0001:2C04       SetPaintFnt
+ 0001:2D17       GetFontList
+ 0001:2D72       GrbUnlockApp
+ 0001:2DA9       CursorOn
+ 0001:2DDE       CursorOff
+ 0001:2E23       CursorPosit
+ 0001:2E55       TranslateWinToFScreen
+ 0001:2E93       CheckGRBVersion
+ 0001:2F02       GrbGetTextColor
+ 0001:2F52       WEP
+ 0001:2F55       InitGrabber
+
+Program entry point at 0001:2F55

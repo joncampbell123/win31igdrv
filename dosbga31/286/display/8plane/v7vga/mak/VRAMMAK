@@ -1,0 +1,2 @@
+-B63 -v -ML -I..\inc -I..\src\ -I..\src\inc ..\src\bs216
+-DPALETTES -DHIRES -DPROTECTEDMODE ..\obj\bs216.obj;

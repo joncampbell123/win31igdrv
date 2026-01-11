@@ -1,0 +1,70 @@
+Disptest.exe--Run:  3/27/2018  at  23:20:58
+Run with command line options:
+''.
+
+Using '[VGA]' as display type token.
+
+Using 'C:\DDK\NCT\DISK1\disptest.ini' as .ini file.
+
+
+
+The video display token '[VGA]' was not found in the
+file 'C:\DDK\NCT\DISK1\disptest.ini'.Disptest.exe--Run:  3/27/2018  at  23:21:24
+Run with command line options:
+''.
+
+Using '[VGA]' as display type token.
+
+Using 'C:\DDK\NCT\DISK1\disptest.ini' as .ini file.
+
+Error:Screen #5030003
+Failure to set scanlines to 200
+
+Error:Screen #5030100
+Failure to set scanlines to 350
+
+Error:Screen #5030000
+Failure to set scanlines to 200
+
+Error:Screen #5030103
+Failure to set scanlines to 350
+
+Error:Screen #5030000
+Failure to set scanlines to 200
+
+Error:Screen #5030100
+Failure to set scanlines to 350
+
+Error:Screen #5010103
+Failure to set scanlines to 350
+
+Error:Screen #5010000
+Failure to set scanlines to 200
+
+Error:Screen #5010000
+Failure to set scanlines to 200
+
+Error:Screen #5030100
+Failure to set scanlines to 350
+
+Error:Screen #5000000
+Failure to set scanlines to 200
+
+Error:Screen #5000000
+Failure to set scanlines to 200
+
+Error:Screen #5010000
+Failure to set scanlines to 200
+
+Error:Screen #5030000
+Failure to set scanlines to 200
+
+Error:Screen #5020000
+Failure to set scanlines to 200
+
+Error:Screen #5030100
+Failure to set scanlines to 350
+
+Disptest.exe--Ended:  3/27/2018  at  23:22:01
+Completed 46 screens.
+

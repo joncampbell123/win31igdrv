@@ -1,0 +1,1178 @@
+;	Static Name Aliases
+;
+	TITLE   midic.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_FIX	SEGMENT  WORD PUBLIC 'CODE'
+_FIX	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+_TEXT	SEGMENT  WORD PUBLIC 'CODE'
+_TEXT	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _gbMidiLengths
+PUBLIC  _gbSysLengths
+EXTRN	LSTRCPY:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	GLOBALPAGELOCK:FAR
+EXTRN	GLOBALPAGEUNLOCK:FAR
+EXTRN	_SoundWarmInit:FAR
+EXTRN	SYNTHMIDIDATA:NEAR
+EXTRN	SYNTHALLNOTESOFF:NEAR
+EXTRN	DRIVERCALLBACK:FAR
+EXTRN	VADLIBDACQUIREADLIBSYNTH:FAR
+EXTRN	VADLIBDRELEASEADLIBSYNTH:FAR
+EXTRN	_wDebugLevel:WORD
+EXTRN	_fEnabled:WORD
+EXTRN	_aszProductName:BYTE
+_BSS      SEGMENT
+COMM NEAR	_gClient:	BYTE:	 14
+COMM NEAR	_wAllocated:	BYTE:	 2
+COMM NEAR	_synthreenter:	BYTE:	 2
+_BSS      ENDS
+EXTRN	_fPercussion:WORD
+_BSS      SEGMENT
+COMM NEAR	_bCurrentLen:	BYTE:	 1
+COMM NEAR	_status:	BYTE:	 1
+_BSS      ENDS
+_DATA      SEGMENT
+_gbMidiLengths	DB	03H
+	DB	03H
+	DB	03H
+	DB	03H
+	DB	02H
+	DB	02H
+	DB	03H
+	ORG	$+1
+_gbSysLengths	DB	01H
+	DB	02H
+	DB	03H
+	DB	02H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+$SG2567	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2568	DB	'modMessage called while disabled',  00H
+$SG2573	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2574	DB	'invalid midi device id',  00H
+$SG2581	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2582	DB	'MODM_GETNUMDEVS',  00H
+$SG2585	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2586	DB	'MODM_GETDEVCAPS',  00H
+$SG2589	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2590	DB	'MODM_OPEN',  00H
+$SG2594	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2595	DB	'AdLib could NOT be aquired!!!',  00H
+$SG2601	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2602	DB	'MODM_CLOSE',  00H
+$SG2605	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2606	DB	'AdLib could NOT be RELEASED!!! VERY GOOFY!!',  00H
+$SG2609	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2610	DB	'MODM_RESET',  00H
+$SG2613	DB	' ',  00H
+$SG2614	DB	'MODM_DATA',  00H
+$SG2617	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2618	DB	'MODM_DATA reentered!',  00H
+$SG2628	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2629	DB	'MODM_LONGDATA',  00H
+$SG2632	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2633	DB	'MODM_LONGDATA reentered!',  00H
+_DATA      ENDS
+_FIX      SEGMENT
+	ASSUME	CS: _FIX
+	PUBLIC	MIDICALLBACK
+MIDICALLBACK	PROC NEAR
+;|*** /*****************************************************************************
+;|***  *
+;|***  *   midic.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "adlib.h"
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|*** *****************************************************************************/ 
+;|*** 
+;|*** static void NEAR PASCAL midiCallback(NPSYNTHALLOC pClient, WORD msg, DWORD dw1, DWORD dw2);
+;|*** 
+;|*** static void FAR PASCAL GetSynthCaps(LPBYTE lpCaps, WORD wSize);
+;|*** #pragma alloc_text(_TEXT, GetSynthCaps)
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     local data
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** static SYNTHALLOC gClient;     /* client information */
+;|*** static WORD wAllocated;        /* have we already been allocated? */
+;|*** static int synthreenter;       /* reentrancy check */
+;|*** BYTE status;                   /* don't make assumptions about initial status */
+;|*** BYTE bCurrentLen;
+;|*** 
+;|*** 
+;|*** #define FIXED_DS()  HIWORD((DWORD)(LPVOID)(&wAllocated))
+;|*** #define FIXED_CS()  HIWORD((DWORD)(LPVOID)modMessage)
+;|*** 
+;|*** BYTE gbMidiLengths[] =
+;|*** {
+;|***         3,      /* STATUS_NOTEOFF */
+;|***         3,      /* STATUS_NOTEON */
+;|***         3,      /* STATUS_POLYPHONICKEY */
+;|***         3,      /* STATUS_CONTROLCHANGE */
+;|***         2,      /* STATUS_PROGRAMCHANGE */
+;|***         2,      /* STATUS_CHANNELPRESSURE */
+;|***         3,      /* STATUS_PITCHBEND */
+;|*** };
+;|*** 
+;|*** BYTE gbSysLengths[] =
+;|*** {
+;|***         1,      /* STATUS_SYSEX */
+;|***         2,      /* STATUS_QFRAME */
+;|***         3,      /* STATUS_SONGPOINTER */
+;|***         2,      /* STATUS_SONGSELECT */
+;|***         1,      /* STATUS_F4 */
+;|***         1,      /* STATUS_F5 */
+;|***         1,      /* STATUS_TUNEREQUEST */
+;|***         1,      /* STATUS_EOX */
+;|*** };
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | midiCallback | This calls DriverCallback, which calls the
+;|***  *     client's callback or window if the client has requested notification.
+;|***  *
+;|***  * @parm NPSYNTHALLOC | pClient | Pointer to the SYNTHALLOC structure.
+;|***  *
+;|***  * @parm WORD | msg | The message to send.
+;|***  *
+;|***  * @parm DWORD | dw1 | Message-dependent parameter.
+;|***  *
+;|***  * @parm DWORD | dw2 | Message-dependent parameter.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL midiCallback(NPSYNTHALLOC pClient, WORD msg, DWORD dw1, DWORD dw2)
+;|*** {
+; Line 81
+	*** 000000	55 			push	bp
+	*** 000001	8b ec 			mov	bp,sp
+	*** 000003	56 			push	si
+;	pClient = 14
+;	msg = 12
+;	dw1 = 8
+;	dw2 = 4
+	*** 000004	8b 76 0e 		mov	si,WORD PTR [bp+14]	;pClient
+;|***     /* dwFlags contains midi driver specific flags in the LOWORD */
+;|***     /* and generic driver flags in the HIWORD */
+;|*** 
+;|***     if (pClient->dwCallback)
+; Line 85
+	*** 000007	8b 44 04 		mov	ax,WORD PTR [si+4]
+	*** 00000a	0b 44 02 		or	ax,WORD PTR [si+2]
+	*** 00000d	74 25 			je	$EX2538
+;|***         DriverCallback(pClient->dwCallback,      /* client's callback DWORD */
+;|***                        HIWORD(pClient->dwFlags), /* callback flags */
+;|***                        pClient->hMidiOut,        /* handle to the wave device */
+;|***                        msg,                      /* the message */
+;|***                        pClient->dwInstance,      /* client's instance data */
+;|***                        dw1,                      /* first DWORD */
+;|***                        dw2);                     /* second DWORD */
+; Line 92
+	*** 00000f	ff 74 04 		push	WORD PTR [si+4]
+	*** 000012	ff 74 02 		push	WORD PTR [si+2]
+	*** 000015	ff 74 0c 		push	WORD PTR [si+12]
+	*** 000018	ff 34 			push	WORD PTR [si]
+	*** 00001a	ff 76 0c 		push	WORD PTR [bp+12]	;msg
+	*** 00001d	ff 74 08 		push	WORD PTR [si+8]
+	*** 000020	ff 74 06 		push	WORD PTR [si+6]
+	*** 000023	ff 76 0a 		push	WORD PTR [bp+10]
+	*** 000026	ff 76 08 		push	WORD PTR [bp+8]	;dw1
+	*** 000029	ff 76 06 		push	WORD PTR [bp+6]
+	*** 00002c	ff 76 04 		push	WORD PTR [bp+4]	;dw2
+	*** 00002f	9a 00 00 00 00 		call	FAR PTR DRIVERCALLBACK
+;|*** }
+; Line 93
+					$EX2538:
+	*** 000034	5e 			pop	si
+	*** 000035	c9 			leave	
+	*** 000036	c2 0c 00 		ret	12	;000cH
+	*** 000039	90 			nop	
+
+MIDICALLBACK	ENDP
+_FIX      ENDS
+_TEXT      SEGMENT
+	ASSUME	CS: _TEXT
+	PUBLIC	GETSYNTHCAPS
+GETSYNTHCAPS	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | GetSynthCaps | Get the capabilities of the synth.
+;|***  *
+;|***  * @parm LPBYTE | lpCaps | Far pointer to a MIDICAPS structure.
+;|***  *
+;|***  * @parm WORD | wSize | Size of the MIDICAPS structure.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void FAR PASCAL GetSynthCaps(LPBYTE lpCaps, WORD wSize)
+;|*** {
+; Line 107
+	*** 000000	c8 38 00 00 		enter	56,0
+	*** 000004	57 			push	di
+	*** 000005	56 			push	si
+;	lpCaps = 8
+;	wSize = 6
+;	mc = -56
+;	mp = -6
+;	w = -2
+;|*** MIDIOUTCAPS mc;    /* caps structure we know about */
+;|*** LPBYTE      mp;    /* place in client's buffer */
+;|*** WORD        w;     /* number of bytes to copy */
+;|*** 
+;|***     mc.wMid = MM_MICROSOFT;
+; Line 112
+	*** 000006	c7 46 c8 01 00 		mov	WORD PTR [bp-56],1	;mc
+;|***     mc.wPid = MM_ADLIB;
+; Line 113
+	*** 00000b	c7 46 ca 09 00 		mov	WORD PTR [bp-54],9
+;|***     mc.wTechnology = MOD_FMSYNTH;
+; Line 114
+	*** 000010	c7 46 ee 04 00 		mov	WORD PTR [bp-18],4
+;|***     mc.wVoices = NUMVOICES;
+; Line 115
+	*** 000015	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 00001a	1b c0 			sbb	ax,ax
+	*** 00001c	24 fe 			and	al,254	;00feH
+	*** 00001e	05 0b 00 		add	ax,11	;000bH
+	*** 000021	89 46 f0 		mov	WORD PTR [bp-16],ax
+;|***     mc.wNotes = NUMVOICES;
+; Line 116
+	*** 000024	89 46 f2 		mov	WORD PTR [bp-14],ax
+;|***     mc.wChannelMask = 0xff;                       /* all channels */
+; Line 117
+	*** 000027	c7 46 f4 ff 00 		mov	WORD PTR [bp-12],255	;00ffH
+;|***     mc.vDriverVersion = DRIVER_VERSION;
+; Line 118
+	*** 00002c	c7 46 cc 01 01 		mov	WORD PTR [bp-52],257	;0101H
+;|***     mc.dwSupport = 0L;
+; Line 119
+	*** 000031	2b c0 			sub	ax,ax
+	*** 000033	89 46 f8 		mov	WORD PTR [bp-8],ax
+	*** 000036	89 46 f6 		mov	WORD PTR [bp-10],ax
+;|***     lstrcpy(mc.szPname, aszProductName);
+; Line 120
+	*** 000039	8d 46 ce 		lea	ax,WORD PTR [bp-50]
+	*** 00003c	16 			push	ss
+	*** 00003d	50 			push	ax
+	*** 00003e	68 00 00 		push	SEG _aszProductName
+	*** 000041	68 00 00 		push	OFFSET _aszProductName
+	*** 000044	9a 00 00 00 00 		call	FAR PTR LSTRCPY
+;|*** 
+;|***     /* copy as much as will fit into client's buffer */
+;|***     w = min(wSize, sizeof(MIDIOUTCAPS));
+; Line 123
+	*** 000049	8b 76 06 		mov	si,WORD PTR [bp+6]	;wSize
+	*** 00004c	83 fe 32 		cmp	si,50	;0032H
+	*** 00004f	76 03 			jbe	$L2643
+	*** 000051	be 32 00 		mov	si,50	;0032H
+					$L2643:
+;|***     mp = (LPBYTE)&mc;
+; Line 124
+	*** 000054	8d 46 c8 		lea	ax,WORD PTR [bp-56]	;mc
+	*** 000057	8b f8 			mov	di,ax
+	*** 000059	8c 56 fc 		mov	WORD PTR [bp-4],ss
+	*** 00005c	89 76 fe 		mov	WORD PTR [bp-2],si	;w
+	*** 00005f	8b 76 08 		mov	si,WORD PTR [bp+8]	;lpCaps
+	*** 000062	8b 4e fe 		mov	cx,WORD PTR [bp-2]	;w
+;|***     while (w--) *lpCaps++ = *mp++;
+; Line 125
+	*** 000065	eb 12 			jmp	SHORT $L2646
+					$FC2549:
+	*** 000067	8e 46 fc 		mov	es,WORD PTR [bp-4]
+	*** 00006a	8b df 			mov	bx,di
+	*** 00006c	47 			inc	di
+	*** 00006d	26 8a 07 		mov	al,BYTE PTR es:[bx]
+	*** 000070	8e 46 0a 		mov	es,WORD PTR [bp+10]
+	*** 000073	8b de 			mov	bx,si
+	*** 000075	46 			inc	si
+	*** 000076	26 88 07 		mov	BYTE PTR es:[bx],al
+					$L2646:
+	*** 000079	8b c1 			mov	ax,cx
+	*** 00007b	49 			dec	cx
+	*** 00007c	0b c0 			or	ax,ax
+	*** 00007e	75 e7 			jne	$FC2549
+;|*** }
+; Line 126
+	*** 000080	5e 			pop	si
+	*** 000081	5f 			pop	di
+	*** 000082	c9 			leave	
+	*** 000083	ca 06 00 		ret	6
+
+GETSYNTHCAPS	ENDP
+_TEXT      ENDS
+_FIX      SEGMENT
+	ASSUME	CS: _FIX
+	PUBLIC	MODMESSAGE
+MODMESSAGE	PROC FAR
+;|*** /****************************************************************************
+;|*** 
+;|***     This function conforms to the standard MIDI output driver message proc
+;|***     modMessage, which is documented in the multimedia DDK.
+;|*** 
+;|***  ***************************************************************************/
+;|*** DWORD FAR PASCAL _loadds modMessage(WORD id, WORD msg, DWORD dwUser, DWORD dwParam1, DWORD dwParam2)
+;|*** {
+; Line 134
+	*** 00003a	c8 04 00 00 		enter	4,0
+	*** 00003e	57 			push	di
+	*** 00003f	56 			push	si
+	*** 000040	1e 			push	ds
+	*** 000041	b8 00 00 		mov	ax,DGROUP
+	*** 000044	8e d8 			mov	ds,ax
+	ASSUME DS: DGROUP
+;	dwParam2 = 6
+;	lpHdr = -4
+;	lpBuf = -4
+;	dwLength = -4
+;	id = 20
+;	msg = 18
+;	dwUser = 14
+;	dwParam1 = 10
+;|*** LPMIDIHDR    lpHdr;        /* header of long message buffer */
+;|*** LPSTR lpBuf;               /* current spot in long message buffer */
+;|*** DWORD dwLength;            /* length of data being processed */
+;|***     
+;|***     /* has the whole card been enabled? */
+;|***     if (!fEnabled) {
+; Line 140
+	*** 000046	83 3e 00 00 00 		cmp	WORD PTR _fEnabled,0
+	*** 00004b	75 29 			jne	$I2565
+;|***         D1("modMessage called while disabled");
+; Line 141
+	*** 00004d	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000052	72 12 			jb	$I2566
+	*** 000054	50 			push	ax
+	*** 000055	68 00 00 		push	OFFSET DGROUP:$SG2567
+	*** 000058	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00005d	1e 			push	ds
+	*** 00005e	68 00 00 		push	OFFSET DGROUP:$SG2568
+	*** 000061	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         if (msg == MODM_GETNUMDEVS)
+; Line 142
+					$I2566:
+	*** 000066	83 7e 12 01 		cmp	WORD PTR [bp+18],1	;msg
+	*** 00006a	75 03 			jne	$JCC106
+	*** 00006c	e9 3f 03 		jmp	$L2647
+					$JCC106:
+	*** 00006f	b8 03 00 		mov	ax,3
+	*** 000072	99 			cwd	
+;|***             return 0L;
+;|***         else
+;|***             return MMSYSERR_NOTENABLED;
+; Line 145
+	*** 000073	e9 3c 03 		jmp	$EX2561
+;|***     }
+;|*** 
+;|***     /* this driver only supports one device */
+;|***     if (id != 0) {               
+; Line 149
+					$I2565:
+	*** 000076	83 7e 14 00 		cmp	WORD PTR [bp+20],0	;id
+	*** 00007a	74 1f 			je	$I2571
+;|***         D1("invalid midi device id");
+; Line 150
+	*** 00007c	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000081	72 12 			jb	$I2572
+	*** 000083	1e 			push	ds
+	*** 000084	68 00 00 		push	OFFSET DGROUP:$SG2573
+	*** 000087	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00008c	1e 			push	ds
+	*** 00008d	68 00 00 		push	OFFSET DGROUP:$SG2574
+	*** 000090	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return MMSYSERR_BADDEVICEID;
+; Line 151
+					$I2572:
+	*** 000095	b8 02 00 		mov	ax,2
+	*** 000098	e9 15 03 		jmp	$L2648
+;|***     }
+;|*** 
+;|***     switch (msg) {
+; Line 154
+					$I2571:
+	*** 00009b	8b 46 12 		mov	ax,WORD PTR [bp+18]	;msg
+;|***         
+;|***         case MODM_GETNUMDEVS:   
+;|***             D1("MODM_GETNUMDEVS");
+;|***             return 1L;
+;|*** 
+;|***         case MODM_GETDEVCAPS:
+;|***             D1("MODM_GETDEVCAPS");
+;|***             GetSynthCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+;|***             return 0L;
+;|*** 
+;|***         case MODM_OPEN:
+;|***             D1("MODM_OPEN");
+;|*** 
+;|***             /* check if allocated */
+;|***             if (wAllocated)
+;|***                 return MMSYSERR_ALLOCATED;
+;|*** 
+;|***             if (vadlibdAcquireAdLibSynth()) {
+;|***                 D1("AdLib could NOT be aquired!!!");
+;|***                 return MMSYSERR_ALLOCATED;
+;|***             }
+;|***             
+;|***             {
+;|***                 extern void FAR SoundWarmInit(void);
+;|***                 SoundWarmInit();
+;|***             }
+;|*** 
+;|***             /* save client information */
+;|***             gClient.dwCallback = ((LPMIDIOPENDESC)dwParam1)->dwCallback;
+;|***             gClient.dwInstance = ((LPMIDIOPENDESC)dwParam1)->dwInstance;
+;|***             gClient.hMidiOut   = ((LPMIDIOPENDESC)dwParam1)->hMidi;
+;|***             gClient.dwFlags    = dwParam2;
+;|*** 
+;|***             /* !!! fix for 3.0 286p mode */
+;|***             if (!GlobalPageLock(FIXED_DS()) || !GlobalPageLock(FIXED_CS())) {
+;|***                 vadlibdReleaseAdLibSynth();
+;|***                 return MMSYSERR_NOMEM;
+;|***             }
+;|*** 
+;|***             wAllocated++;
+;|***             bCurrentLen = 0;
+;|***             status = 0;
+;|*** 
+;|***             /* notify client */
+;|***             midiCallback(&gClient, MOM_OPEN, 0L,  0L);
+;|*** 
+;|***             return 0L;
+;|***             
+;|***         case MODM_CLOSE:
+;|***             D1("MODM_CLOSE");
+;|*** 
+;|***             /* shut up */
+;|***             synthAllNotesOff();
+;|*** 
+;|***             midiCallback(&gClient, MOM_CLOSE, 0L,  0L);
+;|*** 
+;|***             /* get out */
+;|***             wAllocated--;
+;|*** 
+;|***             GlobalPageUnlock(FIXED_DS());
+;|***             GlobalPageUnlock(FIXED_CS());
+;|*** 
+;|***             if (vadlibdReleaseAdLibSynth())
+;|***                 D1("AdLib could NOT be RELEASED!!! VERY GOOFY!!");
+;|*** 
+;|***             return 0L;
+;|***             
+;|***         case MODM_RESET:
+;|***             D1("MODM_RESET");
+;|*** 
+;|***             /* we don't need to return all long buffers since we've */
+;|***             /* implemented MODM_LONGDATA synchronously */
+;|***             synthAllNotesOff();
+;|***             return 0L;
+;|*** 
+;|***         case MODM_DATA:
+;|***             D4("MODM_DATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+;|***             if (synthreenter > 1) {
+;|***                 D1("MODM_DATA reentered!");
+;|***                 synthreenter--;
+;|***                 return MIDIERR_NOTREADY;
+;|***             }
+;|*** 
+;|***             lpBuf = (LPBYTE)&dwParam1;
+;|***             if (*lpBuf >= STATUS_TIMINGCLOCK)
+;|***                 dwLength = 1;
+;|***             else {
+;|***                 bCurrentLen = 0;
+;|***                 if (ISSTATUS(*lpBuf)) {
+;|***                     if (*lpBuf >= STATUS_SYSEX)
+;|***                         dwLength = SYSLENGTH(*lpBuf);
+;|***                     else
+;|***                         dwLength = MIDILENGTH(*lpBuf);
+;|***                 }
+;|*** 		else {
+;|***                     if (!status)
+;|***                         return 0L;
+;|***                     dwLength = MIDILENGTH(status) - 1;
+;|***                 }
+;|***             }
+;|***             synthMidiData(lpBuf, dwLength);
+;|*** 
+;|***             synthreenter--;
+;|***             return 0L;
+;|*** 
+;|***         case MODM_LONGDATA:
+;|***             D1("MODM_LONGDATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+;|***             if (synthreenter > 1) {
+;|***                 D1("MODM_LONGDATA reentered!");
+;|***                 synthreenter--;
+;|***                 return MIDIERR_NOTREADY;
+;|***             }
+;|*** 
+;|***             /* check if it's been prepared */
+;|***             lpHdr = (LPMIDIHDR)dwParam1;
+;|***             if (!(lpHdr->dwFlags & MHDR_PREPARED)) {
+;|***                 synthreenter--;
+;|***                 return MIDIERR_UNPREPARED;
+;|***             }
+;|*** 
+;|***             synthMidiData(lpHdr->lpData, lpHdr->dwBufferLength);
+;|*** 
+;|***             /* return buffer to client */
+;|***             lpHdr->dwFlags |= MHDR_DONE;
+;|***             midiCallback(&gClient, MOM_DONE, dwParam1,  0L);
+;|*** 
+;|***             synthreenter--;
+;|***             return 0L;
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+; Line 292
+	*** 00009e	48 			dec	ax
+	*** 00009f	3d 08 00 		cmp	ax,8
+	*** 0000a2	77 1a 			ja	$SD2635
+	*** 0000a4	03 c0 			add	ax,ax
+	*** 0000a6	93 			xchg	ax,bx
+	*** 0000a7	2e ff a7 00 00 		jmp	WORD PTR cs:$L2645[bx]
+					$L2645:
+	*** 0000ac	00 00 				DW	$SC2579
+	*** 0000ae	00 00 				DW	$SC2583
+	*** 0000b0	00 00 				DW	$SC2587
+	*** 0000b2	00 00 				DW	$SC2599
+	*** 0000b4	00 00 				DW	$SD2635
+	*** 0000b6	00 00 				DW	$SD2635
+	*** 0000b8	00 00 				DW	$SC2611
+	*** 0000ba	00 00 				DW	$SC2626
+	*** 0000bc	00 00 				DW	$SC2607
+;|***         default:
+; Line 290
+					$SD2635:
+;|***             return MMSYSERR_NOTSUPPORTED;
+; Line 291
+	*** 0000be	b8 08 00 		mov	ax,8
+	*** 0000c1	e9 ec 02 		jmp	$L2648
+;|***         case MODM_GETNUMDEVS:   
+; Line 156
+					$SC2579:
+;|***             D1("MODM_GETNUMDEVS");
+; Line 157
+	*** 0000c4	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000c9	72 12 			jb	$I2580
+	*** 0000cb	1e 			push	ds
+	*** 0000cc	68 00 00 		push	OFFSET DGROUP:$SG2581
+	*** 0000cf	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000d4	1e 			push	ds
+	*** 0000d5	68 00 00 		push	OFFSET DGROUP:$SG2582
+	*** 0000d8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             return 1L;
+; Line 158
+					$I2580:
+	*** 0000dd	b8 01 00 		mov	ax,1
+	*** 0000e0	e9 cd 02 		jmp	$L2648
+;|*** 
+;|***         case MODM_GETDEVCAPS:
+; Line 160
+					$SC2583:
+;|***             D1("MODM_GETDEVCAPS");
+; Line 161
+	*** 0000e3	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000e8	72 12 			jb	$I2584
+	*** 0000ea	1e 			push	ds
+	*** 0000eb	68 00 00 		push	OFFSET DGROUP:$SG2585
+	*** 0000ee	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000f3	1e 			push	ds
+	*** 0000f4	68 00 00 		push	OFFSET DGROUP:$SG2586
+	*** 0000f7	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             GetSynthCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+; Line 162
+					$I2584:
+	*** 0000fc	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 0000ff	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 000102	ff 76 06 		push	WORD PTR [bp+6]	;dwParam2
+	*** 000105	9a 00 00 00 00 		call	FAR PTR GETSYNTHCAPS
+	*** 00010a	e9 a1 02 		jmp	$L2647
+;|***             return 0L;
+;|*** 
+;|***         case MODM_OPEN:
+; Line 165
+					$SC2587:
+;|***             D1("MODM_OPEN");
+; Line 166
+	*** 00010d	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000112	72 12 			jb	$I2588
+	*** 000114	1e 			push	ds
+	*** 000115	68 00 00 		push	OFFSET DGROUP:$SG2589
+	*** 000118	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00011d	1e 			push	ds
+	*** 00011e	68 00 00 		push	OFFSET DGROUP:$SG2590
+	*** 000121	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* check if allocated */
+;|***             if (wAllocated)
+; Line 169
+					$I2588:
+	*** 000126	83 3e 00 00 00 		cmp	WORD PTR _wAllocated,0
+	*** 00012b	75 22 			jne	$I2593
+;|***                 return MMSYSERR_ALLOCATED;
+;|*** 
+;|***             if (vadlibdAcquireAdLibSynth()) {
+; Line 172
+	*** 00012d	9a 00 00 00 00 		call	FAR PTR VADLIBDACQUIREADLIBSYNTH
+	*** 000132	0b c0 			or	ax,ax
+	*** 000134	74 1f 			je	$I2592
+;|***                 D1("AdLib could NOT be aquired!!!");
+; Line 173
+	*** 000136	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00013b	72 12 			jb	$I2593
+	*** 00013d	1e 			push	ds
+	*** 00013e	68 00 00 		push	OFFSET DGROUP:$SG2594
+	*** 000141	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000146	1e 			push	ds
+	*** 000147	68 00 00 		push	OFFSET DGROUP:$SG2595
+	*** 00014a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 return MMSYSERR_ALLOCATED;
+; Line 174
+					$I2593:
+	*** 00014f	b8 04 00 		mov	ax,4
+	*** 000152	e9 5b 02 		jmp	$L2648
+;|***             }
+;|***             
+;|***             {
+; Line 177
+					$I2592:
+;|***                 extern void FAR SoundWarmInit(void);
+;|***                 SoundWarmInit();
+; Line 179
+	*** 000155	9a 00 00 00 00 		call	FAR PTR _SoundWarmInit
+;|***             }
+;|*** 
+;|***             /* save client information */
+;|***             gClient.dwCallback = ((LPMIDIOPENDESC)dwParam1)->dwCallback;
+; Line 183
+	*** 00015a	c4 5e 0a 		les	bx,DWORD PTR [bp+10]	;dwParam1
+	*** 00015d	26 8b 47 02 		mov	ax,WORD PTR es:[bx+2]
+	*** 000161	26 8b 57 04 		mov	dx,WORD PTR es:[bx+4]
+	*** 000165	a3 02 00 		mov	WORD PTR _gClient+2,ax
+	*** 000168	89 16 04 00 		mov	WORD PTR _gClient+4,dx
+;|***             gClient.dwInstance = ((LPMIDIOPENDESC)dwParam1)->dwInstance;
+; Line 184
+	*** 00016c	26 8b 47 06 		mov	ax,WORD PTR es:[bx+6]
+	*** 000170	26 8b 57 08 		mov	dx,WORD PTR es:[bx+8]
+	*** 000174	a3 06 00 		mov	WORD PTR _gClient+6,ax
+	*** 000177	89 16 08 00 		mov	WORD PTR _gClient+8,dx
+;|***             gClient.hMidiOut   = ((LPMIDIOPENDESC)dwParam1)->hMidi;
+; Line 185
+	*** 00017b	26 8b 07 		mov	ax,WORD PTR es:[bx]
+	*** 00017e	a3 00 00 		mov	WORD PTR _gClient,ax
+;|***             gClient.dwFlags    = dwParam2;
+; Line 186
+	*** 000181	8b 46 06 		mov	ax,WORD PTR [bp+6]	;dwParam2
+	*** 000184	8b 56 08 		mov	dx,WORD PTR [bp+8]
+	*** 000187	a3 0a 00 		mov	WORD PTR _gClient+10,ax
+	*** 00018a	89 16 0c 00 		mov	WORD PTR _gClient+12,dx
+;|*** 
+;|***             /* !!! fix for 3.0 286p mode */
+;|***             if (!GlobalPageLock(FIXED_DS()) || !GlobalPageLock(FIXED_CS())) {
+; Line 189
+	*** 00018e	1e 			push	ds
+	*** 00018f	9a 00 00 00 00 		call	FAR PTR GLOBALPAGELOCK
+	*** 000194	0b c0 			or	ax,ax
+	*** 000196	74 2d 			je	$I2598
+	*** 000198	ba 00 00 		mov	dx,SEG MODMESSAGE
+	*** 00019b	52 			push	dx
+	*** 00019c	9a 00 00 00 00 		call	FAR PTR GLOBALPAGELOCK
+	*** 0001a1	0b c0 			or	ax,ax
+	*** 0001a3	74 20 			je	$I2598
+;|***                 vadlibdReleaseAdLibSynth();
+;|***                 return MMSYSERR_NOMEM;
+;|***             }
+;|*** 
+;|***             wAllocated++;
+; Line 194
+	*** 0001a5	ff 06 00 00 		inc	WORD PTR _wAllocated
+;|***             bCurrentLen = 0;
+;|***             status = 0;
+; Line 196
+	*** 0001a9	32 c0 			xor	al,al
+	*** 0001ab	a2 00 00 		mov	BYTE PTR _bCurrentLen,al
+	*** 0001ae	a2 00 00 		mov	BYTE PTR _status,al
+;|*** 
+;|***             /* notify client */
+;|***             midiCallback(&gClient, MOM_OPEN, 0L,  0L);
+; Line 199
+	*** 0001b1	68 00 00 		push	OFFSET DGROUP:_gClient
+	*** 0001b4	68 c7 03 		push	967	;03c7H
+	*** 0001b7	6a 00 			push	0
+	*** 0001b9	6a 00 			push	0
+	*** 0001bb	6a 00 			push	0
+	*** 0001bd	6a 00 			push	0
+	*** 0001bf	e8 3e fe 		call	MIDICALLBACK
+;|*** 
+;|***             return 0L;
+; Line 201
+	*** 0001c2	e9 e9 01 		jmp	$L2647
+;|***             if (!GlobalPageLock(FIXED_DS()) || !GlobalPageLock(FIXED_CS())) {
+; Line 189
+					$I2598:
+;|***                 vadlibdReleaseAdLibSynth();
+; Line 190
+	*** 0001c5	9a 00 00 00 00 		call	FAR PTR VADLIBDRELEASEADLIBSYNTH
+;|***                 return MMSYSERR_NOMEM;
+; Line 191
+	*** 0001ca	b8 07 00 		mov	ax,7
+	*** 0001cd	e9 e0 01 		jmp	$L2648
+;|***             }
+;|*** 
+;|***             wAllocated++;
+;|***             bCurrentLen = 0;
+;|***             status = 0;
+;|*** 
+;|***             /* notify client */
+;|***             midiCallback(&gClient, MOM_OPEN, 0L,  0L);
+;|*** 
+;|***             return 0L;
+;|***             
+;|***         case MODM_CLOSE:
+; Line 203
+					$SC2599:
+;|***             D1("MODM_CLOSE");
+; Line 204
+	*** 0001d0	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0001d5	72 12 			jb	$I2600
+	*** 0001d7	1e 			push	ds
+	*** 0001d8	68 00 00 		push	OFFSET DGROUP:$SG2601
+	*** 0001db	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001e0	1e 			push	ds
+	*** 0001e1	68 00 00 		push	OFFSET DGROUP:$SG2602
+	*** 0001e4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* shut up */
+;|***             synthAllNotesOff();
+; Line 207
+					$I2600:
+	*** 0001e9	e8 00 00 		call	SYNTHALLNOTESOFF
+;|*** 
+;|***             midiCallback(&gClient, MOM_CLOSE, 0L,  0L);
+; Line 209
+	*** 0001ec	68 00 00 		push	OFFSET DGROUP:_gClient
+	*** 0001ef	68 c8 03 		push	968	;03c8H
+	*** 0001f2	6a 00 			push	0
+	*** 0001f4	6a 00 			push	0
+	*** 0001f6	6a 00 			push	0
+	*** 0001f8	6a 00 			push	0
+	*** 0001fa	e8 03 fe 		call	MIDICALLBACK
+;|*** 
+;|***             /* get out */
+;|***             wAllocated--;
+; Line 212
+	*** 0001fd	ff 0e 00 00 		dec	WORD PTR _wAllocated
+;|*** 
+;|***             GlobalPageUnlock(FIXED_DS());
+; Line 214
+	*** 000201	1e 			push	ds
+	*** 000202	9a 00 00 00 00 		call	FAR PTR GLOBALPAGEUNLOCK
+;|***             GlobalPageUnlock(FIXED_CS());
+; Line 215
+	*** 000207	ba 00 00 		mov	dx,SEG MODMESSAGE
+	*** 00020a	52 			push	dx
+	*** 00020b	9a 00 00 00 00 		call	FAR PTR GLOBALPAGEUNLOCK
+;|*** 
+;|***             if (vadlibdReleaseAdLibSynth())
+; Line 217
+	*** 000210	9a 00 00 00 00 		call	FAR PTR VADLIBDRELEASEADLIBSYNTH
+	*** 000215	0b c0 			or	ax,ax
+	*** 000217	74 07 			je	$L2658
+;|***                 D1("AdLib could NOT be RELEASED!!! VERY GOOFY!!");
+; Line 218
+	*** 000219	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00021e	73 03 			jae	$L2657
+					$L2658:
+	*** 000220	e9 8b 01 		jmp	$L2647
+					$L2657:
+	*** 000223	1e 			push	ds
+	*** 000224	68 00 00 		push	OFFSET DGROUP:$SG2605
+	*** 000227	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00022c	1e 			push	ds
+	*** 00022d	68 00 00 		push	OFFSET DGROUP:$SG2606
+	*** 000230	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             return 0L;
+; Line 220
+	*** 000235	e9 76 01 		jmp	$L2647
+;|***             
+;|***         case MODM_RESET:
+;|***             D1("MODM_RESET");
+;|*** 
+;|***             /* we don't need to return all long buffers since we've */
+;|***             /* implemented MODM_LONGDATA synchronously */
+;|***             synthAllNotesOff();
+;|***             return 0L;
+;|*** 
+;|***         case MODM_DATA:
+; Line 230
+					$SC2611:
+;|***             D4("MODM_DATA");
+; Line 231
+	*** 000238	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 00023d	72 12 			jb	$I2612
+	*** 00023f	1e 			push	ds
+	*** 000240	68 00 00 		push	OFFSET DGROUP:$SG2613
+	*** 000243	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000248	1e 			push	ds
+	*** 000249	68 00 00 		push	OFFSET DGROUP:$SG2614
+	*** 00024c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+; Line 234
+					$I2612:
+;|***             if (synthreenter > 1) {
+; Line 235
+	*** 000251	ff 06 00 00 		inc	WORD PTR _synthreenter
+	*** 000255	83 3e 00 00 01 		cmp	WORD PTR _synthreenter,1
+	*** 00025a	7e 1a 			jle	$I2615
+;|***                 D1("MODM_DATA reentered!");
+; Line 236
+	*** 00025c	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000261	73 03 			jae	$JCC609
+	*** 000263	e9 d9 00 		jmp	$I2631
+					$JCC609:
+	*** 000266	1e 			push	ds
+	*** 000267	68 00 00 		push	OFFSET DGROUP:$SG2617
+	*** 00026a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00026f	1e 			push	ds
+	*** 000270	68 00 00 		push	OFFSET DGROUP:$SG2618
+	*** 000273	e9 c4 00 		jmp	$L2655
+;|***                 synthreenter--;
+;|***                 return MIDIERR_NOTREADY;
+;|***             }
+;|*** 
+;|***             lpBuf = (LPBYTE)&dwParam1;
+; Line 241
+					$I2615:
+;|***             if (*lpBuf >= STATUS_TIMINGCLOCK)
+; Line 242
+	*** 000276	8d 5e 0a 		lea	bx,WORD PTR [bp+10]	;dwParam1
+	*** 000279	89 5e fc 		mov	WORD PTR [bp-4],bx	;lpHdr
+	*** 00027c	8c 56 fe 		mov	WORD PTR [bp-2],ss
+	*** 00027f	36 8a 07 		mov	al,BYTE PTR ss:[bx]
+	*** 000282	98 			cbw	
+	*** 000283	3d f8 00 		cmp	ax,248	;00f8H
+	*** 000286	7c 0c 			jl	$I2619
+;|***                 dwLength = 1;
+; Line 243
+	*** 000288	c7 46 fc 01 00 		mov	WORD PTR [bp-4],1	;lpHdr
+					$L2650:
+	*** 00028d	c7 46 fe 00 00 		mov	WORD PTR [bp-2],0
+;|***             else {
+; Line 244
+	*** 000292	eb 59 			jmp	SHORT $I2620
+					$I2619:
+;|***                 bCurrentLen = 0;
+; Line 245
+	*** 000294	c6 06 00 00 00 		mov	BYTE PTR _bCurrentLen,0
+;|***                 if (ISSTATUS(*lpBuf)) {
+; Line 246
+	*** 000299	f6 46 0a 80 		test	BYTE PTR [bp+10],128	;0080H	;dwParam1
+	*** 00029d	74 2a 			je	$I2621
+;|***                     if (*lpBuf >= STATUS_SYSEX)
+; Line 247
+	*** 00029f	8a 46 0a 		mov	al,BYTE PTR [bp+10]	;dwParam1
+	*** 0002a2	98 			cbw	
+	*** 0002a3	3d f0 00 		cmp	ax,240	;00f0H
+	*** 0002a6	7c 10 			jl	$I2622
+;|***                         dwLength = SYSLENGTH(*lpBuf);
+; Line 248
+	*** 0002a8	25 07 00 		and	ax,7
+	*** 0002ab	8b d8 			mov	bx,ax
+	*** 0002ad	8a 87 00 00 		mov	al,BYTE PTR _gbSysLengths[bx]
+					$L2651:
+	*** 0002b1	2a e4 			sub	ah,ah
+	*** 0002b3	89 46 fc 		mov	WORD PTR [bp-4],ax	;lpHdr
+	*** 0002b6	eb d5 			jmp	SHORT $L2650
+					$I2622:
+;|***                     else
+;|***                         dwLength = MIDILENGTH(*lpBuf);
+; Line 250
+	*** 0002b8	8a 46 0a 		mov	al,BYTE PTR [bp+10]	;dwParam1
+	*** 0002bb	24 70 			and	al,112	;0070H
+	*** 0002bd	c0 f8 04 		sar	al,4
+	*** 0002c0	98 			cbw	
+	*** 0002c1	8b d8 			mov	bx,ax
+	*** 0002c3	8a 87 00 00 		mov	al,BYTE PTR _gbMidiLengths[bx]
+	*** 0002c7	eb e8 			jmp	SHORT $L2651
+					$I2621:
+;|***                 }
+;|*** 		else {
+;|***                     if (!status)
+; Line 253
+	*** 0002c9	80 3e 00 00 00 		cmp	BYTE PTR _status,0
+	*** 0002ce	75 03 			jne	$JCC718
+	*** 0002d0	e9 db 00 		jmp	$L2647
+					$JCC718:
+;|***                         return 0L;
+;|***                     dwLength = MIDILENGTH(status) - 1;
+; Line 255
+	*** 0002d3	8a 1e 00 00 		mov	bl,BYTE PTR _status
+	*** 0002d7	80 e3 70 		and	bl,112	;0070H
+	*** 0002da	c0 eb 04 		shr	bl,4
+	*** 0002dd	2a ff 			sub	bh,bh
+	*** 0002df	8a 87 00 00 		mov	al,BYTE PTR _gbMidiLengths[bx]
+	*** 0002e3	2a e4 			sub	ah,ah
+	*** 0002e5	48 			dec	ax
+	*** 0002e6	99 			cwd	
+	*** 0002e7	89 46 fc 		mov	WORD PTR [bp-4],ax	;lpHdr
+	*** 0002ea	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|***                 }
+;|***             }
+; Line 257
+					$I2620:
+;|***             synthMidiData(lpBuf, dwLength);
+; Line 258
+	*** 0002ed	8d 46 0a 		lea	ax,WORD PTR [bp+10]	;dwParam1
+	*** 0002f0	16 			push	ss
+	*** 0002f1	50 			push	ax
+	*** 0002f2	ff 76 fe 		push	WORD PTR [bp-2]
+	*** 0002f5	ff 76 fc 		push	WORD PTR [bp-4]	;lpHdr
+	*** 0002f8	e8 00 00 		call	SYNTHMIDIDATA
+;|*** 
+;|***             synthreenter--;
+; Line 260
+					$L2656:
+	*** 0002fb	ff 0e 00 00 		dec	WORD PTR _synthreenter
+;|***             return 0L;
+; Line 261
+	*** 0002ff	e9 ac 00 		jmp	$L2647
+;|*** 
+;|***         case MODM_LONGDATA:
+; Line 263
+					$SC2626:
+;|***             D1("MODM_LONGDATA");
+; Line 264
+	*** 000302	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000307	72 12 			jb	$I2627
+	*** 000309	1e 			push	ds
+	*** 00030a	68 00 00 		push	OFFSET DGROUP:$SG2628
+	*** 00030d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000312	1e 			push	ds
+	*** 000313	68 00 00 		push	OFFSET DGROUP:$SG2629
+	*** 000316	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+; Line 267
+					$I2627:
+;|***             if (synthreenter > 1) {
+; Line 268
+	*** 00031b	ff 06 00 00 		inc	WORD PTR _synthreenter
+	*** 00031f	83 3e 00 00 01 		cmp	WORD PTR _synthreenter,1
+	*** 000324	7e 22 			jle	$I2630
+;|***                 D1("MODM_LONGDATA reentered!");
+; Line 269
+	*** 000326	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00032b	72 12 			jb	$I2631
+	*** 00032d	1e 			push	ds
+	*** 00032e	68 00 00 		push	OFFSET DGROUP:$SG2632
+	*** 000331	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000336	1e 			push	ds
+	*** 000337	68 00 00 		push	OFFSET DGROUP:$SG2633
+					$L2655:
+	*** 00033a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 synthreenter--;
+; Line 270
+					$I2631:
+	*** 00033f	ff 0e 00 00 		dec	WORD PTR _synthreenter
+;|***                 return MIDIERR_NOTREADY;
+; Line 271
+	*** 000343	b8 43 00 		mov	ax,67	;0043H
+	*** 000346	eb 68 			jmp	SHORT $L2648
+;|***             }
+;|*** 
+;|***             /* check if it's been prepared */
+;|***             lpHdr = (LPMIDIHDR)dwParam1;
+; Line 275
+					$I2630:
+;|***             if (!(lpHdr->dwFlags & MHDR_PREPARED)) {
+; Line 276
+	*** 000348	c4 5e 0a 		les	bx,DWORD PTR [bp+10]	;dwParam1
+	*** 00034b	8b f3 			mov	si,bx
+	*** 00034d	8c 46 fe 		mov	WORD PTR [bp-2],es
+	*** 000350	26 f6 47 10 02 		test	BYTE PTR es:[bx+16],2
+	*** 000355	75 09 			jne	$I2634
+;|***                 synthreenter--;
+; Line 277
+	*** 000357	ff 0e 00 00 		dec	WORD PTR _synthreenter
+;|***                 return MIDIERR_UNPREPARED;
+; Line 278
+	*** 00035b	b8 40 00 		mov	ax,64	;0040H
+	*** 00035e	eb 50 			jmp	SHORT $L2648
+;|***             }
+;|*** 
+;|***             synthMidiData(lpHdr->lpData, lpHdr->dwBufferLength);
+; Line 281
+					$I2634:
+	*** 000360	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 000363	26 ff 74 02 		push	WORD PTR es:[si+2]
+	*** 000367	26 ff 34 		push	WORD PTR es:[si]
+	*** 00036a	26 ff 74 06 		push	WORD PTR es:[si+6]
+	*** 00036e	26 ff 74 04 		push	WORD PTR es:[si+4]
+	*** 000372	8c c7 			mov	di,es
+	*** 000374	e8 00 00 		call	SYNTHMIDIDATA
+;|*** 
+;|***             /* return buffer to client */
+;|***             lpHdr->dwFlags |= MHDR_DONE;
+; Line 284
+	*** 000377	8e c7 			mov	es,di
+	*** 000379	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|***             midiCallback(&gClient, MOM_DONE, dwParam1,  0L);
+; Line 285
+	*** 00037e	68 00 00 		push	OFFSET DGROUP:_gClient
+	*** 000381	68 c9 03 		push	969	;03c9H
+	*** 000384	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 000387	56 			push	si
+	*** 000388	6a 00 			push	0
+	*** 00038a	6a 00 			push	0
+	*** 00038c	e8 71 fc 		call	MIDICALLBACK
+	*** 00038f	e9 69 ff 		jmp	$L2656
+;|***         case MODM_RESET:
+; Line 222
+					$SC2607:
+;|***             D1("MODM_RESET");
+; Line 223
+	*** 000392	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000397	72 12 			jb	$I2608
+	*** 000399	1e 			push	ds
+	*** 00039a	68 00 00 		push	OFFSET DGROUP:$SG2609
+	*** 00039d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003a2	1e 			push	ds
+	*** 0003a3	68 00 00 		push	OFFSET DGROUP:$SG2610
+	*** 0003a6	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* we don't need to return all long buffers since we've */
+;|***             /* implemented MODM_LONGDATA synchronously */
+;|***             synthAllNotesOff();
+; Line 227
+					$I2608:
+	*** 0003ab	e8 00 00 		call	SYNTHALLNOTESOFF
+;|***             return 0L;
+; Line 228
+					$L2647:
+	*** 0003ae	33 c0 			xor	ax,ax
+					$L2648:
+	*** 0003b0	33 d2 			xor	dx,dx
+;|*** 
+;|***         case MODM_DATA:
+;|***             D4("MODM_DATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+;|***             if (synthreenter > 1) {
+;|***                 D1("MODM_DATA reentered!");
+;|***                 synthreenter--;
+;|***                 return MIDIERR_NOTREADY;
+;|***             }
+;|*** 
+;|***             lpBuf = (LPBYTE)&dwParam1;
+;|***             if (*lpBuf >= STATUS_TIMINGCLOCK)
+;|***                 dwLength = 1;
+;|***             else {
+;|***                 bCurrentLen = 0;
+;|***                 if (ISSTATUS(*lpBuf)) {
+;|***                     if (*lpBuf >= STATUS_SYSEX)
+;|***                         dwLength = SYSLENGTH(*lpBuf);
+;|***                     else
+;|***                         dwLength = MIDILENGTH(*lpBuf);
+;|***                 }
+;|*** 		else {
+;|***                     if (!status)
+;|***                         return 0L;
+;|***                     dwLength = MIDILENGTH(status) - 1;
+;|***                 }
+;|***             }
+;|***             synthMidiData(lpBuf, dwLength);
+;|*** 
+;|***             synthreenter--;
+;|***             return 0L;
+;|*** 
+;|***         case MODM_LONGDATA:
+;|***             D1("MODM_LONGDATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             synthreenter++;
+;|***             if (synthreenter > 1) {
+;|***                 D1("MODM_LONGDATA reentered!");
+;|***                 synthreenter--;
+;|***                 return MIDIERR_NOTREADY;
+;|***             }
+;|*** 
+;|***             /* check if it's been prepared */
+;|***             lpHdr = (LPMIDIHDR)dwParam1;
+;|***             if (!(lpHdr->dwFlags & MHDR_PREPARED)) {
+;|***                 synthreenter--;
+;|***                 return MIDIERR_UNPREPARED;
+;|***             }
+;|*** 
+;|***             synthMidiData(lpHdr->lpData, lpHdr->dwBufferLength);
+;|*** 
+;|***             /* return buffer to client */
+;|***             lpHdr->dwFlags |= MHDR_DONE;
+;|***             midiCallback(&gClient, MOM_DONE, dwParam1,  0L);
+;|*** 
+;|***             synthreenter--;
+;|***             return 0L;
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+;|*** 
+;|***     /* should never get here... */
+;|***     return MMSYSERR_NOTSUPPORTED;
+;|*** }
+; Line 296
+					$EX2561:
+	*** 0003b2	1f 			pop	ds
+	*** 0003b3	5e 			pop	si
+	*** 0003b4	5f 			pop	di
+	*** 0003b5	c9 			leave	
+	*** 0003b6	ca 10 00 		ret	16	;00000010H
+	*** 0003b9	90 			nop	
+
+MODMESSAGE	ENDP
+_FIX	ENDS
+END

@@ -1,0 +1,15 @@
+textout.obj+
+vga.obj +
+3xswitch.obj bitblt.obj blkwhite.obj bmc_eti.obj bmc_ite.obj +
+bmc_main.obj buildstr.obj cblt.obj charwdth.obj chkstk.obj +
+colorinf.obj colors.obj control.obj trail.obj cursor.obj +
+disable.obj discreen.obj hidither.obj dithers.obj +
+egainit.obj enable.obj enum.obj fb.obj output.obj +
+pixel.obj polyline.obj bstr286.obj +
+rlebm.obj robject.obj scanline.obj scanlr.obj +
+setmode.obj ssb.obj sswitch.obj strblt.obj sblt286.obj +
+vgastate.obj ds.obj dss.obj ds286.obj dss286.obj 
+VGA.drv
+VGA.map
+libw
+VGA.def

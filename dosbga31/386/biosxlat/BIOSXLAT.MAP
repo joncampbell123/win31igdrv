@@ -1,0 +1,53 @@
+
+ BIOSXLAT
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000458H _LTEXT                 CODE 32-bit
+ 0001:00000458 00000016DH _LDATA                 CODE 32-bit
+ 0002:00000000 000000148H _ITEXT                 ICODE 32-bit
+ 0002:00000148 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000458 BIOSXLAT_DDB            BIOSXLAT_DDB
+
+  Address         Publics by Name
+
+ 0001:0000007A       B10_Calc_Reg_Buff_Len
+ 0001:000003AB       BIOSXlat_Calc_Fmt_Buff_Size
+ 0001:00000000       BIOSXlat_Control
+ 0001:00000458       BIOSXLAT_DDB
+ 0001:00000365       BIOSXlat_Get_Sel_Base
+ 0001:0000002D       BIOSXlat_Int10
+ 0001:00000088       BIOSXlat_Int13
+ 0001:000003D7       BIOSXlat_Int15
+ 0001:00000411       BIOSXlat_Int1C
+ 0001:00000012       BIOSXlat_Reflect_Int_EDX
+ 0002:00000000       BIOSXlat_Sys_Critical_Init
+ 0001:0000041E       BIOSXlat_V86_Int1C
+ 0001:00000301       BX_I13_Read_Write_Sector
+
+  Address         Publics by Value
+
+ 0001:00000000       BIOSXlat_Control
+ 0001:00000012       BIOSXlat_Reflect_Int_EDX
+ 0001:0000002D       BIOSXlat_Int10
+ 0001:0000007A       B10_Calc_Reg_Buff_Len
+ 0001:00000088       BIOSXlat_Int13
+ 0001:00000301       BX_I13_Read_Write_Sector
+ 0001:00000365       BIOSXlat_Get_Sel_Base
+ 0001:000003AB       BIOSXlat_Calc_Fmt_Buff_Size
+ 0001:000003D7       BIOSXlat_Int15
+ 0001:00000411       BIOSXlat_Int1C
+ 0001:0000041E       BIOSXlat_V86_Int1C
+ 0001:00000458       BIOSXLAT_DDB
+ 0002:00000000       BIOSXlat_Sys_Critical_Init

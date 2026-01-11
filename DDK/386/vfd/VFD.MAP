@@ -1,0 +1,45 @@
+
+ VFD
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000180H _LTEXT                 CODE 32-bit
+ 0001:00000180 000000101H _LDATA                 CODE 32-bit
+ 0002:00000000 0000000F8H _ITEXT                 ICODE 32-bit
+ 0002:000000F8 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000180 VFD_DDB                 VFD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000000       VFD_Control
+ 0001:00000180       VFD_DDB
+ 0001:000000CF       VFD_DMA2_Handler
+ 0001:00000270       VFD_Enable_Compaq_Slime
+ 0001:0000008C       VFD_I13_Iret
+ 0001:0000003C       VFD_Int_13
+ 0001:00000019       VFD_Sys_Critical_Exit
+ 0002:00000000       VFD_Sys_Critical_Init
+ 0001:00000260       VFD_Verify_Hack_INI_Switch
+
+  Address         Publics by Value
+
+ 0001:00000000       VFD_Control
+ 0001:00000019       VFD_Sys_Critical_Exit
+ 0001:0000003C       VFD_Int_13
+ 0001:0000008C       VFD_I13_Iret
+ 0001:000000CF       VFD_DMA2_Handler
+ 0001:00000180       VFD_DDB
+ 0001:00000260       VFD_Verify_Hack_INI_Switch
+ 0001:00000270       VFD_Enable_Compaq_Slime
+ 0002:00000000       VFD_Sys_Critical_Init

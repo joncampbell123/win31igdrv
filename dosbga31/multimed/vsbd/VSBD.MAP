@@ -1,0 +1,87 @@
+
+ VSBD
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000086CH _LTEXT                 CODE 32-bit
+ 0001:0000086C 00000058FH _LDATA                 CODE 32-bit
+ 0002:00000000 0000001BCH _ITEXT                 ICODE 32-bit
+ 0002:000001BC 0000000A8H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000874 VSBD_DDB                VSBD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000870       $VSBD_Get_Sound_Blaster_Focus
+ 0001:0000086C       $VSBD_Get_Version
+ 0001:000004F3       @VSBD_Get_Sound_Blaster_Focus
+ 0001:000004D2       @VSBD_Get_Version
+ 0001:00000DB0       gszNoAccessMessage
+ 0001:0000039B       VSBD_Acquire_Sound_Blaster
+ 0001:00000607       VSBD_API_Acquire_Sound_Blaster
+ 0001:000006F6       VSBD_API_Get_Sound_Blaster_Info
+ 0001:000005EB       VSBD_API_Get_Version
+ 0001:000005C8       VSBD_API_Handler
+ 0001:00000682       VSBD_API_Release_Sound_Blaster
+ 0001:00000000       VSBD_Control
+ 0001:00000874       VSBD_DDB
+ 0001:00000754       VSBD_Debug_Dump
+ 0002:00000000       VSBD_Device_Init
+ 0001:0000022D       VSBD_Disable_Trapping
+ 0001:000001A7       VSBD_DSP_Get_Version
+ 0001:00000086       VSBD_DSP_Read
+ 0001:00000147       VSBD_DSP_Reset
+ 0001:000000E7       VSBD_DSP_Write
+ 0001:000001E8       VSBD_Enable_Trapping
+ 0001:00000567       VSBD_IO_Default
+ 0001:0000004B       VSBD_IRQ_EOI_Proc
+ 0001:00000026       VSBD_IRQ_Hw_Int_Proc
+ 0001:0000005E       VSBD_IRQ_Mask_Changed_Proc
+ 0001:000002BA       VSBD_Release_Sound_Blaster
+ 0002:000001EB       VSBD_SB_Port_Table
+ 0002:000000C6       VSBD_Virtualize_Sound_Blaster
+ 0001:00000274       VSBD_VM_Not_Executeable
+ 0001:0000051A       VSBD_Warning
+
+  Address         Publics by Value
+
+ 0001:00000000       VSBD_Control
+ 0001:00000026       VSBD_IRQ_Hw_Int_Proc
+ 0001:0000004B       VSBD_IRQ_EOI_Proc
+ 0001:0000005E       VSBD_IRQ_Mask_Changed_Proc
+ 0001:00000086       VSBD_DSP_Read
+ 0001:000000E7       VSBD_DSP_Write
+ 0001:00000147       VSBD_DSP_Reset
+ 0001:000001A7       VSBD_DSP_Get_Version
+ 0001:000001E8       VSBD_Enable_Trapping
+ 0001:0000022D       VSBD_Disable_Trapping
+ 0001:00000274       VSBD_VM_Not_Executeable
+ 0001:000002BA       VSBD_Release_Sound_Blaster
+ 0001:0000039B       VSBD_Acquire_Sound_Blaster
+ 0001:000004D2       @VSBD_Get_Version
+ 0001:000004F3       @VSBD_Get_Sound_Blaster_Focus
+ 0001:0000051A       VSBD_Warning
+ 0001:00000567       VSBD_IO_Default
+ 0001:000005C8       VSBD_API_Handler
+ 0001:000005EB       VSBD_API_Get_Version
+ 0001:00000607       VSBD_API_Acquire_Sound_Blaster
+ 0001:00000682       VSBD_API_Release_Sound_Blaster
+ 0001:000006F6       VSBD_API_Get_Sound_Blaster_Info
+ 0001:00000754       VSBD_Debug_Dump
+ 0001:0000086C       $VSBD_Get_Version
+ 0001:00000870       $VSBD_Get_Sound_Blaster_Focus
+ 0001:00000874       VSBD_DDB
+ 0001:00000DB0       gszNoAccessMessage
+ 0002:00000000       VSBD_Device_Init
+ 0002:000000C6       VSBD_Virtualize_Sound_Blaster
+ 0002:000001EB       VSBD_SB_Port_Table

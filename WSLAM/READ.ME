@@ -1,0 +1,37 @@
+Thank you for trying Slam!  I started writing this game back when Windows
+3.0 was still in beta test, and worked on it for a few days, shelved it
+for many months, worked on it another few days, etc.  Despite my busy work
+schedule (and my unexpected attainment of a social life and subsequent
+marriage), I have finally FINISHED the program!
+
+My goal was to make the interaction between the puck and the paddles quite
+realistic.  Therefore the program is constantly doing alot of 32-bit and
+some 64-bit computations.  For this reason, I don't recommend running this
+game on anything less than a 33MHz 386DX system.  Despite my best efforts,
+there is still some inaccurate behavior, such as the puck sometimes bouncing
+off the paddle faster than would seem reasonable.  Attempts to fix this have
+made the movements worse instead of better, so I have decided that enough is
+enough for now -- the game is still quite playable and fun!  I have pretty
+much forgotten my high school physics, and have had to build my transfer-of-
+momentum equations from trial and error.  Hopefully in future versions I
+will be able to "tweak" the math to where the behavior is totally accurate.
+
+Another area that needs work is when you or the computer tries to "smash"
+the puck against the wall with the paddle.  This is very difficult to deal
+with at the mathematical level, so for the time being I have taken the cheap
+approach and allowed the puck to travel through the wall, which is immedi-
+ately detected and the puck put back on the table on the other side of the
+paddle.  Only very occasionally you will see the puck make a brief appearance
+outside the table boundaries.
+
+The program runs fine under Windows NT, with the exception that the cursor
+will not be hidden when you "grab" your paddle.  This seems to be a restric-
+tion that Windows NT imposes on Windows 3.1 programs, presumably to prevent
+a crashing program from taking the cursor with it.  Depending on your mouse
+settings, this may restrict your paddle's movement and make the game unplay-
+able.  I will be porting the game to NT pretty soon, and hopefully that
+version will be able to hide the cursor!  (It will also be the first version
+to support network play.)
+
+I have not tested the program under OS/2 2.1; it may also prevent the pro-
+gram from hiding the cursor.

@@ -1,0 +1,1265 @@
+;	Static Name Aliases
+;
+	TITLE   wavein.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+WAVE	SEGMENT  WORD PUBLIC 'CODE'
+WAVE	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+EXTRN	WAVECALLBACK:FAR
+EXTRN	LOADSTRING:FAR
+EXTRN	CRITENTER:FAR
+EXTRN	WIDBLOCKFINISHED:FAR
+EXTRN	CRITLEAVE:FAR
+EXTRN	DSPSETSAMPLERATE:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	INITDISPLAYCONFIGERRORS:FAR
+EXTRN	WIDSTART:FAR
+EXTRN	WIDSTOP:FAR
+EXTRN	WIDACQUIREHARDWARE:FAR
+EXTRN	WIDRELEASEHARDWARE:FAR
+EXTRN	WAVEGETPOS:NEAR
+EXTRN	ASSERTBREAK:FAR
+EXTRN	LOCALALLOC:FAR
+EXTRN	MEMCOPY:FAR
+EXTRN	LOCALFREE:FAR
+EXTRN	_STR_CRLF:BYTE
+EXTRN	_ghModule:WORD
+EXTRN	_hpCurInData:DWORD
+EXTRN	_dwCurInCount:DWORD
+EXTRN	_gfEnabled:BYTE
+EXTRN	_wDebugLevel:WORD
+EXTRN	_glpWIQueue:DWORD
+_DATA      SEGMENT
+$SG2656	DB	'WIDM_INIT',  00H
+$SG2658	DB	'widMessage called while disabled',  00H
+$SG2661	DB	'invalid wave device id',  00H
+$SG2668	DB	'WIDM_GETNUMDEVS',  00H
+$SG2671	DB	'WIDM_GETDEVCAPS',  00H
+$SG2674	DB	'WIDM_OPEN',  00H
+$SG2680	DB	'Wave input hardware is not available!',  00H
+$SG2684	DB	'WIDM_CLOSE',  00H
+$SG2688	DB	'Wave input hardware could NOT be released!',  00H
+$SG2691	DB	'WIDM_ADDBUFFER',  00H
+$SG2694	DB	'AssertF failed (dwParam1 != NULL)',  00H
+$SG2697	DB	'AssertF failed (!(((LPWAVEHDR)dwParam1)->dwFlags & ~(WHDR_IN'
+	DB	'QUEUE|WHDR_DONE|WHDR_PREPARED)))',  00H
+$SG2700	DB	'WIDM_START',  00H
+$SG2703	DB	'WIDM_STOP',  00H
+$SG2706	DB	'WIDM_RESET',  00H
+$SG2709	DB	'WIDM_GETPOS',  00H
+$SG2713	DB	'AssertF failed (0)',  00H
+_DATA      ENDS
+WAVE      SEGMENT
+	ASSUME	CS: WAVE
+	PUBLIC	WIDFREEQ
+WIDFREEQ	PROC NEAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   wavein.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** static void NEAR PASCAL widFreeQ(void);
+;|*** static void NEAR PASCAL widGetDevCaps(LPBYTE lpCaps, WORD wSize);
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | widFreeQ | Free all buffers.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/ 
+;|*** static void NEAR PASCAL widFreeQ(void)
+;|*** {
+; Line 31
+	*** 000000	c8 08 00 00 		enter	8,0
+	*** 000004	57 			push	di
+	*** 000005	56 			push	si
+;	lpH = -8
+;	lpN = -4
+;|*** LPWAVEHDR lpH, lpN;
+;|*** 
+;|***     lpH = glpWIQueue;              /* point to top of the queue */
+; Line 34
+	*** 000006	a1 00 00 		mov	ax,WORD PTR _glpWIQueue
+	*** 000009	8b 16 02 00 		mov	dx,WORD PTR _glpWIQueue+2
+	*** 00000d	8b f0 			mov	si,ax
+	*** 00000f	89 56 fa 		mov	WORD PTR [bp-6],dx
+;|***     glpWIQueue = NULL;             /* mark the queue as empty */
+; Line 35
+	*** 000012	2b c0 			sub	ax,ax
+	*** 000014	a3 02 00 		mov	WORD PTR _glpWIQueue+2,ax
+	*** 000017	a3 00 00 		mov	WORD PTR _glpWIQueue,ax
+;|*** 
+;|***     while (lpH) {
+; Line 37
+	*** 00001a	8b c2 			mov	ax,dx
+	*** 00001c	0b c6 			or	ax,si
+	*** 00001e	74 23 			je	$EX2613
+					$FC2617:
+;|***         lpN = lpH->lpNext;
+; Line 38
+	*** 000020	8e 46 fa 		mov	es,WORD PTR [bp-6]
+	*** 000023	26 8b 44 18 		mov	ax,WORD PTR es:[si+24]
+	*** 000027	26 8b 54 1a 		mov	dx,WORD PTR es:[si+26]
+	*** 00002b	8b f8 			mov	di,ax
+	*** 00002d	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|***         widBlockFinished(lpH);
+; Line 39
+	*** 000030	06 			push	es
+	*** 000031	56 			push	si
+	*** 000032	9a 00 00 00 00 		call	FAR PTR WIDBLOCKFINISHED
+;|***         lpH = lpN;
+;|***     }
+; Line 41
+	*** 000037	8b 46 fe 		mov	ax,WORD PTR [bp-2]
+	*** 00003a	8b f7 			mov	si,di
+	*** 00003c	89 46 fa 		mov	WORD PTR [bp-6],ax
+	*** 00003f	0b c7 			or	ax,di
+	*** 000041	75 dd 			jne	$FC2617
+;|*** }
+; Line 42
+					$EX2613:
+	*** 000043	5e 			pop	si
+	*** 000044	5f 			pop	di
+	*** 000045	c9 			leave	
+	*** 000046	c3 			ret	
+	*** 000047	90 			nop	
+
+WIDFREEQ	ENDP
+	PUBLIC	WIDADDBUFFER
+WIDADDBUFFER	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | widAddBuffer | Adds a buffer to our input queue.
+;|***  *
+;|***  * @rdesc The return value is an MMSYS error code (0L if success).
+;|***  ***************************************************************************/ 
+;|*** static DWORD NEAR PASCAL widAddBuffer( LPWAVEHDR lpwh )
+;|*** {
+; Line 52
+	*** 000048	c8 08 00 00 		enter	8,0
+	*** 00004c	57 			push	di
+	*** 00004d	56 			push	si
+;	lpwh = 4
+;	lpN = -4
+	*** 00004e	8b 7e 04 		mov	di,WORD PTR [bp+4]	;lpwh
+;|*** LPWAVEHDR   lpN;
+;|*** 
+;|***     /* check if it's been prepared */
+;|***     if (!(lpwh->dwFlags & WHDR_PREPARED))
+; Line 56
+	*** 000051	8e 46 06 		mov	es,WORD PTR [bp+6]
+	*** 000054	26 f6 45 10 02 		test	BYTE PTR es:[di+16],2
+	*** 000059	75 05 			jne	$I2624
+;|***         return WAVERR_UNPREPARED;
+; Line 57
+	*** 00005b	b8 22 00 		mov	ax,34	;0022H
+	*** 00005e	eb 7c 			jmp	SHORT $L2725
+;|*** 
+;|***     /* check if it's in our queue already */
+;|***     if (lpwh->dwFlags & WHDR_INQUEUE)
+; Line 60
+					$I2624:
+	*** 000060	26 f6 45 10 10 		test	BYTE PTR es:[di+16],16	;0010H
+	*** 000065	74 05 			je	$I2625
+;|***         return WAVERR_STILLPLAYING;
+; Line 61
+	*** 000067	b8 21 00 		mov	ax,33	;0021H
+	*** 00006a	eb 70 			jmp	SHORT $L2725
+;|*** 
+;|***     /* add the buffer to our queue */
+;|***     lpwh->dwFlags |= WHDR_INQUEUE;
+; Line 64
+					$I2625:
+	*** 00006c	26 80 4d 10 10 		or	BYTE PTR es:[di+16],16	;0010H
+;|***     lpwh->dwFlags &= ~WHDR_DONE;
+; Line 65
+	*** 000071	26 80 65 10 fe 		and	BYTE PTR es:[di+16],254	;00feH
+;|*** 
+;|***     /* sanity */
+;|***     lpwh->dwBytesRecorded = 0;
+; Line 68
+	*** 000076	2b c0 			sub	ax,ax
+	*** 000078	26 89 45 0a 		mov	WORD PTR es:[di+10],ax
+	*** 00007c	26 89 45 08 		mov	WORD PTR es:[di+8],ax
+;|***     lpwh->lpNext = NULL;
+; Line 69
+	*** 000080	26 89 45 1a 		mov	WORD PTR es:[di+26],ax
+	*** 000084	26 89 45 18 		mov	WORD PTR es:[di+24],ax
+;|*** 
+;|***     CritEnter();
+; Line 71
+	*** 000088	9a 00 00 00 00 		call	FAR PTR CRITENTER
+;|***     {
+;|***         if ( lpN = glpWIQueue ) {
+; Line 73
+	*** 00008d	a1 00 00 		mov	ax,WORD PTR _glpWIQueue
+	*** 000090	8b 16 02 00 		mov	dx,WORD PTR _glpWIQueue+2
+	*** 000094	8b f0 			mov	si,ax
+	*** 000096	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 000099	0b d0 			or	dx,ax
+	*** 00009b	75 0c 			jne	$L2716
+;|***             while ( lpN->lpNext && (lpN = lpN->lpNext) )
+;|***                 ;
+;|*** 
+;|***             lpN->lpNext = lpwh;
+;|***         }
+;|*** 
+;|***         else 
+;|***             glpWIQueue = lpwh;
+; Line 81
+	*** 00009d	8b 46 06 		mov	ax,WORD PTR [bp+6]
+	*** 0000a0	89 3e 00 00 		mov	WORD PTR _glpWIQueue,di
+	*** 0000a4	a3 02 00 		mov	WORD PTR _glpWIQueue+2,ax
+	*** 0000a7	eb 2c 			jmp	SHORT $I2630
+					$L2716:
+;|***             while ( lpN->lpNext && (lpN = lpN->lpNext) )
+; Line 74
+	*** 0000a9	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 0000ac	26 8b 44 18 		mov	ax,WORD PTR es:[si+24]
+	*** 0000b0	26 8b 54 1a 		mov	dx,WORD PTR es:[si+26]
+	*** 0000b4	89 56 fa 		mov	WORD PTR [bp-6],dx
+	*** 0000b7	0b d0 			or	dx,ax
+	*** 0000b9	74 0c 			je	$FB2629
+	*** 0000bb	8b 56 fa 		mov	dx,WORD PTR [bp-6]
+	*** 0000be	8b f0 			mov	si,ax
+	*** 0000c0	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 0000c3	0b d0 			or	dx,ax
+	*** 0000c5	75 e2 			jne	$L2716
+;|***                 ;
+; Line 75
+					$FB2629:
+;|*** 
+;|***             lpN->lpNext = lpwh;
+; Line 77
+	*** 0000c7	8b 46 06 		mov	ax,WORD PTR [bp+6]
+	*** 0000ca	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 0000cd	26 89 7c 18 		mov	WORD PTR es:[si+24],di
+	*** 0000d1	26 89 44 1a 		mov	WORD PTR es:[si+26],ax
+;|***         }
+;|*** 
+;|***         else 
+;|***             glpWIQueue = lpwh;
+; Line 81
+					$I2630:
+;|***     }
+;|***     CritLeave();
+; Line 83
+	*** 0000d5	9a 00 00 00 00 		call	FAR PTR CRITLEAVE
+;|*** 
+;|***     /* return success */
+;|***     return ( 0L );
+; Line 86
+	*** 0000da	33 c0 			xor	ax,ax
+					$L2725:
+	*** 0000dc	33 d2 			xor	dx,dx
+;|*** }
+; Line 87
+	*** 0000de	5e 			pop	si
+	*** 0000df	5f 			pop	di
+	*** 0000e0	c9 			leave	
+	*** 0000e1	c2 04 00 		ret	4
+	*** 0000e4	90 			nop	
+	*** 0000e5	90 			nop	
+
+WIDADDBUFFER	ENDP
+	PUBLIC	WIDSENDPARTBUFFER
+WIDSENDPARTBUFFER	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  * 
+;|***  * @api WORD | widSendPartBuffer | This function is called from widStop().
+;|***  *     It looks at the buffer at the head of the queue and, if it contains
+;|***  *     any data, marks it as done as sends it back to the client.
+;|***  * 
+;|***  * @rdesc The return value is the number of bytes transfered. A value of zero
+;|***  *     indicates that there was no more data in the input queue.
+;|***  ***************************************************************************/ 
+;|*** void NEAR PASCAL widSendPartBuffer(void)
+;|*** {
+; Line 100
+	*** 0000e6	56 			push	si
+;	lpH = -4
+;|*** LPWAVEHDR lpH;
+;|*** 
+;|***     /* Note that unlike midi input, we don't have to check if the
+;|***      * current buffer has data - it is only called if wave input is
+;|***      * started, which means it has data (whereas midi input being
+;|***      * started doesn't necessarily mean data has been received).
+;|***      */
+;|***     if (glpWIQueue) {
+; Line 108
+	*** 0000e7	a1 02 00 		mov	ax,WORD PTR _glpWIQueue+2
+	*** 0000ea	0b 06 00 00 		or	ax,WORD PTR _glpWIQueue
+	*** 0000ee	74 3b 			je	$EX2631
+;|***         lpH = glpWIQueue;
+; Line 109
+	*** 0000f0	a1 00 00 		mov	ax,WORD PTR _glpWIQueue
+	*** 0000f3	8b 16 02 00 		mov	dx,WORD PTR _glpWIQueue+2
+	*** 0000f7	8b f0 			mov	si,ax
+;|***         glpWIQueue = glpWIQueue->lpNext;
+; Line 110
+	*** 0000f9	8b d8 			mov	bx,ax
+	*** 0000fb	8e c2 			mov	es,dx
+	*** 0000fd	26 8b 47 18 		mov	ax,WORD PTR es:[bx+24]
+	*** 000101	26 8b 57 1a 		mov	dx,WORD PTR es:[bx+26]
+	*** 000105	a3 00 00 		mov	WORD PTR _glpWIQueue,ax
+	*** 000108	89 16 02 00 		mov	WORD PTR _glpWIQueue+2,dx
+;|***         lpH->dwFlags |= WHDR_DONE;
+; Line 111
+	*** 00010c	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|***         lpH->dwFlags &= ~WHDR_INQUEUE;
+; Line 112
+	*** 000111	26 80 64 10 ef 		and	BYTE PTR es:[si+16],239	;00efH
+;|***         dwCurInCount = 0L;
+; Line 113
+	*** 000116	2b c0 			sub	ax,ax
+	*** 000118	a3 02 00 		mov	WORD PTR _dwCurInCount+2,ax
+	*** 00011b	a3 00 00 		mov	WORD PTR _dwCurInCount,ax
+;|***         hpCurInData = NULL;
+; Line 114
+	*** 00011e	a3 02 00 		mov	WORD PTR _hpCurInData+2,ax
+	*** 000121	a3 00 00 		mov	WORD PTR _hpCurInData,ax
+;|***         widBlockFinished(lpH);
+; Line 115
+	*** 000124	06 			push	es
+	*** 000125	56 			push	si
+	*** 000126	9a 00 00 00 00 		call	FAR PTR WIDBLOCKFINISHED
+;|***     }
+;|*** }
+; Line 117
+					$EX2631:
+	*** 00012b	5e 			pop	si
+	*** 00012c	c3 			ret	
+	*** 00012d	90 			nop	
+
+WIDSENDPARTBUFFER	ENDP
+	PUBLIC	WIDGETDEVCAPS
+WIDGETDEVCAPS	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | widGetDevCaps | Get the device capabilities.
+;|***  *
+;|***  * @parm LPBYTE | lpCaps | Far pointer to a WAVEINCAPS structure to
+;|***  *     receive the information.
+;|***  *
+;|***  * @parm WORD | wSize | Size of the WAVEINCAPS structure.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL widGetDevCaps(LPBYTE lpCaps, WORD wSize)
+;|*** {
+; Line 132
+	*** 00012e	c8 2c 00 00 		enter	44,0
+;	lpCaps = 6
+;	wSize = 4
+;	wc = -44
+;|*** WAVEINCAPS wc;
+;|*** 
+;|***     wc.wMid = MM_MICROSOFT;
+;|***     wc.wPid = MM_SNDBLST_WAVEIN;
+; Line 136
+	*** 000132	c7 46 d6 07 00 		mov	WORD PTR [bp-42],7
+;|***     wc.vDriverVersion = DRIVER_VERSION;
+; Line 137
+	*** 000137	c7 46 d8 01 01 		mov	WORD PTR [bp-40],257	;0101H
+;|***     wc.dwFormats = WAVE_FORMAT_1M08;
+; Line 138
+	*** 00013c	c7 46 fa 01 00 		mov	WORD PTR [bp-6],1
+	*** 000141	c7 46 fc 00 00 		mov	WORD PTR [bp-4],0
+;|***     wc.wChannels = 1;
+; Line 139
+	*** 000146	b8 01 00 		mov	ax,1
+	*** 000149	89 46 d4 		mov	WORD PTR [bp-44],ax	;wc
+	*** 00014c	89 46 fe 		mov	WORD PTR [bp-2],ax
+;|***     LoadString(ghModule, IDS_SNDBLSTWAVEIN, wc.szPname, MAXPNAMELEN);
+; Line 140
+	*** 00014f	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 000153	6a 20 			push	32	;0020H
+	*** 000155	8d 46 da 		lea	ax,WORD PTR [bp-38]
+	*** 000158	16 			push	ss
+	*** 000159	50 			push	ax
+	*** 00015a	6a 20 			push	32	;0020H
+	*** 00015c	9a 00 00 00 00 		call	FAR PTR LOADSTRING
+;|*** 
+;|***     MemCopy(lpCaps, &wc, min(wSize, sizeof(wc)));
+; Line 142
+	*** 000161	ff 76 08 		push	WORD PTR [bp+8]
+	*** 000164	ff 76 06 		push	WORD PTR [bp+6]	;lpCaps
+	*** 000167	8d 46 d4 		lea	ax,WORD PTR [bp-44]	;wc
+	*** 00016a	16 			push	ss
+	*** 00016b	50 			push	ax
+	*** 00016c	8b 46 04 		mov	ax,WORD PTR [bp+4]	;wSize
+	*** 00016f	3d 2c 00 		cmp	ax,44	;002cH
+	*** 000172	76 03 			jbe	$L2717
+	*** 000174	b8 2c 00 		mov	ax,44	;002cH
+					$L2717:
+	*** 000177	50 			push	ax
+	*** 000178	9a 00 00 00 00 		call	FAR PTR MEMCOPY
+;|*** }
+; Line 143
+	*** 00017d	c9 			leave	
+	*** 00017e	c2 06 00 		ret	6
+	*** 000181	90 			nop	
+
+WIDGETDEVCAPS	ENDP
+	PUBLIC	WIDMESSAGE
+WIDMESSAGE	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     This function conforms to the standard wave input driver message proc
+;|*** 
+;|*** ****************************************************************************/
+;|*** DWORD FAR PASCAL _loadds widMessage(WORD id, UINT msg, DWORD dwUser, DWORD dwParam1, DWORD dwParam2)
+;|*** {
+; Line 151
+	*** 000182	c8 06 00 00 		enter	6,0
+	*** 000186	57 			push	di
+	*** 000187	56 			push	si
+	*** 000188	1e 			push	ds
+	*** 000189	b8 00 00 		mov	ax,DGROUP
+	*** 00018c	8e d8 			mov	ds,ax
+	ASSUME DS: DGROUP
+;	id = 20
+;	msg = 18
+;	dwUser = 14
+;	dwParam1 = 10
+;	dwParam2 = 6
+;	lpFmt = -6
+;	pInClient = -2
+;|*** const WAVEFORMAT FAR *lpFmt;      /* pointer to passed format */
+;|*** NPWAVEALLOC           pInClient;  /* pointer to client information structure */
+;|*** 
+;|***     if (!gfEnabled) {
+; Line 155
+	*** 00018e	80 3e 00 00 00 		cmp	BYTE PTR _gfEnabled,0
+	*** 000193	75 58 			jne	$I2653
+	*** 000195	8b 76 12 		mov	si,WORD PTR [bp+18]	;msg
+;|***         if ( msg == WIDM_INIT ) {
+; Line 156
+	*** 000198	83 fe 64 		cmp	si,100	;0064H
+	*** 00019b	75 22 			jne	$I2654
+;|***             D1("WIDM_INIT");
+; Line 157
+	*** 00019d	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0001a2	72 14 			jb	$I2655
+	*** 0001a4	68 00 00 		push	SEG _STR_CRLF
+	*** 0001a7	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0001aa	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001af	1e 			push	ds
+	*** 0001b0	68 00 00 		push	OFFSET DGROUP:$SG2656
+	*** 0001b3	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             InitDisplayConfigErrors();
+; Line 158
+					$I2655:
+	*** 0001b8	9a 00 00 00 00 		call	FAR PTR INITDISPLAYCONFIGERRORS
+;|***             return 0L;
+; Line 159
+	*** 0001bd	eb 20 			jmp	SHORT $L2729
+;|***         }
+;|*** 
+;|***         D1("widMessage called while disabled");
+; Line 162
+					$I2654:
+	*** 0001bf	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0001c4	72 14 			jb	$I2657
+	*** 0001c6	68 00 00 		push	SEG _STR_CRLF
+	*** 0001c9	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0001cc	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001d1	1e 			push	ds
+	*** 0001d2	68 00 00 		push	OFFSET DGROUP:$SG2658
+	*** 0001d5	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return ((msg == WIDM_GETNUMDEVS) ? 0L : MMSYSERR_NOTENABLED);
+; Line 163
+					$I2657:
+	*** 0001da	83 fe 32 		cmp	si,50	;0032H
+	*** 0001dd	75 07 			jne	$L2720
+					$L2729:
+	*** 0001df	33 c0 			xor	ax,ax
+					$L2728:
+	*** 0001e1	33 d2 			xor	dx,dx
+	*** 0001e3	e9 bf 03 		jmp	$EX2650
+					$L2720:
+	*** 0001e6	b8 03 00 		mov	ax,3
+	*** 0001e9	99 			cwd	
+	*** 0001ea	e9 b8 03 		jmp	$EX2650
+;|***     }
+;|*** 
+;|***     /* this driver only supports one device */
+;|***     if (id != 0) {               
+; Line 167
+					$I2653:
+	*** 0001ed	83 7e 14 00 		cmp	WORD PTR [bp+20],0	;id
+	*** 0001f1	74 20 			je	$I2659
+;|***         D1("invalid wave device id");
+; Line 168
+	*** 0001f3	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0001f8	72 14 			jb	$I2660
+	*** 0001fa	68 00 00 		push	SEG _STR_CRLF
+	*** 0001fd	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000200	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000205	1e 			push	ds
+	*** 000206	68 00 00 		push	OFFSET DGROUP:$SG2661
+	*** 000209	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return MMSYSERR_BADDEVICEID;
+; Line 169
+					$I2660:
+	*** 00020e	b8 02 00 		mov	ax,2
+	*** 000211	eb ce 			jmp	SHORT $L2728
+;|***     }
+;|*** 
+;|***     switch (msg) {
+; Line 172
+					$I2659:
+	*** 000213	8b 46 12 		mov	ax,WORD PTR [bp+18]	;msg
+;|***         case WIDM_GETNUMDEVS:
+;|***             D1("WIDM_GETNUMDEVS");
+;|***             return 1L;
+;|*** 
+;|***         case WIDM_GETDEVCAPS:
+;|***             D1("WIDM_GETDEVCAPS");
+;|***             widGetDevCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_OPEN:
+;|***             D1("WIDM_OPEN");
+;|*** 
+;|***             /* dwParam1 contains a pointer to a WAVEOPENDESC
+;|***              * dwParam2 contains wave driver specific flags in the LOWORD
+;|***              * and generic driver flags in the HIWORD
+;|***              */
+;|*** 
+;|***             /* make sure we can handle the format */
+;|***             lpFmt = ((LPWAVEOPENDESC)dwParam1)->lpFormat;
+;|***             if ((lpFmt->wFormatTag != WAVE_FORMAT_PCM) ||
+;|***                 (lpFmt->nChannels != 1) ||
+;|***                 (lpFmt->nSamplesPerSec < 4000) ||
+;|***                 (lpFmt->nSamplesPerSec > 12000) ||
+;|***                 (lpFmt->nAvgBytesPerSec != lpFmt->nSamplesPerSec) ||
+;|***                 (lpFmt->nBlockAlign != 1) ||
+;|***                 (((LPPCMWAVEFORMAT)lpFmt)->wBitsPerSample != 8))
+;|***             {
+;|***                 return WAVERR_BADFORMAT;
+;|***             }
+;|*** 
+;|***             /* did they just want format information? */
+;|***             if (dwParam2 & WAVE_FORMAT_QUERY)
+;|***                 return 0L;
+;|*** 
+;|***             /* attempt to 'acquire' the Wave input hardware */
+;|***             if ( widAcquireHardware() ) {
+;|***                 D1("Wave input hardware is not available!");
+;|***                 return MMSYSERR_ALLOCATED;
+;|***             }
+;|*** 
+;|***             /* allocate my per-client structure */
+;|***             pInClient = (NPWAVEALLOC)LocalAlloc(LPTR, sizeof(WAVEALLOC));
+;|***             if (pInClient == NULL) {
+;|***                 widReleaseHardware();
+;|***                 return MMSYSERR_NOMEM;
+;|***             }
+;|*** 
+;|***             /* and fill it with info */
+;|***             pInClient->dwCallback  = ((LPWAVEOPENDESC)dwParam1)->dwCallback;
+;|***             pInClient->dwInstance  = ((LPWAVEOPENDESC)dwParam1)->dwInstance;
+;|***             pInClient->hWave       = ((LPWAVEOPENDESC)dwParam1)->hWave;
+;|***             pInClient->dwFlags     = dwParam2;
+;|***             pInClient->dwByteCount = 0L;
+;|***             pInClient->pcmwf       = *((LPPCMWAVEFORMAT)lpFmt);
+;|*** 
+;|***             /* set the sample rate */
+;|***             dspSetSampleRate((WORD)lpFmt->nSamplesPerSec);
+;|*** 
+;|***             /* give the client my driver dw */
+;|***             *((LPDWORD)dwUser) = MAKELONG(pInClient, 0);
+;|*** 
+;|***             /* call client's callback */
+;|***             waveCallback(pInClient, WIM_OPEN, 0L);
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_CLOSE:
+;|***             D1("WIDM_CLOSE");
+;|*** 
+;|***             if (glpWIQueue)
+;|***                 return WAVERR_STILLPLAYING;
+;|*** 
+;|***             /* just in case they started input without adding buffers... */
+;|***             widStop();
+;|*** 
+;|***             /* call client's callback */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             waveCallback(pInClient, WIM_CLOSE, 0L);
+;|*** 
+;|***             /* free the allocated memory */
+;|***             LocalFree((LOCALHANDLE)pInClient);
+;|*** 
+;|***             /* now 'release' the Wave input hardware */
+;|***             if ( widReleaseHardware() ) {
+;|***                 D1("Wave input hardware could NOT be released!");
+;|***             }
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_ADDBUFFER:
+;|***             D1("WIDM_ADDBUFFER");
+;|***             AssertF(dwParam1 != NULL);
+;|***             AssertF(!(((LPWAVEHDR)dwParam1)->dwFlags & ~(WHDR_INQUEUE|WHDR_DONE|WHDR_PREPARED)));
+;|***             ((LPWAVEHDR)dwParam1)->dwFlags &= (WHDR_INQUEUE|WHDR_DONE|WHDR_PREPARED);
+;|*** 
+;|***             /* store the pointer to my WAVEALLOC structure in the wavehdr */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             ((LPWAVEHDR)dwParam1)->reserved = (DWORD)(LPSTR)pInClient;
+;|*** 
+;|***             /* add the buffer to our queue */
+;|***             return widAddBuffer((LPWAVEHDR)dwParam1);
+;|*** 
+;|***         case WIDM_START:
+;|***             D1("WIDM_START");
+;|***             widStart();
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_STOP:
+;|***             D1("WIDM_STOP");
+;|***             widStop();
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_RESET:
+;|***             D1("WIDM_RESET");
+;|*** 
+;|***             /* stop if it is started and release all buffers */
+;|***             widStop(); 
+;|***             widFreeQ(); 
+;|*** 
+;|***             /* reset byte count */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             pInClient->dwByteCount = 0L;
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_GETPOS:
+;|***             D1("WIDM_GETPOS");
+;|***             return waveGetPos(dwUser, (LPMMTIME)dwParam1, (WORD)dwParam2);
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+; Line 304
+	*** 000216	2d 32 00 		sub	ax,50	;0032H
+	*** 000219	3d 0a 00 		cmp	ax,10	;000aH
+	*** 00021c	77 1e 			ja	$SD2710
+	*** 00021e	03 c0 			add	ax,ax
+	*** 000220	93 			xchg	ax,bx
+	*** 000221	2e ff a7 00 00 		jmp	WORD PTR cs:$L2722[bx]
+					$L2722:
+	*** 000226	00 00 				DW	$SC2666
+	*** 000228	00 00 				DW	$SC2669
+	*** 00022a	00 00 				DW	$SC2672
+	*** 00022c	00 00 				DW	$SC2682
+	*** 00022e	00 00 				DW	$SD2710
+	*** 000230	00 00 				DW	$SD2710
+	*** 000232	00 00 				DW	$SC2689
+	*** 000234	00 00 				DW	$SC2698
+	*** 000236	00 00 				DW	$SC2701
+	*** 000238	00 00 				DW	$SC2704
+	*** 00023a	00 00 				DW	$SC2707
+;|***         default:
+; Line 302
+					$SD2710:
+;|***             return MMSYSERR_NOTSUPPORTED;
+; Line 303
+	*** 00023c	b8 08 00 		mov	ax,8
+	*** 00023f	eb a0 			jmp	SHORT $L2728
+;|***         case WIDM_GETNUMDEVS:
+; Line 173
+					$SC2666:
+;|***             D1("WIDM_GETNUMDEVS");
+; Line 174
+	*** 000241	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000246	72 14 			jb	$I2667
+	*** 000248	68 00 00 		push	SEG _STR_CRLF
+	*** 00024b	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00024e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000253	1e 			push	ds
+	*** 000254	68 00 00 		push	OFFSET DGROUP:$SG2668
+	*** 000257	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             return 1L;
+; Line 175
+					$I2667:
+	*** 00025c	b8 01 00 		mov	ax,1
+	*** 00025f	e9 7f ff 		jmp	$L2728
+;|*** 
+;|***         case WIDM_GETDEVCAPS:
+; Line 177
+					$SC2669:
+;|***             D1("WIDM_GETDEVCAPS");
+; Line 178
+	*** 000262	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000267	72 14 			jb	$I2670
+	*** 000269	68 00 00 		push	SEG _STR_CRLF
+	*** 00026c	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00026f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000274	1e 			push	ds
+	*** 000275	68 00 00 		push	OFFSET DGROUP:$SG2671
+	*** 000278	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             widGetDevCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+; Line 179
+					$I2670:
+	*** 00027d	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 000280	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 000283	ff 76 06 		push	WORD PTR [bp+6]	;dwParam2
+	*** 000286	e8 a5 fe 		call	WIDGETDEVCAPS
+	*** 000289	e9 53 ff 		jmp	$L2729
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_OPEN:
+; Line 182
+					$SC2672:
+;|***             D1("WIDM_OPEN");
+; Line 183
+	*** 00028c	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000291	72 14 			jb	$I2673
+	*** 000293	68 00 00 		push	SEG _STR_CRLF
+	*** 000296	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000299	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00029e	1e 			push	ds
+	*** 00029f	68 00 00 		push	OFFSET DGROUP:$SG2674
+	*** 0002a2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* dwParam1 contains a pointer to a WAVEOPENDESC
+;|***              * dwParam2 contains wave driver specific flags in the LOWORD
+;|***              * and generic driver flags in the HIWORD
+;|***              */
+;|*** 
+;|***             /* make sure we can handle the format */
+;|***             lpFmt = ((LPWAVEOPENDESC)dwParam1)->lpFormat;
+; Line 191
+					$I2673:
+;|***             if ((lpFmt->wFormatTag != WAVE_FORMAT_PCM) ||
+;|***                 (lpFmt->nChannels != 1) ||
+;|***                 (lpFmt->nSamplesPerSec < 4000) ||
+;|***                 (lpFmt->nSamplesPerSec > 12000) ||
+;|***                 (lpFmt->nAvgBytesPerSec != lpFmt->nSamplesPerSec) ||
+;|***                 (lpFmt->nBlockAlign != 1) ||
+;|***                 (((LPPCMWAVEFORMAT)lpFmt)->wBitsPerSample != 8))
+; Line 198
+	*** 0002a7	8b 4e 0c 		mov	cx,WORD PTR [bp+12]
+	*** 0002aa	8b 76 0a 		mov	si,WORD PTR [bp+10]	;dwParam1
+	*** 0002ad	8e c1 			mov	es,cx
+	*** 0002af	26 c4 74 02 		les	si,DWORD PTR es:[si+2]
+	*** 0002b3	8b de 			mov	bx,si
+	*** 0002b5	8c 46 fc 		mov	WORD PTR [bp-4],es
+	*** 0002b8	26 83 3c 01 		cmp	WORD PTR es:[si],1
+	*** 0002bc	74 03 			je	$JCC700
+	*** 0002be	e9 25 01 		jmp	$I2676
+					$JCC700:
+	*** 0002c1	26 83 7f 02 01 		cmp	WORD PTR es:[bx+2],1
+	*** 0002c6	74 03 			je	$JCC710
+	*** 0002c8	e9 1b 01 		jmp	$I2676
+					$JCC710:
+	*** 0002cb	26 83 7f 06 00 		cmp	WORD PTR es:[bx+6],0
+	*** 0002d0	75 08 			jne	$L2723
+	*** 0002d2	26 81 7f 04 a0 0f 	cmp	WORD PTR es:[bx+4],4000	;0fa0H
+	*** 0002d8	72 31 			jb	$L2731
+					$L2723:
+	*** 0002da	26 83 7f 06 00 		cmp	WORD PTR es:[bx+6],0
+	*** 0002df	75 2a 			jne	$L2731
+	*** 0002e1	26 81 7f 04 e0 2e 	cmp	WORD PTR es:[bx+4],12000	;2ee0H
+	*** 0002e7	77 22 			ja	$L2731
+	*** 0002e9	26 8b 47 08 		mov	ax,WORD PTR es:[bx+8]
+	*** 0002ed	26 8b 57 0a 		mov	dx,WORD PTR es:[bx+10]
+	*** 0002f1	26 39 47 04 		cmp	WORD PTR es:[bx+4],ax
+	*** 0002f5	75 14 			jne	$L2731
+	*** 0002f7	26 39 57 06 		cmp	WORD PTR es:[bx+6],dx
+	*** 0002fb	75 0e 			jne	$L2731
+	*** 0002fd	26 83 7f 0c 01 		cmp	WORD PTR es:[bx+12],1
+	*** 000302	75 07 			jne	$L2731
+	*** 000304	26 83 7f 0e 08 		cmp	WORD PTR es:[bx+14],8
+	*** 000309	74 03 			je	$L2730
+					$L2731:
+	*** 00030b	e9 d8 00 		jmp	$I2676
+					$L2730:
+	*** 00030e	89 76 fa 		mov	WORD PTR [bp-6],si	;lpFmt
+;|***             {
+;|***                 return WAVERR_BADFORMAT;
+;|***             }
+;|*** 
+;|***             /* did they just want format information? */
+;|***             if (dwParam2 & WAVE_FORMAT_QUERY)
+; Line 204
+	*** 000311	f6 46 06 01 		test	BYTE PTR [bp+6],1	;dwParam2
+	*** 000315	74 03 			je	$JCC789
+	*** 000317	e9 c5 fe 		jmp	$L2729
+					$JCC789:
+;|***                 return 0L;
+;|*** 
+;|***             /* attempt to 'acquire' the Wave input hardware */
+;|***             if ( widAcquireHardware() ) {
+; Line 208
+	*** 00031a	9a 00 00 00 00 		call	FAR PTR WIDACQUIREHARDWARE
+	*** 00031f	0b c0 			or	ax,ax
+	*** 000321	74 21 			je	$I2678
+;|***                 D1("Wave input hardware is not available!");
+; Line 209
+	*** 000323	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000328	72 14 			jb	$I2679
+	*** 00032a	68 00 00 		push	SEG _STR_CRLF
+	*** 00032d	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000330	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000335	1e 			push	ds
+	*** 000336	68 00 00 		push	OFFSET DGROUP:$SG2680
+	*** 000339	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 return MMSYSERR_ALLOCATED;
+; Line 210
+					$I2679:
+	*** 00033e	b8 04 00 		mov	ax,4
+	*** 000341	e9 9d fe 		jmp	$L2728
+;|***             }
+;|*** 
+;|***             /* allocate my per-client structure */
+;|***             pInClient = (NPWAVEALLOC)LocalAlloc(LPTR, sizeof(WAVEALLOC));
+; Line 214
+					$I2678:
+;|***             if (pInClient == NULL) {
+; Line 215
+	*** 000344	6a 40 			push	64	;0040H
+	*** 000346	6a 22 			push	34	;0022H
+	*** 000348	9a 00 00 00 00 		call	FAR PTR LOCALALLOC
+	*** 00034d	89 46 fe 		mov	WORD PTR [bp-2],ax	;pInClient
+	*** 000350	0b c0 			or	ax,ax
+	*** 000352	75 0b 			jne	$I2681
+;|***                 widReleaseHardware();
+; Line 216
+	*** 000354	9a 00 00 00 00 		call	FAR PTR WIDRELEASEHARDWARE
+;|***                 return MMSYSERR_NOMEM;
+; Line 217
+	*** 000359	b8 07 00 		mov	ax,7
+	*** 00035c	e9 82 fe 		jmp	$L2728
+;|***             }
+;|*** 
+;|***             /* and fill it with info */
+;|***             pInClient->dwCallback  = ((LPWAVEOPENDESC)dwParam1)->dwCallback;
+; Line 221
+					$I2681:
+	*** 00035f	8b 4e 0c 		mov	cx,WORD PTR [bp+12]
+	*** 000362	8b 5e 0a 		mov	bx,WORD PTR [bp+10]	;dwParam1
+	*** 000365	8e c1 			mov	es,cx
+	*** 000367	26 8b 47 06 		mov	ax,WORD PTR es:[bx+6]
+	*** 00036b	8b 76 fe 		mov	si,WORD PTR [bp-2]	;pInClient
+	*** 00036e	26 8b 57 08 		mov	dx,WORD PTR es:[bx+8]
+	*** 000372	89 04 			mov	WORD PTR [si],ax
+	*** 000374	89 54 02 		mov	WORD PTR [si+2],dx
+;|***             pInClient->dwInstance  = ((LPWAVEOPENDESC)dwParam1)->dwInstance;
+; Line 222
+	*** 000377	26 8b 47 0a 		mov	ax,WORD PTR es:[bx+10]
+	*** 00037b	26 8b 57 0c 		mov	dx,WORD PTR es:[bx+12]
+	*** 00037f	89 44 04 		mov	WORD PTR [si+4],ax
+	*** 000382	89 54 06 		mov	WORD PTR [si+6],dx
+;|***             pInClient->hWave       = ((LPWAVEOPENDESC)dwParam1)->hWave;
+; Line 223
+	*** 000385	26 8b 07 		mov	ax,WORD PTR es:[bx]
+	*** 000388	89 44 08 		mov	WORD PTR [si+8],ax
+;|***             pInClient->dwFlags     = dwParam2;
+; Line 224
+	*** 00038b	8b 46 06 		mov	ax,WORD PTR [bp+6]	;dwParam2
+	*** 00038e	8b 56 08 		mov	dx,WORD PTR [bp+8]
+	*** 000391	89 44 0a 		mov	WORD PTR [si+10],ax
+	*** 000394	89 54 0c 		mov	WORD PTR [si+12],dx
+;|***             pInClient->dwByteCount = 0L;
+; Line 225
+	*** 000397	2b c0 			sub	ax,ax
+	*** 000399	89 44 10 		mov	WORD PTR [si+16],ax
+	*** 00039c	89 44 0e 		mov	WORD PTR [si+14],ax
+;|***             pInClient->pcmwf       = *((LPPCMWAVEFORMAT)lpFmt);
+; Line 226
+	*** 00039f	8b 46 fa 		mov	ax,WORD PTR [bp-6]	;lpFmt
+	*** 0003a2	8b 56 fc 		mov	dx,WORD PTR [bp-4]
+	*** 0003a5	1e 			push	ds
+	*** 0003a6	8d 7c 12 		lea	di,WORD PTR [si+18]
+	*** 0003a9	8b f0 			mov	si,ax
+	*** 0003ab	1e 			push	ds
+	*** 0003ac	07 			pop	es
+	*** 0003ad	8e da 			mov	ds,dx
+	ASSUME DS: NOTHING
+	*** 0003af	b9 08 00 		mov	cx,8
+	*** 0003b2	f3 			rep
+	*** 0003b3	a5 			movsw
+	*** 0003b4	1f 			pop	ds
+	ASSUME DS: DGROUP
+;|*** 
+;|***             /* set the sample rate */
+;|***             dspSetSampleRate((WORD)lpFmt->nSamplesPerSec);
+; Line 229
+	*** 0003b5	8e c2 			mov	es,dx
+	*** 0003b7	8b d8 			mov	bx,ax
+	*** 0003b9	26 ff 77 04 		push	WORD PTR es:[bx+4]
+	*** 0003bd	9a 00 00 00 00 		call	FAR PTR DSPSETSAMPLERATE
+;|*** 
+;|***             /* give the client my driver dw */
+;|***             *((LPDWORD)dwUser) = MAKELONG(pInClient, 0);
+; Line 232
+	*** 0003c2	8b 46 fe 		mov	ax,WORD PTR [bp-2]	;pInClient
+	*** 0003c5	8b 4e 10 		mov	cx,WORD PTR [bp+16]
+	*** 0003c8	8b 5e 0e 		mov	bx,WORD PTR [bp+14]	;dwUser
+	*** 0003cb	8e c1 			mov	es,cx
+	*** 0003cd	26 89 07 		mov	WORD PTR es:[bx],ax
+	*** 0003d0	26 c7 47 02 00 00 	mov	WORD PTR es:[bx+2],0
+;|*** 
+;|***             /* call client's callback */
+;|***             waveCallback(pInClient, WIM_OPEN, 0L);
+; Line 235
+	*** 0003d6	50 			push	ax
+	*** 0003d7	68 be 03 		push	958	;03beH
+	*** 0003da	6a 00 			push	0
+	*** 0003dc	6a 00 			push	0
+	*** 0003de	9a 00 00 00 00 		call	FAR PTR WAVECALLBACK
+	*** 0003e3	e9 f9 fd 		jmp	$L2729
+;|***                 (((LPPCMWAVEFORMAT)lpFmt)->wBitsPerSample != 8))
+; Line 198
+					$I2676:
+;|***             {
+;|***                 return WAVERR_BADFORMAT;
+; Line 200
+	*** 0003e6	b8 20 00 		mov	ax,32	;0020H
+	*** 0003e9	e9 f5 fd 		jmp	$L2728
+;|***             }
+;|*** 
+;|***             /* did they just want format information? */
+;|***             if (dwParam2 & WAVE_FORMAT_QUERY)
+;|***                 return 0L;
+;|*** 
+;|***             /* attempt to 'acquire' the Wave input hardware */
+;|***             if ( widAcquireHardware() ) {
+;|***                 D1("Wave input hardware is not available!");
+;|***                 return MMSYSERR_ALLOCATED;
+;|***             }
+;|*** 
+;|***             /* allocate my per-client structure */
+;|***             pInClient = (NPWAVEALLOC)LocalAlloc(LPTR, sizeof(WAVEALLOC));
+;|***             if (pInClient == NULL) {
+;|***                 widReleaseHardware();
+;|***                 return MMSYSERR_NOMEM;
+;|***             }
+;|*** 
+;|***             /* and fill it with info */
+;|***             pInClient->dwCallback  = ((LPWAVEOPENDESC)dwParam1)->dwCallback;
+;|***             pInClient->dwInstance  = ((LPWAVEOPENDESC)dwParam1)->dwInstance;
+;|***             pInClient->hWave       = ((LPWAVEOPENDESC)dwParam1)->hWave;
+;|***             pInClient->dwFlags     = dwParam2;
+;|***             pInClient->dwByteCount = 0L;
+;|***             pInClient->pcmwf       = *((LPPCMWAVEFORMAT)lpFmt);
+;|*** 
+;|***             /* set the sample rate */
+;|***             dspSetSampleRate((WORD)lpFmt->nSamplesPerSec);
+;|*** 
+;|***             /* give the client my driver dw */
+;|***             *((LPDWORD)dwUser) = MAKELONG(pInClient, 0);
+;|*** 
+;|***             /* call client's callback */
+;|***             waveCallback(pInClient, WIM_OPEN, 0L);
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_CLOSE:
+; Line 239
+					$SC2682:
+;|***             D1("WIDM_CLOSE");
+; Line 240
+	*** 0003ec	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0003f1	72 14 			jb	$I2683
+	*** 0003f3	68 00 00 		push	SEG _STR_CRLF
+	*** 0003f6	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0003f9	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003fe	1e 			push	ds
+	*** 0003ff	68 00 00 		push	OFFSET DGROUP:$SG2684
+	*** 000402	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             if (glpWIQueue)
+; Line 242
+					$I2683:
+	*** 000407	a1 02 00 		mov	ax,WORD PTR _glpWIQueue+2
+	*** 00040a	0b 06 00 00 		or	ax,WORD PTR _glpWIQueue
+	*** 00040e	74 06 			je	$I2685
+;|***                 return WAVERR_STILLPLAYING;
+; Line 243
+	*** 000410	b8 21 00 		mov	ax,33	;0021H
+	*** 000413	e9 cb fd 		jmp	$L2728
+;|*** 
+;|***             /* just in case they started input without adding buffers... */
+;|***             widStop();
+; Line 246
+					$I2685:
+	*** 000416	9a 00 00 00 00 		call	FAR PTR WIDSTOP
+;|*** 
+;|***             /* call client's callback */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             waveCallback(pInClient, WIM_CLOSE, 0L);
+; Line 250
+	*** 00041b	ff 76 0e 		push	WORD PTR [bp+14]	;dwUser
+	*** 00041e	68 bf 03 		push	959	;03bfH
+	*** 000421	6a 00 			push	0
+	*** 000423	6a 00 			push	0
+	*** 000425	9a 00 00 00 00 		call	FAR PTR WAVECALLBACK
+;|*** 
+;|***             /* free the allocated memory */
+;|***             LocalFree((LOCALHANDLE)pInClient);
+; Line 253
+	*** 00042a	ff 76 0e 		push	WORD PTR [bp+14]	;dwUser
+	*** 00042d	9a 00 00 00 00 		call	FAR PTR LOCALFREE
+;|*** 
+;|***             /* now 'release' the Wave input hardware */
+;|***             if ( widReleaseHardware() ) {
+; Line 256
+	*** 000432	9a 00 00 00 00 		call	FAR PTR WIDRELEASEHARDWARE
+	*** 000437	0b c0 			or	ax,ax
+	*** 000439	74 07 			je	$L2733
+;|***                 D1("Wave input hardware could NOT be released!");
+; Line 257
+	*** 00043b	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000440	73 03 			jae	$L2732
+					$L2733:
+	*** 000442	e9 9a fd 		jmp	$L2729
+					$L2732:
+	*** 000445	68 00 00 		push	SEG _STR_CRLF
+	*** 000448	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00044b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000450	1e 			push	ds
+	*** 000451	68 00 00 		push	OFFSET DGROUP:$SG2688
+	*** 000454	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             }
+;|*** 
+;|***             return 0L;
+; Line 260
+	*** 000459	e9 83 fd 		jmp	$L2729
+;|*** 
+;|***         case WIDM_ADDBUFFER:
+; Line 262
+					$SC2689:
+;|***             D1("WIDM_ADDBUFFER");
+; Line 263
+	*** 00045c	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000461	72 14 			jb	$I2690
+	*** 000463	68 00 00 		push	SEG _STR_CRLF
+	*** 000466	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000469	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00046e	1e 			push	ds
+	*** 00046f	68 00 00 		push	OFFSET DGROUP:$SG2691
+	*** 000472	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             AssertF(dwParam1 != NULL);
+; Line 264
+					$I2690:
+	*** 000477	8b 46 0c 		mov	ax,WORD PTR [bp+12]
+	*** 00047a	0b 46 0a 		or	ax,WORD PTR [bp+10]	;dwParam1
+	*** 00047d	75 20 			jne	$I2692
+	*** 00047f	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000484	72 14 			jb	$I2693
+	*** 000486	68 00 00 		push	SEG _STR_CRLF
+	*** 000489	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00048c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000491	1e 			push	ds
+	*** 000492	68 00 00 		push	OFFSET DGROUP:$SG2694
+	*** 000495	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$I2693:
+	*** 00049a	9a 00 00 00 00 		call	FAR PTR ASSERTBREAK
+					$I2692:
+;|***             AssertF(!(((LPWAVEHDR)dwParam1)->dwFlags & ~(WHDR_INQUEUE|WHDR_DONE|WHDR_PREPARED)));
+; Line 265
+	*** 00049f	8b 4e 0c 		mov	cx,WORD PTR [bp+12]
+	*** 0004a2	8b 5e 0a 		mov	bx,WORD PTR [bp+10]	;dwParam1
+	*** 0004a5	8e c1 			mov	es,cx
+	*** 0004a7	26 8b 47 10 		mov	ax,WORD PTR es:[bx+16]
+	*** 0004ab	26 8b 57 12 		mov	dx,WORD PTR es:[bx+18]
+	*** 0004af	24 ec 			and	al,236	;00ecH
+	*** 0004b1	0b d0 			or	dx,ax
+	*** 0004b3	74 20 			je	$I2695
+	*** 0004b5	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0004ba	72 14 			jb	$I2696
+	*** 0004bc	68 00 00 		push	SEG _STR_CRLF
+	*** 0004bf	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0004c2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0004c7	1e 			push	ds
+	*** 0004c8	68 00 00 		push	OFFSET DGROUP:$SG2697
+	*** 0004cb	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$I2696:
+	*** 0004d0	9a 00 00 00 00 		call	FAR PTR ASSERTBREAK
+					$I2695:
+;|***             ((LPWAVEHDR)dwParam1)->dwFlags &= (WHDR_INQUEUE|WHDR_DONE|WHDR_PREPARED);
+; Line 266
+	*** 0004d5	8b 4e 0c 		mov	cx,WORD PTR [bp+12]
+	*** 0004d8	8b 5e 0a 		mov	bx,WORD PTR [bp+10]	;dwParam1
+	*** 0004db	8e c1 			mov	es,cx
+	*** 0004dd	26 8a 47 10 		mov	al,BYTE PTR es:[bx+16]
+	*** 0004e1	25 13 00 		and	ax,19	;0013H
+	*** 0004e4	26 89 47 10 		mov	WORD PTR es:[bx+16],ax
+	*** 0004e8	26 c7 47 12 00 00 	mov	WORD PTR es:[bx+18],0
+;|*** 
+;|***             /* store the pointer to my WAVEALLOC structure in the wavehdr */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             ((LPWAVEHDR)dwParam1)->reserved = (DWORD)(LPSTR)pInClient;
+; Line 270
+	*** 0004ee	8b 46 0e 		mov	ax,WORD PTR [bp+14]	;dwUser
+	*** 0004f1	26 89 47 1c 		mov	WORD PTR es:[bx+28],ax
+	*** 0004f5	26 8c 5f 1e 		mov	WORD PTR es:[bx+30],ds
+;|*** 
+;|***             /* add the buffer to our queue */
+;|***             return widAddBuffer((LPWAVEHDR)dwParam1);
+; Line 273
+	*** 0004f9	51 			push	cx
+	*** 0004fa	53 			push	bx
+	*** 0004fb	e8 4a fb 		call	WIDADDBUFFER
+	*** 0004fe	e9 a4 00 		jmp	$EX2650
+;|*** 
+;|***         case WIDM_START:
+; Line 275
+					$SC2698:
+;|***             D1("WIDM_START");
+; Line 276
+	*** 000501	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000506	72 14 			jb	$I2699
+	*** 000508	68 00 00 		push	SEG _STR_CRLF
+	*** 00050b	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00050e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000513	1e 			push	ds
+	*** 000514	68 00 00 		push	OFFSET DGROUP:$SG2700
+	*** 000517	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             widStart();
+; Line 277
+					$I2699:
+	*** 00051c	9a 00 00 00 00 		call	FAR PTR WIDSTART
+	*** 000521	e9 bb fc 		jmp	$L2729
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_STOP:
+; Line 280
+					$SC2701:
+;|***             D1("WIDM_STOP");
+; Line 281
+	*** 000524	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000529	72 14 			jb	$I2702
+	*** 00052b	68 00 00 		push	SEG _STR_CRLF
+	*** 00052e	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000531	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000536	1e 			push	ds
+	*** 000537	68 00 00 		push	OFFSET DGROUP:$SG2703
+	*** 00053a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             widStop();
+; Line 282
+					$I2702:
+	*** 00053f	9a 00 00 00 00 		call	FAR PTR WIDSTOP
+	*** 000544	e9 98 fc 		jmp	$L2729
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_RESET:
+; Line 285
+					$SC2704:
+;|***             D1("WIDM_RESET");
+; Line 286
+	*** 000547	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00054c	72 14 			jb	$I2705
+	*** 00054e	68 00 00 		push	SEG _STR_CRLF
+	*** 000551	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000554	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000559	1e 			push	ds
+	*** 00055a	68 00 00 		push	OFFSET DGROUP:$SG2706
+	*** 00055d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* stop if it is started and release all buffers */
+;|***             widStop(); 
+; Line 289
+					$I2705:
+	*** 000562	9a 00 00 00 00 		call	FAR PTR WIDSTOP
+;|***             widFreeQ(); 
+; Line 290
+	*** 000567	e8 96 fa 		call	WIDFREEQ
+;|*** 
+;|***             /* reset byte count */
+;|***             pInClient = (NPWAVEALLOC)LOWORD(dwUser);
+;|***             pInClient->dwByteCount = 0L;
+; Line 294
+	*** 00056a	8b 5e 0e 		mov	bx,WORD PTR [bp+14]	;dwUser
+	*** 00056d	2b c0 			sub	ax,ax
+	*** 00056f	89 47 10 		mov	WORD PTR [bx+16],ax
+	*** 000572	89 47 0e 		mov	WORD PTR [bx+14],ax
+	*** 000575	e9 67 fc 		jmp	$L2729
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case WIDM_GETPOS:
+; Line 298
+					$SC2707:
+;|***             D1("WIDM_GETPOS");
+; Line 299
+	*** 000578	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00057d	72 14 			jb	$I2708
+	*** 00057f	68 00 00 		push	SEG _STR_CRLF
+	*** 000582	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000585	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00058a	1e 			push	ds
+	*** 00058b	68 00 00 		push	OFFSET DGROUP:$SG2709
+	*** 00058e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             return waveGetPos(dwUser, (LPMMTIME)dwParam1, (WORD)dwParam2);
+; Line 300
+					$I2708:
+	*** 000593	ff 76 10 		push	WORD PTR [bp+16]
+	*** 000596	ff 76 0e 		push	WORD PTR [bp+14]	;dwUser
+	*** 000599	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 00059c	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 00059f	ff 76 06 		push	WORD PTR [bp+6]	;dwParam2
+	*** 0005a2	e8 00 00 		call	WAVEGETPOS
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+;|*** 
+;|***     /* should never get here... */
+;|***     AssertF(0);
+;|***     return MMSYSERR_NOTSUPPORTED;
+;|*** }
+; Line 309
+					$EX2650:
+	*** 0005a5	1f 			pop	ds
+	*** 0005a6	5e 			pop	si
+	*** 0005a7	5f 			pop	di
+	*** 0005a8	c9 			leave	
+	*** 0005a9	ca 10 00 		ret	16	;00000010H
+	*** 0005ac	90 			nop	
+	*** 0005ad	90 			nop	
+
+WIDMESSAGE	ENDP
+WAVE	ENDS
+END

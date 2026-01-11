@@ -1,0 +1,2052 @@
+;	Static Name Aliases
+;
+	TITLE   midimain.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_FIX	SEGMENT  WORD PUBLIC 'CODE'
+_FIX	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _channels
+PUBLIC  _loudervol
+PUBLIC  _patchKeyOffset
+PUBLIC  _synthmidi
+EXTRN	SETVOICETIMBRE:NEAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	SETVOICEPITCH:NEAR
+EXTRN	SETVOICEVOLUME:NEAR
+EXTRN	NOTEON:NEAR
+EXTRN	NOTEOFF:NEAR
+EXTRN	__AHINCR:FAR
+EXTRN	_wDebugLevel:WORD
+EXTRN	_patches:BYTE
+EXTRN	_drumpatch:BYTE
+EXTRN	_fPercussion:WORD
+_BSS      SEGMENT
+COMM NEAR	_voices:	 8:	 11
+_BSS      ENDS
+EXTRN	_bCurrentLen:BYTE
+EXTRN	_status:BYTE
+EXTRN	_gbMidiLengths:BYTE
+_BSS      SEGMENT
+COMM NEAR	_dwAge:	BYTE:	 4
+_BSS      ENDS
+EXTRN	_gbSysLengths:BYTE
+_DATA      SEGMENT
+_channels	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	00H
+	DW	02000H
+	DB	081H
+	DW	02000H
+_loudervol	DB	00H
+	DB	00H
+	DB	041H
+	DB	041H
+	DB	042H
+	DB	042H
+	DB	043H
+	DB	043H
+	DB	044H
+	DB	044H
+	DB	045H
+	DB	045H
+	DB	046H
+	DB	046H
+	DB	047H
+	DB	047H
+	DB	048H
+	DB	048H
+	DB	049H
+	DB	049H
+	DB	04aH
+	DB	04aH
+	DB	04bH
+	DB	04bH
+	DB	04cH
+	DB	04cH
+	DB	04dH
+	DB	04dH
+	DB	04eH
+	DB	04eH
+	DB	04fH
+	DB	04fH
+	DB	050H
+	DB	050H
+	DB	051H
+	DB	051H
+	DB	052H
+	DB	052H
+	DB	053H
+	DB	053H
+	DB	054H
+	DB	054H
+	DB	055H
+	DB	055H
+	DB	056H
+	DB	056H
+	DB	057H
+	DB	057H
+	DB	058H
+	DB	058H
+	DB	059H
+	DB	059H
+	DB	05aH
+	DB	05aH
+	DB	05bH
+	DB	05bH
+	DB	05cH
+	DB	05cH
+	DB	05dH
+	DB	05dH
+	DB	05eH
+	DB	05eH
+	DB	05fH
+	DB	05fH
+	DB	060H
+	DB	060H
+	DB	061H
+	DB	061H
+	DB	062H
+	DB	062H
+	DB	063H
+	DB	063H
+	DB	064H
+	DB	064H
+	DB	065H
+	DB	065H
+	DB	066H
+	DB	066H
+	DB	067H
+	DB	067H
+	DB	068H
+	DB	068H
+	DB	069H
+	DB	069H
+	DB	06aH
+	DB	06aH
+	DB	06bH
+	DB	06bH
+	DB	06cH
+	DB	06cH
+	DB	06dH
+	DB	06dH
+	DB	06eH
+	DB	06eH
+	DB	06fH
+	DB	06fH
+	DB	070H
+	DB	070H
+	DB	071H
+	DB	071H
+	DB	072H
+	DB	072H
+	DB	073H
+	DB	073H
+	DB	074H
+	DB	074H
+	DB	075H
+	DB	075H
+	DB	076H
+	DB	076H
+	DB	077H
+	DB	077H
+	DB	078H
+	DB	078H
+	DB	079H
+	DB	079H
+	DB	07aH
+	DB	07aH
+	DB	07bH
+	DB	07bH
+	DB	07cH
+	DB	07cH
+	DB	07dH
+	DB	07dH
+	DB	07eH
+	DB	07eH
+	DB	07fH
+	DB	07fH
+_patchKeyOffset	DB	00H
+	DB	0f4H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	0e8H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	0f4H
+	DB	0f4H
+	DB	00H
+	DB	0cH
+	DB	0f4H
+	DB	0f4H
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	00H
+	DB	0f4H
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	0edH
+	DB	00H
+	DB	00H
+	DB	0f4H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0e1H
+	DB	0f4H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0cH
+	DB	0cH
+	DB	0cH
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	00H
+	DB	0e8H
+	DB	0dcH
+	DB	00H
+	DB	00H
+_synthmidi	DW	SYNTHNOTEOFF
+	DW	SYNTHNOTEON
+	DW	00H
+	DW	SYNTHCONTROLCHANGE
+	DW	SYNTHPROGRAMCHANGE
+	DW	00H
+	DW	SYNTHPITCHBEND
+	DW	00H
+$SG2580	DB	0dH,  0aH, 'ADLIB: ',  00H
+$SG2581	DB	'MIDI message type not supported',  00H
+_DATA      ENDS
+_FIX      SEGMENT
+	ASSUME	CS: _FIX
+	PUBLIC	SYNTHMIDIDATA
+SYNTHMIDIDATA	PROC NEAR
+;|*** /***************************************************************************
+;|***  *
+;|***  *   midimain.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "adlib.h"
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     internal function prototypes
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** static void NEAR PASCAL synthNoteOff(MIDIMSG msg);
+;|*** static void NEAR PASCAL synthNoteOn(MIDIMSG msg);
+;|*** static void NEAR PASCAL synthPitchBend(MIDIMSG msg);
+;|*** static void NEAR PASCAL synthControlChange(MIDIMSG msg);
+;|*** static void NEAR PASCAL synthProgramChange(MIDIMSG msg);
+;|*** 
+;|*** static BYTE NEAR PASCAL FindVoice(BYTE note, BYTE channel);
+;|*** static BYTE NEAR PASCAL GetNewVoice(BYTE note, BYTE channel);
+;|*** static void NEAR PASCAL FreeVoice(BYTE voice);
+;|*** 
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     local data
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** typedef struct _VOICE {
+;|***     BYTE alloc;               /* is voice allocated? */
+;|***     BYTE note;                /* note that is currently being played */
+;|***     BYTE channel;             /* channel that it is being played on */
+;|***     BYTE volume;              /* current volume setting of voice */
+;|***     DWORD dwTimeStamp;        /* time voice was allocated */
+;|*** } VOICE;
+;|*** 
+;|*** static VOICE voices[11];      /* 9 voices if melodic mode or 11 if percussive */
+;|*** 
+;|*** typedef struct _CHANNEL {
+;|***     BYTE patch;               /* the patch on this channel */
+;|***     WORD wPitchBend;
+;|*** } CHANNEL;
+;|*** 
+;|*** /* which patch and PB value (0x2000 = normal) is active on which channel */
+;|*** static CHANNEL channels[NUMCHANNELS] = {
+;|***     0, 0x2000,    /* 0 */
+;|***     0, 0x2000,    /* 1 */
+;|***     0, 0x2000,    /* 2 */
+;|***     0, 0x2000,    /* 3 */
+;|***     0, 0x2000,    /* 4 */
+;|***     0, 0x2000,    /* 5 */
+;|***     0, 0x2000,    /* 6 */
+;|***     0, 0x2000,    /* 7 */
+;|***     0, 0x2000,    /* 9 */
+;|***     0, 0x2000,    /* 8 */
+;|***     0, 0x2000,    /* 10 */
+;|***     0, 0x2000,    /* 11 */
+;|***     0, 0x2000,    /* 12 */
+;|***     0, 0x2000,    /* 13 */
+;|***     0, 0x2000,    /* 14 */
+;|***     129, 0x2000   /* 15 - percussive channel */
+;|*** };
+;|*** 
+;|*** static BYTE loudervol[128] = {
+;|***     0,   0,  65,  65,  66,  66,  67,  67,         /* 0 - 7 */
+;|***    68,  68,  69,  69,  70,  70,  71,  71,         /* 8 - 15 */
+;|***    72,  72,  73,  73,  74,  74,  75,  75,         /* 16 - 23 */
+;|***    76,  76,  77,  77,  78,  78,  79,  79,         /* 24 - 31 */
+;|***    80,  80,  81,  81,  82,  82,  83,  83,         /* 32 - 39 */
+;|***    84,  84,  85,  85,  86,  86,  87,  87,         /* 40 - 47 */
+;|***    88,  88,  89,  89,  90,  90,  91,  91,         /* 48 - 55 */
+;|***    92,  92,  93,  93,  94,  94,  95,  95,         /* 56 - 63 */
+;|***    96,  96,  97,  97,  98,  98,  99,  99,         /* 64 - 71 */
+;|***   100, 100, 101, 101, 102, 102, 103, 103,         /* 72 - 79 */
+;|***   104, 104, 105, 105, 106, 106, 107, 107,         /* 80 - 87 */
+;|***   108, 108, 109, 109, 110, 110, 111, 111,         /* 88 - 95 */
+;|***   112, 112, 113, 113, 114, 114, 115, 115,         /* 96 - 103 */
+;|***   116, 116, 117, 117, 118, 118, 119, 119,         /* 104 - 111 */
+;|***   120, 120, 121, 121, 122, 122, 123, 123,         /* 112 - 119 */
+;|***   124, 124, 125, 125, 126, 126, 127, 127};        /* 120 - 127 */
+;|*** 
+;|*** 
+;|*** static char patchKeyOffset[] = {
+;|***        0, -12,  12,   0,   0,  12, -12,   0,   0, -24,   /* 0 - 9 */
+;|***        0,   0,   0,   0,   0,   0,   0,   0, -12,   0,   /* 10 - 19 */
+;|***        0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   /* 20 - 29 */
+;|***        0,   0,  12,  12,  12,   0,   0,  12,  12,   0,   /* 30 - 39 */
+;|***      -12, -12,   0,  12, -12, -12,   0,  12,   0,   0,   /* 40 - 49 */
+;|***      -12,   0,   0,   0,  12,  12,   0,   0,  12,   0,   /* 50 - 59 */
+;|***        0,   0,  12,   0,   0,   0,  12,  12,   0,  12,   /* 60 - 69 */
+;|***        0,   0, -12,   0, -12, -12,   0,   0, -12, -12,   /* 70 - 79 */
+;|***        0,   0,   0,   0,   0, -12, -19,   0,   0, -12,   /* 80 - 89 */
+;|***        0,   0,   0,   0,   0,   0, -31, -12,   0,  12,   /* 90 - 99 */
+;|***       12,  12,  12,   0,  12,   0,  12,   0,   0,   0,   /* 100 - 109 */
+;|***        0,  12,   0,   0,   0,   0,  12,  12,  12,   0,   /* 110 - 119 */
+;|***        0,   0,   0,   0, -24, -36,   0,   0};            /* 120 - 127 */
+;|*** 
+;|*** 
+;|*** static DWORD dwAge;           /* voice relative age */
+;|*** 
+;|*** #define msg_ch         msg.ch /* all messages */
+;|*** 
+;|*** #define msg_note       msg.b1 /* noteoff(0x80),noteon(0x90),keypressure(0xA0) */
+;|*** #define msg_controller msg.b1 /* controlchange(0xB0) */
+;|*** #define msg_patch      msg.b1 /* programchange(0xC0) */
+;|*** #define msg_cpress     msg.b1 /* channelpressure(0xD0) */
+;|*** #define msg_lsb        msg.b1 /* pitchbend(0xE0) */
+;|*** 
+;|*** #define msg_velocity   msg.b2 /* noteoff(0x80), noteon(0x90) */
+;|*** #define msg_kpress     msg.b2 /* keypressure(0xA0) */
+;|*** #define msg_value      msg.b2 /* controlchange(0xB0) */
+;|*** #define msg_unused     msg.b2 /* programchange(0xC0), channelpressure(0xD0) */
+;|*** #define msg_msb        msg.b2 /* pitchbend(0xE0) */
+;|*** 
+;|*** /***************************************************************************
+;|***  *
+;|***  *  MIDI function director array
+;|***  *
+;|***  *  (x = channel)
+;|***  *  0x8x        Note Off
+;|***  *  0x9x        Note On                (vel 0 == Note Off)
+;|***  *  0xAx        Key Pressure (Aftertouch)
+;|***  *  0xBx        Control Change
+;|***  *  0xCx        Program Change
+;|***  *  0xDx        Channel Pressure (Aftertouch)
+;|***  *  0xEx        Pitch Bend Change
+;|***  *  0xF0        Sysex
+;|***  *  011111sssb  System Common
+;|***  *  011110tttb  System Real Time
+;|***  *
+;|***  *************************************************************************/
+;|*** void (NEAR PASCAL * synthmidi [8]) (MIDIMSG);
+;|*** 
+;|***     void (NEAR PASCAL * synthmidi []) () = {
+;|***         synthNoteOff,
+;|***         synthNoteOn,
+;|***         NULL,                   /* key pressure not currently implemented */
+;|***         synthControlChange,
+;|***         synthProgramChange,
+;|***         NULL,                   /* channel pressure not currently implemented */
+;|***         synthPitchBend,
+;|***         NULL                    /* sysex etc. not currently implemented */
+;|***     };
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     public functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @func void | synthMidiData | Process a stream of MIDI messages by calling
+;|***  *     the appropriate function based on each status byte.  The function deals
+;|***  *     with messages spanning buffers, and with invalid data being passed.
+;|***  *
+;|***  *     In general, the function steps through the buffer, using the current
+;|***  *     state in determining what to look for in checking the next data byte.
+;|***  *     This may mean looking for a new status byte, or looking for data
+;|***  *     associated with a current status whose data has not been completely
+;|***  *     read yet.
+;|***  *
+;|***  *     The key item to determine the current state of message processing is
+;|***  *     the "bCurrentLen" global static byte, which indicates the number of
+;|***  *     bytes that are needed to complete the current message being processed.
+;|***  *     The current message is stored in the local static "bCurrentStatus", not
+;|***  *     to be confused with the global static "status", which is the running
+;|***  *     status.  The local static "msg" is used to build the current message,
+;|***  *     and is static in order to enable messages to cross buffer boundaries.
+;|***  *     The local static "bPosition" determines where in the message buffer to
+;|***  *     place the next byte of the message, if any.
+;|***  *
+;|***  *     The first item in the processing loop is a check for the presence of a
+;|***  *     real time message, which can occur anywhere in the data stream, and does
+;|***  *     not affect the current state (unless it is possibly a reset command).
+;|***  *     Real time messages are ignored for now, including the reset command.
+;|***  *     After ignoring them, the loop is continued in case that was the last
+;|***  *     byte in the buffer.  If the loop was not continued at this point, the
+;|***  *     message sending portion would not function correctly, as "bCurrentLen"
+;|***  *     and "bCurrentStatus" is not modified by a real time message.
+;|***  *
+;|***  *     The next loop item checks to determine if a message is currently being
+;|***  *     built.  If "bCurrentLen" is zero, no message is being built, and the
+;|***  *     next status byte can be retrieved.  At this point, the current message
+;|***  *     position is reset, as any new byte will be the first for this new
+;|***  *     message.
+;|***  *
+;|***  *     If the next byte is a system command, as opposed to a channel command,
+;|***  *     it must reset the current running status, and extract the message length
+;|***  *     from a different message length table (subtracting one for the status
+;|***  *     already retrieved).  Even though these messages are eventually ignored,
+;|***  *     the actual message buffer is built as normal.  This will enable a
+;|***  *     function to be attached to the message function table which would deal
+;|***  *     with system messages.  Note that the system message id is placed into
+;|***  *     the channel portion of the message, in place of the channel for a normal
+;|***  *     message.
+;|***  *
+;|***  *     If the next byte is not a system command, then it might be either a
+;|***  *     new status byte, or a data byte which depends upon the running status.
+;|***  *     If it is a new status byte, running status is updated.  If it is not,
+;|***  *     and there is not running status, the byte is ignored, and the loop is
+;|***  *     continued.  This might be the case when ignoring data after a SYSEX,
+;|***  *     or when invalid data occurs.  If a valid status byte is retrieved, or
+;|***  *     is already present in the running status, the internal current status
+;|***  *     is updated, in case this message spans buffers, and the length of the
+;|***  *     message is retrieved from the channel table (subtracting one for the
+;|***  *     status byte already retrieved).
+;|***  *
+;|***  *     At this point, the message may be completely built (i.e., a one byte
+;|***  *     message), in which case, it will fall into the message dispatch code.
+;|***  *
+;|***  *     The next loop item is fallen into if a message is currently being
+;|***  *     processed.  It checks the next byte in the buffer to ensure that it
+;|***  *     is actually a data byte.  If it is a status byte instead, the current
+;|***  *     message is aborted by resetting "bCurrentLen", and the loop is
+;|***  *     continued.  Note that running status is not reset in this case.
+;|***  *
+;|***  *     If however the next byte is valid, it is placed in either the first or
+;|***  *     the second data position in the message being built.  The local static
+;|***  *     "bPosition" is used to determine which in position to place the data.
+;|***  *
+;|***  *     The next loop item checks to see if a complete message has been built.
+;|***  *     If so, it dispatches the message based on the current command.  It does
+;|***  *     not use running status, as that might have been reset for a system
+;|***  *     command.  If a function for the particular command is present, the
+;|***  *     message is dispatched, else it is ignored.  If the message was not
+;|***  *     complete, the next pass through the loop will pick up the next data
+;|***  *     byte for the message.
+;|***  *
+;|***  *     The loop then continues until it is out of data.
+;|***  *
+;|***  * @parm HPBYTE | lpBuf | Points to a buffer containing the stream of MIDI
+;|***  *     data.
+;|***  *
+;|***  * @parm DWORD | dwLength | Contains the length of the data pointed to by
+;|***  *     <p>lpBuf<d>.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|*** *************************************************************************/
+;|*** void NEAR PASCAL synthMidiData(HPBYTE lpBuf, DWORD dwLength)
+;|*** {
+; Line 250
+	*** 000000	c8 08 00 00 		enter	8,0
+;	lpBuf = 8
+;	dwLength = 4
+;	msg = -8
+;	bCurrentStatus = -3
+;	bPosition = -2
+;	bByte = -1
+;|*** static MIDIMSG msg;
+;|*** static BYTE bCurrentStatus;
+;|*** static BYTE bPosition;
+;|*** BYTE bByte;
+;|*** 
+;|***     for (; dwLength; dwLength--) {
+; Line 256
+	*** 000004	8b 46 06 		mov	ax,WORD PTR [bp+6]
+	*** 000007	0b 46 04 		or	ax,WORD PTR [bp+4]	;dwLength
+	*** 00000a	75 03 			jne	$JCC10
+	*** 00000c	e9 02 01 		jmp	$EX2554
+					$JCC10:
+					$F2559:
+;|***         bByte = *lpBuf++;
+;|***         
+;|***         if (bByte >= STATUS_TIMINGCLOCK)
+; Line 259
+	*** 00000f	c4 5e 08 		les	bx,DWORD PTR [bp+8]	;lpBuf
+	*** 000012	83 46 08 01 		add	WORD PTR [bp+8],1	;lpBuf
+	*** 000016	73 05 			jae	$L2683
+	*** 000018	81 46 0a 00 00 		add	WORD PTR [bp+10],OFFSET __AHINCR
+					$L2683:
+	*** 00001d	26 8a 07 		mov	al,BYTE PTR es:[bx]
+	*** 000020	88 46 ff 		mov	BYTE PTR [bp-1],al	;bByte
+	*** 000023	3c f8 			cmp	al,248	;00f8H
+	*** 000025	72 03 			jb	$JCC37
+	*** 000027	e9 d4 00 		jmp	$FC2560
+					$JCC37:
+;|***             continue;
+;|*** 
+;|***         if (!bCurrentLen) {
+; Line 262
+	*** 00002a	80 3e 00 00 00 		cmp	BYTE PTR _bCurrentLen,0
+	*** 00002f	74 13 			je	$kludge_city2564
+;|*** kludge_city:
+;|***             bPosition = 0;
+;|***             if (bByte >= STATUS_SYSEX) {
+;|***                 bCurrentStatus = bByte;
+;|***                 status = 0;
+;|***                 bCurrentLen = (BYTE)(SYSLENGTH(bCurrentStatus) - 1);
+;|***             }
+;|*** 	    else {
+;|***                 if (bByte >= STATUS_NOTEOFF)
+;|***                     status = bByte;
+;|***                 else if (!status)
+;|***                     continue;
+;|***                 bCurrentStatus = status;
+;|***                 bCurrentLen = (BYTE)(MIDILENGTH(status) - 1);
+;|***                 if (bByte < STATUS_NOTEOFF)
+;|***                     goto first_byte;
+;|***             }
+;|***             msg_ch = FILTERSTATUS(bCurrentStatus);
+;|***         }
+;|*** 	else {
+;|***             if (bByte >= STATUS_NOTEOFF)
+; Line 283
+	*** 000031	3c 80 			cmp	al,128	;0080H
+	*** 000033	73 0f 			jae	$kludge_city2564
+;|***                 goto kludge_city;
+;|***             if (!bPosition) {
+; Line 285
+	*** 000035	80 7e fe 00 		cmp	BYTE PTR [bp-2],0	;bPosition
+	*** 000039	75 03 			jne	$JCC57
+	*** 00003b	e9 98 00 		jmp	$first_byte2571
+					$JCC57:
+;|*** first_byte:
+;|***                 bPosition++;
+;|***                 msg.b1 = bByte;
+;|***             }
+;|*** 	    else
+;|***                 msg.b2 = bByte;
+; Line 291
+	*** 00003e	88 46 fa 		mov	BYTE PTR [bp-6],al
+	*** 000041	e9 9b 00 		jmp	$I2575
+;|*** kludge_city:
+; Line 263
+					$kludge_city2564:
+;|***             bPosition = 0;
+; Line 264
+	*** 000044	c6 46 fe 00 		mov	BYTE PTR [bp-2],0	;bPosition
+;|***             if (bByte >= STATUS_SYSEX) {
+; Line 265
+	*** 000048	80 7e ff f0 		cmp	BYTE PTR [bp-1],240	;00f0H	;bByte
+	*** 00004c	72 55 			jb	$I2565
+;|***                 bCurrentStatus = bByte;
+; Line 266
+	*** 00004e	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bByte
+	*** 000051	88 46 fd 		mov	BYTE PTR [bp-3],al	;bCurrentStatus
+;|***                 status = 0;
+; Line 267
+	*** 000054	c6 06 00 00 00 		mov	BYTE PTR _status,0
+;|***                 bCurrentLen = (BYTE)(SYSLENGTH(bCurrentStatus) - 1);
+; Line 268
+	*** 000059	8a d8 			mov	bl,al
+	*** 00005b	83 e3 07 		and	bx,7
+	*** 00005e	8a 87 00 00 		mov	al,BYTE PTR _gbSysLengths[bx]
+	*** 000062	fe c8 			dec	al
+	*** 000064	a2 00 00 		mov	BYTE PTR _bCurrentLen,al
+;|***             }
+;|*** 	    else {
+; Line 270
+					$I2566:
+;|***                 if (bByte >= STATUS_NOTEOFF)
+;|***                     status = bByte;
+;|***                 else if (!status)
+;|***                     continue;
+;|***                 bCurrentStatus = status;
+;|***                 bCurrentLen = (BYTE)(MIDILENGTH(status) - 1);
+;|***                 if (bByte < STATUS_NOTEOFF)
+;|***                     goto first_byte;
+;|***             }
+;|***             msg_ch = FILTERSTATUS(bCurrentStatus);
+; Line 280
+	*** 000067	8a 46 fd 		mov	al,BYTE PTR [bp-3]	;bCurrentStatus
+	*** 00006a	24 0f 			and	al,15	;000fH
+	*** 00006c	88 46 f8 		mov	BYTE PTR [bp-8],al	;msg
+;|***         }
+;|*** 	else {
+;|***             if (bByte >= STATUS_NOTEOFF)
+;|***                 goto kludge_city;
+;|***             if (!bPosition) {
+;|*** first_byte:
+;|***                 bPosition++;
+;|***                 msg.b1 = bByte;
+;|***             }
+;|*** 	    else
+;|***                 msg.b2 = bByte;
+;|***             bCurrentLen--;
+;|***         }
+; Line 293
+					$I2572:
+;|***         if (!bCurrentLen) {
+; Line 294
+	*** 00006f	80 3e 00 00 00 		cmp	BYTE PTR _bCurrentLen,0
+	*** 000074	74 03 			je	$JCC116
+	*** 000076	e9 85 00 		jmp	$FC2560
+					$JCC116:
+;|***             bByte = (BYTE)((bCurrentStatus >> 4) & 0x07);
+;|***             if (*synthmidi[bByte])
+; Line 296
+	*** 000079	8a 5e fd 		mov	bl,BYTE PTR [bp-3]	;bCurrentStatus
+	*** 00007c	80 e3 70 		and	bl,112	;0070H
+	*** 00007f	c0 eb 04 		shr	bl,4
+	*** 000082	88 5e ff 		mov	BYTE PTR [bp-1],bl	;bByte
+	*** 000085	2a ff 			sub	bh,bh
+	*** 000087	03 db 			add	bx,bx
+	*** 000089	83 bf 00 00 00 		cmp	WORD PTR _synthmidi[bx],0
+	*** 00008e	74 55 			je	$I2577
+;|***                 (*synthmidi[bByte]) (msg);
+; Line 297
+	*** 000090	ff 76 fa 		push	WORD PTR [bp-6]
+	*** 000093	ff 76 f8 		push	WORD PTR [bp-8]	;msg
+	*** 000096	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;bByte
+	*** 000099	2a ff 			sub	bh,bh
+	*** 00009b	03 db 			add	bx,bx
+	*** 00009d	ff 97 00 00 		call	WORD PTR _synthmidi[bx]
+;|***             else
+; Line 298
+	*** 0000a1	eb 5b 			jmp	SHORT $FC2560
+					$I2565:
+;|***                 if (bByte >= STATUS_NOTEOFF)
+; Line 271
+	*** 0000a3	80 7e ff 80 		cmp	BYTE PTR [bp-1],128	;0080H	;bByte
+	*** 0000a7	72 08 			jb	$I2567
+;|***                     status = bByte;
+; Line 272
+	*** 0000a9	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bByte
+	*** 0000ac	a2 00 00 		mov	BYTE PTR _status,al
+;|***                 else if (!status)
+; Line 273
+	*** 0000af	eb 07 			jmp	SHORT $I2568
+					$I2567:
+	*** 0000b1	80 3e 00 00 00 		cmp	BYTE PTR _status,0
+	*** 0000b6	74 46 			je	$FC2560
+;|***                     continue;
+;|***                 bCurrentStatus = status;
+; Line 275
+					$I2568:
+;|***                 bCurrentLen = (BYTE)(MIDILENGTH(status) - 1);
+; Line 276
+	*** 0000b8	8a 1e 00 00 		mov	bl,BYTE PTR _status
+	*** 0000bc	88 5e fd 		mov	BYTE PTR [bp-3],bl	;bCurrentStatus
+	*** 0000bf	80 e3 70 		and	bl,112	;0070H
+	*** 0000c2	c0 eb 04 		shr	bl,4
+	*** 0000c5	2a ff 			sub	bh,bh
+	*** 0000c7	8a 87 00 00 		mov	al,BYTE PTR _gbMidiLengths[bx]
+	*** 0000cb	fe c8 			dec	al
+	*** 0000cd	a2 00 00 		mov	BYTE PTR _bCurrentLen,al
+;|***                 if (bByte < STATUS_NOTEOFF)
+; Line 277
+	*** 0000d0	80 7e ff 80 		cmp	BYTE PTR [bp-1],128	;0080H	;bByte
+	*** 0000d4	73 91 			jae	$I2566
+;|***                     goto first_byte;
+;|***             }
+;|***             msg_ch = FILTERSTATUS(bCurrentStatus);
+;|***         }
+;|*** 	else {
+;|***             if (bByte >= STATUS_NOTEOFF)
+;|***                 goto kludge_city;
+;|***             if (!bPosition) {
+;|*** first_byte:
+; Line 286
+					$first_byte2571:
+;|***                 bPosition++;
+; Line 287
+	*** 0000d6	fe 46 fe 		inc	BYTE PTR [bp-2]	;bPosition
+;|***                 msg.b1 = bByte;
+; Line 288
+	*** 0000d9	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bByte
+	*** 0000dc	88 46 f9 		mov	BYTE PTR [bp-7],al
+;|***             }
+;|*** 	    else
+;|***                 msg.b2 = bByte;
+; Line 291
+					$I2575:
+;|***             bCurrentLen--;
+; Line 292
+	*** 0000df	fe 0e 00 00 		dec	BYTE PTR _bCurrentLen
+	*** 0000e3	eb 8a 			jmp	SHORT $I2572
+;|***             }
+; Line 279
+					$I2577:
+;|***             msg_ch = FILTERSTATUS(bCurrentStatus);
+;|***         }
+;|*** 	else {
+;|***             if (bByte >= STATUS_NOTEOFF)
+;|***                 goto kludge_city;
+;|***             if (!bPosition) {
+;|*** first_byte:
+;|***                 bPosition++;
+;|***                 msg.b1 = bByte;
+;|***             }
+;|*** 	    else
+;|***                 msg.b2 = bByte;
+;|***             bCurrentLen--;
+;|***         }
+;|***         if (!bCurrentLen) {
+;|***             bByte = (BYTE)((bCurrentStatus >> 4) & 0x07);
+;|***             if (*synthmidi[bByte])
+;|***                 (*synthmidi[bByte]) (msg);
+;|***             else
+;|***                 D1("MIDI message type not supported");
+; Line 299
+	*** 0000e5	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000ea	72 12 			jb	$FC2560
+	*** 0000ec	1e 			push	ds
+	*** 0000ed	68 00 00 		push	OFFSET DGROUP:$SG2580
+	*** 0000f0	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000f5	1e 			push	ds
+	*** 0000f6	68 00 00 		push	OFFSET DGROUP:$SG2581
+	*** 0000f9	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     for (; dwLength; dwLength--) {
+; Line 256
+					$FC2560:
+	*** 0000fe	83 6e 04 01 		sub	WORD PTR [bp+4],1	;dwLength
+	*** 000102	83 5e 06 00 		sbb	WORD PTR [bp+6],0
+	*** 000106	8b 46 06 		mov	ax,WORD PTR [bp+6]
+	*** 000109	0b 46 04 		or	ax,WORD PTR [bp+4]	;dwLength
+	*** 00010c	74 03 			je	$JCC268
+	*** 00010e	e9 fe fe 		jmp	$F2559
+					$JCC268:
+;|***         bByte = *lpBuf++;
+;|***         
+;|***         if (bByte >= STATUS_TIMINGCLOCK)
+;|***             continue;
+;|*** 
+;|***         if (!bCurrentLen) {
+;|*** kludge_city:
+;|***             bPosition = 0;
+;|***             if (bByte >= STATUS_SYSEX) {
+;|***                 bCurrentStatus = bByte;
+;|***                 status = 0;
+;|***                 bCurrentLen = (BYTE)(SYSLENGTH(bCurrentStatus) - 1);
+;|***             }
+;|*** 	    else {
+;|***                 if (bByte >= STATUS_NOTEOFF)
+;|***                     status = bByte;
+;|***                 else if (!status)
+;|***                     continue;
+;|***                 bCurrentStatus = status;
+;|***                 bCurrentLen = (BYTE)(MIDILENGTH(status) - 1);
+;|***                 if (bByte < STATUS_NOTEOFF)
+;|***                     goto first_byte;
+;|***             }
+;|***             msg_ch = FILTERSTATUS(bCurrentStatus);
+;|***         }
+;|*** 	else {
+;|***             if (bByte >= STATUS_NOTEOFF)
+;|***                 goto kludge_city;
+;|***             if (!bPosition) {
+;|*** first_byte:
+;|***                 bPosition++;
+;|***                 msg.b1 = bByte;
+;|***             }
+;|*** 	    else
+;|***                 msg.b2 = bByte;
+;|***             bCurrentLen--;
+;|***         }
+;|***         if (!bCurrentLen) {
+;|***             bByte = (BYTE)((bCurrentStatus >> 4) & 0x07);
+;|***             if (*synthmidi[bByte])
+;|***                 (*synthmidi[bByte]) (msg);
+;|***             else
+;|***                 D1("MIDI message type not supported");
+;|***         }
+;|***     }
+;|*** }
+; Line 302
+					$EX2554:
+	*** 000111	c9 			leave	
+	*** 000112	c2 08 00 		ret	8
+	*** 000115	90 			nop	
+
+SYNTHMIDIDATA	ENDP
+	PUBLIC	SYNTHALLNOTESOFF
+SYNTHALLNOTESOFF	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthAllNotesOff | Turn any notes off which are playing.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ************************************************************************/
+;|*** void NEAR PASCAL synthAllNotesOff(void)
+;|*** {
+; Line 312
+	*** 000116	c8 08 00 00 		enter	8,0
+;	voice = -1
+;	msg = -6
+;|*** BYTE voice;
+;|*** MIDIMSG msg;
+;|***     
+;|***     for (voice = 0; voice < (BYTE)NUMVOICES; voice++) {
+; Line 316
+	*** 00011a	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;voice
+	*** 00011e	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 000123	1a c0 			sbb	al,al
+	*** 000125	24 fe 			and	al,254	;00feH
+	*** 000127	04 0b 			add	al,11	;000bH
+	*** 000129	74 39 			je	$EX2582
+					$F2585:
+;|***         if (voices[voice].alloc) {
+; Line 317
+	*** 00012b	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;voice
+	*** 00012e	2a ff 			sub	bh,bh
+	*** 000130	c1 e3 03 		shl	bx,3
+	*** 000133	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 000138	74 17 			je	$FC2586
+;|***             msg_ch = voices[voice].channel;
+; Line 318
+	*** 00013a	8a 87 02 00 		mov	al,BYTE PTR _voices[bx+2]
+	*** 00013e	88 46 fa 		mov	BYTE PTR [bp-6],al	;msg
+;|***             msg_note = voices[voice].note;
+; Line 319
+	*** 000141	8a 87 01 00 		mov	al,BYTE PTR _voices[bx+1]
+	*** 000145	88 46 fb 		mov	BYTE PTR [bp-5],al
+;|***             synthNoteOff(msg);
+; Line 320
+	*** 000148	ff 76 fc 		push	WORD PTR [bp-4]
+	*** 00014b	ff 76 fa 		push	WORD PTR [bp-6]	;msg
+	*** 00014e	e8 00 00 		call	SYNTHNOTEOFF
+;|***     for (voice = 0; voice < (BYTE)NUMVOICES; voice++) {
+; Line 316
+					$FC2586:
+	*** 000151	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 000156	1a c0 			sbb	al,al
+	*** 000158	24 fe 			and	al,254	;00feH
+	*** 00015a	04 0b 			add	al,11	;000bH
+	*** 00015c	fe 46 ff 		inc	BYTE PTR [bp-1]	;voice
+	*** 00015f	3a 46 ff 		cmp	al,BYTE PTR [bp-1]	;voice
+	*** 000162	77 c7 			ja	$F2585
+;|***         if (voices[voice].alloc) {
+;|***             msg_ch = voices[voice].channel;
+;|***             msg_note = voices[voice].note;
+;|***             synthNoteOff(msg);
+;|***         }
+;|***     }
+;|*** }
+; Line 323
+					$EX2582:
+	*** 000164	c9 			leave	
+	*** 000165	c3 			ret	
+
+SYNTHALLNOTESOFF	ENDP
+	PUBLIC	SYNTHOCTAVEREG
+SYNTHOCTAVEREG	PROC NEAR
+;|*** 
+;|*** /***************************************************************************
+;|*** 
+;|***     private functions
+;|*** 
+;|*** ***************************************************************************/
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthOctaveReg | Perform octave registration on a message.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel the note is to be played on.
+;|***  *
+;|***  * @parm BYTE | msg_note | The MIDI note number.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthOctaveReg(MIDIMSG FAR *pMsg)
+;|*** {
+; Line 343
+	*** 000166	c8 06 00 00 		enter	6,0
+	*** 00016a	57 			push	di
+	*** 00016b	56 			push	si
+;	pMsg = 4
+;	register si = iModNote
+;	msg = -4
+	*** 00016c	8b 7e 04 		mov	di,WORD PTR [bp+4]	;pMsg
+;|*** int  iModNote;
+;|*** MIDIMSG msg = *pMsg;
+; Line 345
+	*** 00016f	8e 46 06 		mov	es,WORD PTR [bp+6]
+	*** 000172	26 8b 05 		mov	ax,WORD PTR es:[di]
+	*** 000175	26 8b 55 02 		mov	dx,WORD PTR es:[di+2]
+	*** 000179	89 46 fc 		mov	WORD PTR [bp-4],ax	;msg
+	*** 00017c	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|*** 
+;|***     if ((msg_ch == DRUMKITCHANNEL) || (channels[msg_ch].patch > 127))
+; Line 347
+	*** 00017f	80 7e fc 0f 		cmp	BYTE PTR [bp-4],15	;000fH	;msg
+	*** 000183	74 42 			je	$EX2592
+	*** 000185	8a 46 fc 		mov	al,BYTE PTR [bp-4]	;msg
+	*** 000188	2a e4 			sub	ah,ah
+	*** 00018a	6b d8 03 		imul	bx,ax,3
+	*** 00018d	8a 87 00 00 		mov	al,BYTE PTR _channels[bx]
+	*** 000191	3c 7f 			cmp	al,127	;007fH
+	*** 000193	77 32 			ja	$EX2592
+;|***         return;  /* only affect normal melodic patches */
+;|***     
+;|***     iModNote = msg_note + patchKeyOffset[channels[msg_ch].patch];
+;|***     if ((iModNote < 0) || (iModNote > 127))
+; Line 351
+	*** 000195	8a d8 			mov	bl,al
+	*** 000197	2a ff 			sub	bh,bh
+	*** 000199	8a 87 00 00 		mov	al,BYTE PTR _patchKeyOffset[bx]
+	*** 00019d	98 			cbw	
+	*** 00019e	8b f0 			mov	si,ax
+	*** 0001a0	8a 46 fd 		mov	al,BYTE PTR [bp-3]
+	*** 0001a3	2a e4 			sub	ah,ah
+	*** 0001a5	03 f0 			add	si,ax
+	*** 0001a7	78 05 			js	$I2598
+	*** 0001a9	83 fe 7f 		cmp	si,127	;007fH
+	*** 0001ac	7e 07 			jle	$I2597
+					$I2598:
+;|***         iModNote = msg_note;
+; Line 352
+	*** 0001ae	8a 46 fd 		mov	al,BYTE PTR [bp-3]
+	*** 0001b1	2a e4 			sub	ah,ah
+	*** 0001b3	8b f0 			mov	si,ax
+;|*** 
+;|***     msg_note = (BYTE) iModNote;
+; Line 354
+					$I2597:
+	*** 0001b5	8b c6 			mov	ax,si
+	*** 0001b7	88 46 fd 		mov	BYTE PTR [bp-3],al
+;|***     *pMsg = msg;  /* modify what was pointed to */
+; Line 355
+	*** 0001ba	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;msg
+	*** 0001bd	8b 56 fe 		mov	dx,WORD PTR [bp-2]
+	*** 0001c0	26 89 05 		mov	WORD PTR es:[di],ax
+	*** 0001c3	26 89 55 02 		mov	WORD PTR es:[di+2],dx
+;|*** }
+; Line 356
+					$EX2592:
+	*** 0001c7	5e 			pop	si
+	*** 0001c8	5f 			pop	di
+	*** 0001c9	c9 			leave	
+	*** 0001ca	c2 04 00 		ret	4
+	*** 0001cd	90 			nop	
+
+SYNTHOCTAVEREG	ENDP
+	PUBLIC	SYNTHNOTEON
+SYNTHNOTEON	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthNoteOn | Turn on a requested note.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel the note is to be played on.
+;|***  *
+;|***  * @parm BYTE | msg_note | The MIDI note number.
+;|***  *
+;|***  * @parm BYTE | msg_velocity | The velocity level for the note.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthNoteOn(MIDIMSG msg)
+;|*** {
+; Line 372
+	*** 0001ce	c8 04 00 00 		enter	4,0
+;	msg = 4
+;	voice = -1
+;|*** BYTE voice;
+;|*** 
+;|***     if (msg_velocity == 0) {               /* 0 velocity means note off */
+; Line 375
+	*** 0001d2	80 7e 06 00 		cmp	BYTE PTR [bp+6],0
+	*** 0001d6	75 0c 			jne	$I2603
+;|***         synthNoteOff(msg);
+; Line 376
+	*** 0001d8	ff 76 06 		push	WORD PTR [bp+6]
+	*** 0001db	ff 76 04 		push	WORD PTR [bp+4]	;msg
+	*** 0001de	e8 00 00 		call	SYNTHNOTEOFF
+;|***         return;
+; Line 377
+	*** 0001e1	e9 bc 00 		jmp	$EX2601
+;|***     }
+;|*** 
+;|***     synthOctaveReg(&msg);  /* adjust key # to overcome patch octave diffs */
+; Line 380
+					$I2603:
+	*** 0001e4	8d 46 04 		lea	ax,WORD PTR [bp+4]	;msg
+	*** 0001e7	16 			push	ss
+	*** 0001e8	50 			push	ax
+	*** 0001e9	e8 7a ff 		call	SYNTHOCTAVEREG
+;|*** 
+;|***     /* hack to overcome how quiet this thing is in relation to wave output */
+;|***     msg_velocity = loudervol[msg_velocity];
+; Line 383
+	*** 0001ec	8a 5e 06 		mov	bl,BYTE PTR [bp+6]
+	*** 0001ef	2a ff 			sub	bh,bh
+	*** 0001f1	8a 87 00 00 		mov	al,BYTE PTR _loudervol[bx]
+	*** 0001f5	88 46 06 		mov	BYTE PTR [bp+6],al
+;|*** 
+;|***     if (msg_ch == DRUMKITCHANNEL) {       /* drum kit hardwired on channel 15 */
+; Line 385
+	*** 0001f8	80 7e 04 0f 		cmp	BYTE PTR [bp+4],15	;000fH	;msg
+	*** 0001fc	75 45 			jne	$I2604
+;|***         if ((msg_note < FIRSTDRUMNOTE) || (msg_note > LASTDRUMNOTE))
+; Line 386
+	*** 0001fe	80 7e 05 23 		cmp	BYTE PTR [bp+5],35	;0023H
+	*** 000202	72 06 			jb	$L2720
+	*** 000204	80 7e 05 51 		cmp	BYTE PTR [bp+5],81	;0051H
+	*** 000208	76 03 			jbe	$L2719
+;|***             return;
+;|*** 
+;|***         channels[DRUMKITCHANNEL].patch = drumpatch[msg_note - FIRSTDRUMNOTE].patch;
+; Line 389
+					$L2720:
+	*** 00020a	e9 93 00 		jmp	$EX2601
+					$L2719:
+	*** 00020d	8a 5e 05 		mov	bl,BYTE PTR [bp+5]
+	*** 000210	03 db 			add	bx,bx
+	*** 000212	8a 87 ba ff 		mov	al,BYTE PTR _drumpatch[bx-70]
+	*** 000216	a2 2d 00 		mov	BYTE PTR _channels+45,al
+;|***         msg_note = drumpatch[msg_note - FIRSTDRUMNOTE].note;
+;|*** 
+;|***         if ((voice = FindVoice(msg_note, msg_ch)) != 0xFF)
+; Line 392
+	*** 000219	8a 87 bb ff 		mov	al,BYTE PTR _drumpatch[bx-69]
+	*** 00021d	88 46 05 		mov	BYTE PTR [bp+5],al
+	*** 000220	50 			push	ax
+	*** 000221	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 000224	50 			push	ax
+	*** 000225	e8 00 00 		call	FINDVOICE
+	*** 000228	88 46 ff 		mov	BYTE PTR [bp-1],al	;voice
+	*** 00022b	3c ff 			cmp	al,255	;00ffH
+	*** 00022d	74 04 			je	$I2607
+;|***             NoteOff(voice);
+; Line 393
+	*** 00022f	50 			push	ax
+	*** 000230	e8 00 00 		call	NOTEOFF
+;|***         voice = GetNewVoice(msg_note, msg_ch);
+; Line 394
+					$I2607:
+	*** 000233	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 000236	50 			push	ax
+	*** 000237	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 00023a	50 			push	ax
+	*** 00023b	e8 00 00 		call	GETNEWVOICE
+	*** 00023e	88 46 ff 		mov	BYTE PTR [bp-1],al	;voice
+;|***     }
+;|*** 
+;|***     else {
+; Line 397
+	*** 000241	eb 16 			jmp	SHORT $I2608
+					$I2604:
+;|***         voice = FindVoice(msg_note, msg_ch);       /* voice already assigned? */
+;|***         if (voice == 0xff)
+; Line 399
+	*** 000243	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 000246	50 			push	ax
+	*** 000247	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 00024a	50 			push	ax
+	*** 00024b	e8 00 00 		call	FINDVOICE
+	*** 00024e	88 46 ff 		mov	BYTE PTR [bp-1],al	;voice
+	*** 000251	3c ff 			cmp	al,255	;00ffH
+	*** 000253	74 de 			je	$I2607
+;|***             voice = GetNewVoice(msg_note, msg_ch); /* if not, get one */
+;|***         else
+;|***             NoteOff(voice);
+; Line 402
+	*** 000255	50 			push	ax
+	*** 000256	e8 00 00 		call	NOTEOFF
+;|***     }
+; Line 403
+					$I2608:
+;|*** 
+;|***     if (voices[voice].volume != msg_velocity) { /* check if it's already set */
+; Line 405
+	*** 000259	8a 46 06 		mov	al,BYTE PTR [bp+6]
+	*** 00025c	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;voice
+	*** 00025f	2a ff 			sub	bh,bh
+	*** 000261	c1 e3 03 		shl	bx,3
+	*** 000264	81 c3 03 00 		add	bx,OFFSET DGROUP:_voices+3
+	*** 000268	89 5e fc 		mov	WORD PTR [bp-4],bx
+	*** 00026b	38 07 			cmp	BYTE PTR [bx],al
+	*** 00026d	74 13 			je	$I2611
+;|***         SetVoiceVolume(voice, msg_velocity);
+; Line 406
+	*** 00026f	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 000272	50 			push	ax
+	*** 000273	8a 46 06 		mov	al,BYTE PTR [bp+6]
+	*** 000276	50 			push	ax
+	*** 000277	e8 00 00 		call	SETVOICEVOLUME
+;|***         voices[voice].volume = msg_velocity;
+; Line 407
+	*** 00027a	8b 5e fc 		mov	bx,WORD PTR [bp-4]
+	*** 00027d	8a 46 06 		mov	al,BYTE PTR [bp+6]
+	*** 000280	88 07 			mov	BYTE PTR [bx],al
+;|***     }
+;|***     /* apply any pb for this channel */
+;|***     SetVoicePitch(voice, channels[msg_ch].wPitchBend);
+; Line 410
+					$I2611:
+	*** 000282	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 000285	50 			push	ax
+	*** 000286	8a 4e 04 		mov	cl,BYTE PTR [bp+4]	;msg
+	*** 000289	2a ed 			sub	ch,ch
+	*** 00028b	6b d9 03 		imul	bx,cx,3
+	*** 00028e	ff b7 01 00 		push	WORD PTR _channels[bx+1]
+	*** 000292	e8 00 00 		call	SETVOICEPITCH
+;|***     /* adjust for octave reg. */
+;|***     NoteOn(voice, msg_note);
+; Line 412
+	*** 000295	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 000298	50 			push	ax
+	*** 000299	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 00029c	50 			push	ax
+	*** 00029d	e8 00 00 		call	NOTEON
+;|*** }
+; Line 413
+					$EX2601:
+	*** 0002a0	c9 			leave	
+	*** 0002a1	c2 04 00 		ret	4
+	*** 0002a4	90 			nop	
+	*** 0002a5	90 			nop	
+
+SYNTHNOTEON	ENDP
+	PUBLIC	SYNTHNOTEOFF
+SYNTHNOTEOFF	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthNoteOff | Turn off a requested note.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel the note is on.
+;|***  *
+;|***  * @parm BYTE | msg_note | The MIDI note number.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthNoteOff(MIDIMSG msg)
+;|*** {
+; Line 427
+	*** 0002a6	c8 02 00 00 		enter	2,0
+;	msg = 4
+;	voice = -1
+;	bPatch = -2
+;|*** BYTE voice;
+;|***     
+;|***     /* adjust key # to overcome patch octave differences */
+;|***     synthOctaveReg(&msg); 
+; Line 431
+	*** 0002aa	8d 46 04 		lea	ax,WORD PTR [bp+4]	;msg
+	*** 0002ad	16 			push	ss
+	*** 0002ae	50 			push	ax
+	*** 0002af	e8 b4 fe 		call	SYNTHOCTAVEREG
+;|*** 
+;|***     if (msg_ch == DRUMKITCHANNEL) {       /* drum kit hardwired on channel 15 */
+; Line 433
+	*** 0002b2	80 7e 04 0f 		cmp	BYTE PTR [bp+4],15	;000fH	;msg
+	*** 0002b6	75 45 			jne	$I2616
+;|***         BYTE bPatch;
+;|*** 
+;|***         if ((msg_note < FIRSTDRUMNOTE) || (msg_note > LASTDRUMNOTE))
+; Line 436
+	*** 0002b8	80 7e 05 23 		cmp	BYTE PTR [bp+5],35	;0023H
+	*** 0002bc	72 6d 			jb	$EX2614
+	*** 0002be	80 7e 05 51 		cmp	BYTE PTR [bp+5],81	;0051H
+	*** 0002c2	77 67 			ja	$EX2614
+;|***             return;
+;|*** 
+;|***         bPatch = drumpatch[msg_note - FIRSTDRUMNOTE].patch;
+; Line 439
+	*** 0002c4	8a 5e 05 		mov	bl,BYTE PTR [bp+5]
+	*** 0002c7	2a ff 			sub	bh,bh
+	*** 0002c9	03 db 			add	bx,bx
+	*** 0002cb	8a 87 ba ff 		mov	al,BYTE PTR _drumpatch[bx-70]
+	*** 0002cf	88 46 fe 		mov	BYTE PTR [bp-2],al	;bPatch
+;|***         msg_note = drumpatch[msg_note - FIRSTDRUMNOTE].note;
+;|*** 
+;|***         if ((voice = FindVoice(msg_note, msg_ch)) != 0xFF) {
+; Line 442
+	*** 0002d2	8a 87 bb ff 		mov	al,BYTE PTR _drumpatch[bx-69]
+	*** 0002d6	88 46 05 		mov	BYTE PTR [bp+5],al
+	*** 0002d9	50 			push	ax
+	*** 0002da	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 0002dd	50 			push	ax
+	*** 0002de	e8 00 00 		call	FINDVOICE
+	*** 0002e1	88 46 ff 		mov	BYTE PTR [bp-1],al	;voice
+	*** 0002e4	3c ff 			cmp	al,255	;00ffH
+	*** 0002e6	74 43 			je	$EX2614
+;|***             if (LOWORD(voices[voice].dwTimeStamp) == bPatch) {
+; Line 443
+	*** 0002e8	8a 46 fe 		mov	al,BYTE PTR [bp-2]	;bPatch
+	*** 0002eb	2a e4 			sub	ah,ah
+	*** 0002ed	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;voice
+	*** 0002f0	2a ff 			sub	bh,bh
+	*** 0002f2	c1 e3 03 		shl	bx,3
+	*** 0002f5	39 87 04 00 		cmp	WORD PTR _voices[bx+4],ax
+	*** 0002f9	75 30 			jne	$EX2614
+	*** 0002fb	eb 20 			jmp	SHORT $L2721
+;|***                 NoteOff(voice);
+;|***                 FreeVoice(voice);
+;|***             }
+;|***         }
+;|***         return;
+;|***     }
+;|*** 
+;|***     else {
+; Line 451
+					$I2616:
+;|***         voice = FindVoice(msg_note, msg_ch);       /* get the assigned voice */
+;|***     }
+;|*** 
+;|***     if (voice == 0xFF)
+; Line 455
+	*** 0002fd	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 000300	50 			push	ax
+	*** 000301	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 000304	50 			push	ax
+	*** 000305	e8 00 00 		call	FINDVOICE
+	*** 000308	88 46 ff 		mov	BYTE PTR [bp-1],al	;voice
+	*** 00030b	3c ff 			cmp	al,255	;00ffH
+	*** 00030d	74 1c 			je	$EX2614
+;|***         return;
+;|*** 
+;|***     /* turn the note off */
+;|*** 
+;|***     if (voices[voice].note) {               /* check if note is playing */
+; Line 460
+	*** 00030f	8a d8 			mov	bl,al
+	*** 000311	2a ff 			sub	bh,bh
+	*** 000313	c1 e3 03 		shl	bx,3
+	*** 000316	80 bf 01 00 00 		cmp	BYTE PTR _voices[bx+1],0
+	*** 00031b	74 0e 			je	$EX2614
+;|***         NoteOff(voice);
+; Line 461
+					$L2721:
+	*** 00031d	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 000320	50 			push	ax
+	*** 000321	e8 00 00 		call	NOTEOFF
+;|***         /* return note to pool of notes. */
+;|***         FreeVoice(voice);
+; Line 463
+	*** 000324	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 000327	50 			push	ax
+	*** 000328	e8 00 00 		call	FREEVOICE
+;|***     }
+;|*** }
+; Line 465
+					$EX2614:
+	*** 00032b	c9 			leave	
+	*** 00032c	c2 04 00 		ret	4
+	*** 00032f	90 			nop	
+
+SYNTHNOTEOFF	ENDP
+	PUBLIC	SYNTHPITCHBEND
+SYNTHPITCHBEND	PROC NEAR
+;|*** 
+;|*** #if 0
+;|*** /* These functions are commented out because we are not currently supporting
+;|***  * channel and key pressure messages in this driver.  Ad Lib had originally
+;|***  * interpreted them as volume values, which produces incorrect results.
+;|***  * I haven't implemented them because it's not clear from the technical
+;|***  * documentation how produce the low-frequency oscillation that is often
+;|***  * produced by these messages.  To support the messages, change the
+;|***  * entries in the synthmidi array to call these functions again, uncomment
+;|***  * these two functions, and define an xSetVoicePressure routine.
+;|***  */
+;|*** 
+;|*** static void NEAR PASCAL synthKeyPressure(MIDIMSG msg);
+;|*** static void NEAR PASCAL synthChannelPressure(MIDIMSG msg);
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthChannelPressure | Set the pressure for a channel.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel to be set.
+;|***  *
+;|***  * @parm BYTE | msg_cpress | The pressure level for the channel.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthChannelPressure(MIDIMSG msg)
+;|*** {
+;|*** int i;
+;|*** 
+;|***     for (i = 0; i < NUMVOICES; i++) {
+;|***         if ((voices[i].alloc) && (voices[i].channel == msg_ch))
+;|***             xSetVoicePressure(i, msg_cpress);
+;|***     }
+;|*** }
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthKeyPressure | Set the key pressure for a note.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel the note is on.
+;|***  *
+;|***  * @parm BYTE | msg_note | The MIDI note number.
+;|***  *
+;|***  * @parm BYTE | msg_kpress | The pressure level for the note.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthKeyPressure(MIDIMSG msg)
+;|*** {
+;|*** BYTE voice;
+;|*** 
+;|***     voice = FindVoice(msg_note, msg_ch);
+;|***     if (voice == 0xFF)
+;|***         return;
+;|*** 
+;|***     xSetVoicePressure(voice, msg_kpress);
+;|*** }
+;|*** #endif
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthPitchBend | Bend the pitch.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The channel to bend the pitch for.
+;|***  *
+;|***  * @parm BYTE | msg_lsb | LSB of pitch bend.
+;|***  *
+;|***  * @parm BYTE | msg_msb | MSB of pitch bend.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthPitchBend(MIDIMSG msg)
+;|*** {
+; Line 540
+	*** 000330	c8 06 00 00 		enter	6,0
+	*** 000334	56 			push	si
+;	msg = 4
+;	i = -1
+;	wPB = -4
+;|*** BYTE i;
+;|*** WORD wPB = (((WORD)msg_msb) << 7) | msg_lsb;
+; Line 542
+	*** 000335	8b 76 06 		mov	si,WORD PTR [bp+6]
+	*** 000338	81 e6 ff 00 		and	si,255	;00ffH
+	*** 00033c	c1 e6 07 		shl	si,7
+	*** 00033f	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 000342	2a e4 			sub	ah,ah
+	*** 000344	0b f0 			or	si,ax
+;|*** 
+;|***     /* msb is shifted by 7 because we've redefined the MIDI pitch bend
+;|***      * range of 0 - 0x7f7f to 0 - 3fff by concatenating the two
+;|***      * 7-bit values in msb and lsb together
+;|***      */
+;|*** 
+;|***     for (i = 0; i < (BYTE)NUMVOICES; i++) {
+; Line 549
+	*** 000346	88 66 ff 		mov	BYTE PTR [bp-1],ah	;i
+	*** 000349	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 00034e	1a c0 			sbb	al,al
+	*** 000350	24 fe 			and	al,254	;00feH
+	*** 000352	04 0b 			add	al,11	;000bH
+	*** 000354	74 33 			je	$FB2632
+					$F2630:
+;|***         if ((voices[i].alloc) && (voices[i].channel == msg_ch))
+; Line 550
+	*** 000356	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;i
+	*** 000359	2a ff 			sub	bh,bh
+	*** 00035b	c1 e3 03 		shl	bx,3
+	*** 00035e	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 000363	74 11 			je	$FC2631
+	*** 000365	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 000368	38 87 02 00 		cmp	BYTE PTR _voices[bx+2],al
+	*** 00036c	75 08 			jne	$FC2631
+;|***             SetVoicePitch(i, wPB);
+; Line 551
+	*** 00036e	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 000371	50 			push	ax
+	*** 000372	56 			push	si
+	*** 000373	e8 00 00 		call	SETVOICEPITCH
+;|***     for (i = 0; i < (BYTE)NUMVOICES; i++) {
+; Line 549
+					$FC2631:
+	*** 000376	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 00037b	1a c0 			sbb	al,al
+	*** 00037d	24 fe 			and	al,254	;00feH
+	*** 00037f	04 0b 			add	al,11	;000bH
+	*** 000381	fe 46 ff 		inc	BYTE PTR [bp-1]	;i
+	*** 000384	3a 46 ff 		cmp	al,BYTE PTR [bp-1]	;i
+	*** 000387	77 cd 			ja	$F2630
+;|***         if ((voices[i].alloc) && (voices[i].channel == msg_ch))
+;|***             SetVoicePitch(i, wPB);
+;|***     }
+; Line 552
+					$FB2632:
+;|***     channels[msg_ch].wPitchBend = wPB; /* remember for subsequent notes */
+; Line 553
+	*** 000389	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 00038c	2a e4 			sub	ah,ah
+	*** 00038e	6b d8 03 		imul	bx,ax,3
+	*** 000391	89 b7 01 00 		mov	WORD PTR _channels[bx+1],si
+;|***                                        /* on this channel */
+;|*** }
+; Line 555
+	*** 000395	5e 			pop	si
+	*** 000396	c9 			leave	
+	*** 000397	c2 04 00 		ret	4
+
+SYNTHPITCHBEND	ENDP
+	PUBLIC	SYNTHCONTROLCHANGE
+SYNTHCONTROLCHANGE	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | synthControlChange | Change a controller value.
+;|***  *
+;|***  * @parm BYTE | msg_ch | The MIDI channel.
+;|***  *
+;|***  * @parm BYTE | msg_controller | The controller number to change.
+;|***  *
+;|***  * @parm BYTE | msg_value | The value to change the controller to.
+;|***  *
+;|***  * @comm The only controllers supported are 123-127 (all notes off).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthControlChange(MIDIMSG msg)
+;|*** {
+; Line 573
+	*** 00039a	55 			push	bp
+	*** 00039b	8b ec 			mov	bp,sp
+;	msg = 4
+;|***     if (msg_controller >= 123)
+; Line 574
+	*** 00039d	80 7e 05 7b 		cmp	BYTE PTR [bp+5],123	;007bH
+	*** 0003a1	72 03 			jb	$EX2636
+;|***         synthAllNotesOff();
+; Line 575
+	*** 0003a3	e8 70 fd 		call	SYNTHALLNOTESOFF
+;|*** }
+; Line 576
+					$EX2636:
+	*** 0003a6	c9 			leave	
+	*** 0003a7	c2 04 00 		ret	4
+
+SYNTHCONTROLCHANGE	ENDP
+	PUBLIC	SYNTHPROGRAMCHANGE
+SYNTHPROGRAMCHANGE	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  *  @doc INTERNAL
+;|***  *
+;|***  *  @api void | synthProgramChange | Change a channel patch assignment.
+;|***  *
+;|***  *  @parm BYTE | msg_ch | The channel the patch is to apply to.
+;|***  *
+;|***  *  @parm BYTE | msg_patch | The new patch number.
+;|***  *
+;|***  *  @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL synthProgramChange(MIDIMSG msg)
+;|*** {
+; Line 590
+	*** 0003aa	c8 04 00 00 		enter	4,0
+;	msg = 4
+;	voice = -1
+;|*** BYTE voice;
+;|*** 
+;|***     /* drum kit hardwired on channel 15, so ignore patch changes there */
+;|***     if (msg_ch == DRUMKITCHANNEL)
+; Line 594
+	*** 0003ae	80 7e 04 0f 		cmp	BYTE PTR [bp+4],15	;000fH	;msg
+	*** 0003b2	74 60 			je	$EX2640
+;|***         return;
+;|*** 
+;|***     /* turn off any notes on this channel which are currently on */
+;|***     for (voice = 0; voice < (BYTE)NUMVOICES; voice++) {
+; Line 598
+	*** 0003b4	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;voice
+	*** 0003b8	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 0003bd	1a c0 			sbb	al,al
+	*** 0003bf	24 fe 			and	al,254	;00feH
+	*** 0003c1	04 0b 			add	al,11	;000bH
+	*** 0003c3	74 40 			je	$FB2645
+					$F2643:
+;|***         if ((voices[voice].alloc) && (voices[voice].channel == msg_ch)
+;|***              && (voices[voice].note)) {      /* check if note is playing */
+; Line 600
+	*** 0003c5	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;voice
+	*** 0003c8	2a ff 			sub	bh,bh
+	*** 0003ca	c1 e3 03 		shl	bx,3
+	*** 0003cd	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 0003d2	74 1e 			je	$FC2644
+	*** 0003d4	8a 46 04 		mov	al,BYTE PTR [bp+4]	;msg
+	*** 0003d7	38 87 02 00 		cmp	BYTE PTR _voices[bx+2],al
+	*** 0003db	75 15 			jne	$FC2644
+	*** 0003dd	80 bf 01 00 00 		cmp	BYTE PTR _voices[bx+1],0
+	*** 0003e2	74 0e 			je	$FC2644
+;|***                 NoteOff(voice);              /* turn note off */
+; Line 601
+	*** 0003e4	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 0003e7	50 			push	ax
+	*** 0003e8	e8 00 00 		call	NOTEOFF
+;|***                 FreeVoice(voice);            /* return note to pool of notes. */
+; Line 602
+	*** 0003eb	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;voice
+	*** 0003ee	50 			push	ax
+	*** 0003ef	e8 00 00 		call	FREEVOICE
+;|***     for (voice = 0; voice < (BYTE)NUMVOICES; voice++) {
+; Line 598
+					$FC2644:
+	*** 0003f2	83 3e 00 00 01 		cmp	WORD PTR _fPercussion,1
+	*** 0003f7	1a c0 			sbb	al,al
+	*** 0003f9	24 fe 			and	al,254	;00feH
+	*** 0003fb	04 0b 			add	al,11	;000bH
+	*** 0003fd	fe 46 ff 		inc	BYTE PTR [bp-1]	;voice
+	*** 000400	3a 46 ff 		cmp	al,BYTE PTR [bp-1]	;voice
+	*** 000403	77 c0 			ja	$F2643
+;|***         if ((voices[voice].alloc) && (voices[voice].channel == msg_ch)
+;|***              && (voices[voice].note)) {      /* check if note is playing */
+;|***                 NoteOff(voice);              /* turn note off */
+;|***                 FreeVoice(voice);            /* return note to pool of notes. */
+;|***         }
+;|***     }
+; Line 604
+					$FB2645:
+;|*** 
+;|***     /* change the patch for this channel */
+;|***     channels[msg_ch].patch = msg_patch;
+; Line 607
+	*** 000405	8a 46 05 		mov	al,BYTE PTR [bp+5]
+	*** 000408	8a 4e 04 		mov	cl,BYTE PTR [bp+4]	;msg
+	*** 00040b	2a ed 			sub	ch,ch
+	*** 00040d	6b d9 03 		imul	bx,cx,3
+	*** 000410	88 87 00 00 		mov	BYTE PTR _channels[bx],al
+;|*** 
+;|*** }
+; Line 609
+					$EX2640:
+	*** 000414	c9 			leave	
+	*** 000415	c2 04 00 		ret	4
+
+SYNTHPROGRAMCHANGE	ENDP
+	PUBLIC	FINDVOICE
+FINDVOICE	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api BYTE | FindVoice | Find the voice a note/channel is using.
+;|***  *
+;|***  * @parm BYTE | note | The note in use.
+;|***  *
+;|***  * @parm BYTE | channel | The channel in use.
+;|***  *
+;|***  * @rdesc There return value is the voice number or 0xFF if no match is found.
+;|***  **************************************************************************/
+;|*** static BYTE NEAR PASCAL FindVoice(BYTE note, BYTE channel)
+;|*** {
+; Line 623
+	*** 000418	c8 06 00 00 		enter	6,0
+;	note = 6
+;	channel = 4
+;	i = -1
+;|*** BYTE i;
+;|*** 
+;|***     if (channel == DRUMKITCHANNEL) {
+; Line 626
+	*** 00041c	80 7e 04 0f 		cmp	BYTE PTR [bp+4],15	;000fH	;channel
+	*** 000420	75 1f 			jne	$I2653
+;|***         i = patches[channels[DRUMKITCHANNEL].patch].percVoice;
+;|*** 
+;|***         if (voices[i].alloc)
+; Line 629
+	*** 000422	a0 2d 00 		mov	al,BYTE PTR _channels+45
+	*** 000425	2a e4 			sub	ah,ah
+	*** 000427	6b d8 1e 		imul	bx,ax,30	;001eH
+	*** 00042a	8a 9f 01 00 		mov	bl,BYTE PTR _patches[bx+1]
+	*** 00042e	88 5e ff 		mov	BYTE PTR [bp-1],bl	;i
+	*** 000431	2a ff 			sub	bh,bh
+	*** 000433	c1 e3 03 		shl	bx,3
+	*** 000436	38 a7 00 00 		cmp	BYTE PTR _voices[bx],ah
+	*** 00043a	74 6e 			je	$I2655
+;|***             return i;
+; Line 630
+					$L2722:
+	*** 00043c	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 00043f	eb 6b 			jmp	SHORT $EX2651
+;|***     }
+;|*** 
+;|***     else {
+; Line 633
+					$I2653:
+;|***         for (i = 0; i < (BYTE)NUMVOICES; i++) {
+; Line 634
+	*** 000441	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;i
+	*** 000445	8b 0e 00 00 		mov	cx,WORD PTR _fPercussion
+	*** 000449	83 f9 01 		cmp	cx,1
+	*** 00044c	1a c0 			sbb	al,al
+	*** 00044e	24 fe 			and	al,254	;00feH
+	*** 000450	04 0b 			add	al,11	;000bH
+	*** 000452	88 46 fc 		mov	BYTE PTR [bp-4],al
+	*** 000455	0a c0 			or	al,al
+	*** 000457	74 51 			je	$I2655
+					$F2656:
+;|***             if ((voices[i].alloc) && (voices[i].note == note)
+;|***             && (voices[i].channel == channel)) {
+; Line 636
+	*** 000459	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;i
+	*** 00045c	2a ff 			sub	bh,bh
+	*** 00045e	c1 e3 03 		shl	bx,3
+	*** 000461	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 000466	74 12 			je	$FC2657
+	*** 000468	8a 46 06 		mov	al,BYTE PTR [bp+6]	;note
+	*** 00046b	38 87 01 00 		cmp	BYTE PTR _voices[bx+1],al
+	*** 00046f	75 09 			jne	$FC2657
+	*** 000471	8a 46 04 		mov	al,BYTE PTR [bp+4]	;channel
+	*** 000474	38 87 02 00 		cmp	BYTE PTR _voices[bx+2],al
+	*** 000478	74 0d 			je	$L2705
+;|***         for (i = 0; i < (BYTE)NUMVOICES; i++) {
+; Line 634
+					$FC2657:
+	*** 00047a	8a 46 fc 		mov	al,BYTE PTR [bp-4]
+	*** 00047d	fe 46 ff 		inc	BYTE PTR [bp-1]	;i
+	*** 000480	38 46 ff 		cmp	BYTE PTR [bp-1],al	;i
+	*** 000483	72 d4 			jb	$F2656
+	*** 000485	eb 23 			jmp	SHORT $I2655
+					$L2705:
+;|***             if ((voices[i].alloc) && (voices[i].note == note)
+;|***             && (voices[i].channel == channel)) {
+;|***                 voices[i].dwTimeStamp = dwAge++;
+; Line 637
+	*** 000487	a1 00 00 		mov	ax,WORD PTR _dwAge
+	*** 00048a	8b 16 02 00 		mov	dx,WORD PTR _dwAge+2
+	*** 00048e	83 06 00 00 01 		add	WORD PTR _dwAge,1
+	*** 000493	83 16 02 00 00 		adc	WORD PTR _dwAge+2,0
+	*** 000498	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;i
+	*** 00049b	2a ff 			sub	bh,bh
+	*** 00049d	c1 e3 03 		shl	bx,3
+	*** 0004a0	89 87 04 00 		mov	WORD PTR _voices[bx+4],ax
+	*** 0004a4	89 97 06 00 		mov	WORD PTR _voices[bx+6],dx
+	*** 0004a8	eb 92 			jmp	SHORT $L2722
+;|***                 return i;
+;|***             }
+;|***         }
+;|***     }
+; Line 641
+					$I2655:
+;|*** 
+;|***     return 0xFF;                          /* not found */
+; Line 643
+	*** 0004aa	b0 ff 			mov	al,255	;00ffH
+;|*** }
+; Line 644
+					$EX2651:
+	*** 0004ac	c9 			leave	
+	*** 0004ad	c2 04 00 		ret	4
+	*** 0004b0	90 			nop	
+	*** 0004b1	90 			nop	
+
+FINDVOICE	ENDP
+	PUBLIC	GETNEWVOICE
+GETNEWVOICE	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api BYTE | GetNewVoice | Find a new voice to play a note.  Uses an LRU
+;|***  *     algorithm to steal voices.  The timestamp is set at allocation time
+;|***  *     incremented in <f FindVoice>.
+;|***  *
+;|***  * @parm BYTE | note | The note we want to play.
+;|***  *
+;|***  * @parm BYTE | channel | The channel we want to play it on.
+;|***  *
+;|***  * @rdesc Returns the voice number.
+;|***  **************************************************************************/
+;|*** static BYTE NEAR PASCAL GetNewVoice(BYTE note, BYTE channel) 
+;|*** {
+; Line 660
+	*** 0004b2	c8 0e 00 00 		enter	14,0
+	*** 0004b6	56 			push	si
+;	note = 6
+;	channel = 4
+;	i = -1
+;	voice = -1
+;	patch = -2
+;	bVoiceToUse = -7
+;	dwOldestTime = -6
+;|*** BYTE  i;
+;|*** BYTE  voice;
+;|*** BYTE  patch;
+;|*** BYTE  bVoiceToUse;
+;|*** DWORD dwOldestTime = dwAge;                     /* init to current "time" */
+; Line 665
+	*** 0004b7	a1 00 00 		mov	ax,WORD PTR _dwAge
+	*** 0004ba	8b 16 02 00 		mov	dx,WORD PTR _dwAge+2
+	*** 0004be	89 46 fa 		mov	WORD PTR [bp-6],ax	;dwOldestTime
+	*** 0004c1	89 56 fc 		mov	WORD PTR [bp-4],dx
+;|*** 
+;|***     /* get the patch in use for this channel */
+;|***     patch = channels[channel].patch;
+; Line 668
+	*** 0004c4	8a 46 04 		mov	al,BYTE PTR [bp+4]	;channel
+	*** 0004c7	2a e4 			sub	ah,ah
+	*** 0004c9	6b d8 03 		imul	bx,ax,3
+	*** 0004cc	8a 87 00 00 		mov	al,BYTE PTR _channels[bx]
+	*** 0004d0	88 46 fe 		mov	BYTE PTR [bp-2],al	;patch
+;|*** 
+;|***     if (patches[patch].mode) {                  /* it's a percussive patch */
+; Line 670
+	*** 0004d3	6b d8 1e 		imul	bx,ax,30	;001eH
+	*** 0004d6	38 a7 00 00 		cmp	BYTE PTR _patches[bx],ah
+	*** 0004da	74 41 			je	$I2670
+;|***         voice = patches[patch].percVoice;       /* use fixed percussion voice */
+; Line 671
+	*** 0004dc	6b d8 1e 		imul	bx,ax,30	;001eH
+	*** 0004df	8a 8f 01 00 		mov	cl,BYTE PTR _patches[bx+1]
+	*** 0004e3	88 4e ff 		mov	BYTE PTR [bp-1],cl	;i
+;|***         voices[voice].alloc = TRUE;
+; Line 672
+	*** 0004e6	8b d3 			mov	dx,bx
+	*** 0004e8	8a d9 			mov	bl,cl
+	*** 0004ea	2a ff 			sub	bh,bh
+	*** 0004ec	c1 e3 03 		shl	bx,3
+	*** 0004ef	8b f0 			mov	si,ax
+	*** 0004f1	c6 87 00 00 01 		mov	BYTE PTR _voices[bx],1
+;|***         voices[voice].note = note;
+; Line 673
+	*** 0004f6	8a 46 06 		mov	al,BYTE PTR [bp+6]	;note
+	*** 0004f9	88 87 01 00 		mov	BYTE PTR _voices[bx+1],al
+;|***         voices[voice].channel = channel;
+; Line 674
+	*** 0004fd	8a 46 04 		mov	al,BYTE PTR [bp+4]	;channel
+	*** 000500	88 87 02 00 		mov	BYTE PTR _voices[bx+2],al
+;|***         voices[voice].dwTimeStamp = MAKELONG(patch, 0);
+; Line 675
+	*** 000504	89 b7 04 00 		mov	WORD PTR _voices[bx+4],si
+	*** 000508	c7 87 06 00 00 00 	mov	WORD PTR _voices[bx+6],0
+;|***         SetVoiceTimbre(voice, &patches[patch].op0);  /* set the timbre */
+; Line 676
+	*** 00050e	51 			push	cx
+	*** 00050f	81 c2 02 00 		add	dx,OFFSET _patches+2
+	*** 000513	52 			push	dx
+	*** 000514	e8 00 00 		call	SETVOICETIMBRE
+;|***         return voice;
+; Line 677
+	*** 000517	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 00051a	e9 bd 00 		jmp	$EX2664
+;|***     }
+;|*** 
+;|***     /* find a free melodic voice to use */
+;|***     for (i = 0; i < (BYTE)NUMMELODIC; i++) {  /* it's a melodic patch */
+; Line 681
+					$I2670:
+	*** 00051d	c6 46 ff 00 		mov	BYTE PTR [bp-1],0	;i
+	*** 000521	8b 0e 00 00 		mov	cx,WORD PTR _fPercussion
+	*** 000525	83 f9 01 		cmp	cx,1
+	*** 000528	1a c0 			sbb	al,al
+	*** 00052a	24 03 			and	al,3
+	*** 00052c	04 06 			add	al,6
+	*** 00052e	88 46 f6 		mov	BYTE PTR [bp-10],al
+	*** 000531	0a c0 			or	al,al
+	*** 000533	74 4a 			je	$FB2673
+					$F2671:
+;|***         if (!voices[i].alloc) {
+; Line 682
+	*** 000535	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;i
+	*** 000538	2a ff 			sub	bh,bh
+	*** 00053a	c1 e3 03 		shl	bx,3
+	*** 00053d	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 000542	74 35 			je	$L2712
+;|***             bVoiceToUse = i;                  /* grab first unused one */
+;|***             break;
+;|***         }
+;|***         else if (voices[i].dwTimeStamp < dwOldestTime) {
+; Line 686
+	*** 000544	8b 46 fa 		mov	ax,WORD PTR [bp-6]	;dwOldestTime
+	*** 000547	8b 56 fc 		mov	dx,WORD PTR [bp-4]
+	*** 00054a	39 97 06 00 		cmp	WORD PTR _voices[bx+6],dx
+	*** 00054e	77 1c 			ja	$FC2672
+	*** 000550	72 06 			jb	$L2718
+	*** 000552	39 87 04 00 		cmp	WORD PTR _voices[bx+4],ax
+	*** 000556	73 14 			jae	$FC2672
+					$L2718:
+;|***                 dwOldestTime = voices[i].dwTimeStamp;
+; Line 687
+	*** 000558	8b 87 04 00 		mov	ax,WORD PTR _voices[bx+4]
+	*** 00055c	8b 97 06 00 		mov	dx,WORD PTR _voices[bx+6]
+	*** 000560	89 46 fa 		mov	WORD PTR [bp-6],ax	;dwOldestTime
+	*** 000563	89 56 fc 		mov	WORD PTR [bp-4],dx
+;|***                 bVoiceToUse = i;              /* remember oldest one to steal */
+; Line 688
+	*** 000566	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 000569	88 46 f9 		mov	BYTE PTR [bp-7],al	;bVoiceToUse
+;|***     for (i = 0; i < (BYTE)NUMMELODIC; i++) {  /* it's a melodic patch */
+; Line 681
+					$FC2672:
+	*** 00056c	8a 46 f6 		mov	al,BYTE PTR [bp-10]
+	*** 00056f	fe 46 ff 		inc	BYTE PTR [bp-1]	;i
+	*** 000572	38 46 ff 		cmp	BYTE PTR [bp-1],al	;i
+	*** 000575	72 be 			jb	$F2671
+	*** 000577	eb 06 			jmp	SHORT $FB2673
+					$L2712:
+;|***         if (!voices[i].alloc) {
+;|***             bVoiceToUse = i;                  /* grab first unused one */
+; Line 683
+	*** 000579	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;i
+	*** 00057c	88 46 f9 		mov	BYTE PTR [bp-7],al	;bVoiceToUse
+;|***             break;
+;|***         }
+;|***         else if (voices[i].dwTimeStamp < dwOldestTime) {
+;|***                 dwOldestTime = voices[i].dwTimeStamp;
+;|***                 bVoiceToUse = i;              /* remember oldest one to steal */
+;|***         }
+;|***     }
+; Line 690
+					$FB2673:
+;|*** 
+;|***     /* at this point, we have either found an unused voice, */
+;|***     /* or have found the oldest one among a totally used voice bank */
+;|*** 
+;|***     if (voices[bVoiceToUse].alloc)            /* if we stole it, turn it off */
+; Line 695
+	*** 00057f	8a 5e f9 		mov	bl,BYTE PTR [bp-7]	;bVoiceToUse
+	*** 000582	2a ff 			sub	bh,bh
+	*** 000584	c1 e3 03 		shl	bx,3
+	*** 000587	89 5e f2 		mov	WORD PTR [bp-14],bx
+	*** 00058a	80 bf 00 00 00 		cmp	BYTE PTR _voices[bx],0
+	*** 00058f	74 07 			je	$I2677
+;|***         NoteOff(bVoiceToUse);
+; Line 696
+	*** 000591	8a 46 f9 		mov	al,BYTE PTR [bp-7]	;bVoiceToUse
+	*** 000594	50 			push	ax
+	*** 000595	e8 00 00 		call	NOTEOFF
+;|*** 
+;|***     voices[bVoiceToUse].alloc = 1;
+; Line 698
+					$I2677:
+	*** 000598	8b 5e f2 		mov	bx,WORD PTR [bp-14]
+	*** 00059b	c6 87 00 00 01 		mov	BYTE PTR _voices[bx],1
+;|***     voices[bVoiceToUse].note = note;
+; Line 699
+	*** 0005a0	8a 46 06 		mov	al,BYTE PTR [bp+6]	;note
+	*** 0005a3	88 87 01 00 		mov	BYTE PTR _voices[bx+1],al
+;|***     voices[bVoiceToUse].channel = channel;
+; Line 700
+	*** 0005a7	8a 46 04 		mov	al,BYTE PTR [bp+4]	;channel
+	*** 0005aa	88 87 02 00 		mov	BYTE PTR _voices[bx+2],al
+;|***     voices[bVoiceToUse].dwTimeStamp = dwAge++;
+; Line 701
+	*** 0005ae	a1 00 00 		mov	ax,WORD PTR _dwAge
+	*** 0005b1	8b 16 02 00 		mov	dx,WORD PTR _dwAge+2
+	*** 0005b5	83 06 00 00 01 		add	WORD PTR _dwAge,1
+	*** 0005ba	83 16 02 00 00 		adc	WORD PTR _dwAge+2,0
+	*** 0005bf	89 87 04 00 		mov	WORD PTR _voices[bx+4],ax
+	*** 0005c3	89 97 06 00 		mov	WORD PTR _voices[bx+6],dx
+;|*** 
+;|***     SetVoiceTimbre(bVoiceToUse, &patches[patch].op0);   /* set the timbre */
+; Line 703
+	*** 0005c7	8a 46 f9 		mov	al,BYTE PTR [bp-7]	;bVoiceToUse
+	*** 0005ca	50 			push	ax
+	*** 0005cb	b0 1e 			mov	al,30	;001eH
+	*** 0005cd	f6 66 fe 		mul	BYTE PTR [bp-2]	;patch
+	*** 0005d0	05 02 00 		add	ax,OFFSET _patches+2
+	*** 0005d3	50 			push	ax
+	*** 0005d4	e8 00 00 		call	SETVOICETIMBRE
+;|*** 
+;|***     return bVoiceToUse;
+; Line 705
+	*** 0005d7	8a 46 f9 		mov	al,BYTE PTR [bp-7]	;bVoiceToUse
+;|*** }
+; Line 706
+					$EX2664:
+	*** 0005da	5e 			pop	si
+	*** 0005db	c9 			leave	
+	*** 0005dc	c2 04 00 		ret	4
+	*** 0005df	90 			nop	
+
+GETNEWVOICE	ENDP
+	PUBLIC	FREEVOICE
+FREEVOICE	PROC NEAR
+;|*** 
+;|*** /**************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api BYTE | FreeVoice | Free a voice we have been using.
+;|***  *
+;|***  * @parm BYTE | voice | The voice to free.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  **************************************************************************/
+;|*** static void NEAR PASCAL FreeVoice(BYTE voice) 
+;|*** {
+; Line 718
+	*** 0005e0	55 			push	bp
+	*** 0005e1	8b ec 			mov	bp,sp
+;	voice = 4
+;|***     voices[voice].alloc = 0;
+; Line 719
+	*** 0005e3	2a ff 			sub	bh,bh
+	*** 0005e5	8a 5e 04 		mov	bl,BYTE PTR [bp+4]	;voice
+	*** 0005e8	c1 e3 03 		shl	bx,3
+	*** 0005eb	c6 87 00 00 00 		mov	BYTE PTR _voices[bx],0
+;|*** }
+; Line 720
+	*** 0005f0	c9 			leave	
+	*** 0005f1	c2 02 00 		ret	2
+
+FREEVOICE	ENDP
+_FIX	ENDS
+END

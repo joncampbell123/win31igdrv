@@ -1,0 +1,5 @@
+[disks]
+1 = ., "XingMPEG Install Disk"
+
+[Installable.Drivers]
+MCIDriver = 1:xmdriver.drv, "MpegVideo, CDIVideo", "[MCI] XingMPEG Driver",,

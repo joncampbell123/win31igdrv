@@ -1,0 +1,33 @@
+WinChess README.1ST file, 11 Oct 90
+-----------------------------------
+
+Introduction
+------------
+This is the first released version of my WinChess chess program for Microsoft
+Windows.  I figured it was about time we had a REAL chess program running under
+Windows and not something half-baked.
+
+As my Taipei program proved to be very popular as a shareware program, I've
+decided to make WinChess shareware as well.  If you like WinChess, then please
+support my efforts by sending along $15 to me at my address:
+
+	David Norris
+	17911 NE 101st Ct.
+	Redmond, WA  98052
+
+The only thing the $15 "registration" buys you is the satisfaction you've done
+the right thing.  There's no product support and no user manual (although there
+is a help file), and no product updates - though if enough people register I'm
+sure a new and improved version of WinChess will appear on your favorite BBS...
+
+I'm sure there will be some bugs in this first version.  I've encountered a
+crashing bug on a few occasions but I'm not sure whether it was WinChess or
+another random Windows app.  When you send in the $15 feel free to send along
+your bug list and a list of features you'd like to see in the program.
+
+Installation
+------------
+Just copy all of the files in a subdirectory and run WINCHESS.EXE.  If you run
+the Windows program manager then you can add WINCHESS as an icon to your GAMES
+program group.  WINCHESS will create one more file, WINCHESS.INI, with your
+option settings.

@@ -1,0 +1,39 @@
+
+ VWFD
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000007CH _LTEXT                 CODE 32-bit
+ 0001:0000007C 000000067H _LDATA                 CODE 32-bit
+ 0002:00000000 000000061H _ITEXT                 ICODE 32-bit
+ 0002:00000064 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:0000007C VWFD_DDB                VWFD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000034       VWFD_API_Proc
+ 0001:00000000       VWFD_Control
+ 0001:0000007C       VWFD_DDB
+ 0002:00000041       VWFD_Device_Init
+ 0001:0000001C       VWFD_Set_VMType
+ 0002:00000000       VWFD_Sys_Crit_Init
+
+  Address         Publics by Value
+
+ 0001:00000000       VWFD_Control
+ 0001:0000001C       VWFD_Set_VMType
+ 0001:00000034       VWFD_API_Proc
+ 0001:0000007C       VWFD_DDB
+ 0002:00000000       VWFD_Sys_Crit_Init
+ 0002:00000041       VWFD_Device_Init

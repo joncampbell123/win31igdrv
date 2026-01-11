@@ -1,0 +1,1442 @@
+;	Static Name Aliases
+;
+	TITLE   wavefix.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_TEXT	SEGMENT  WORD PUBLIC 'CODE'
+_TEXT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _hpCurInData
+PUBLIC  _dwCurInCount
+PUBLIC  _hpCurData
+PUBLIC  _dwCurCount
+PUBLIC  _lpLoopStart
+PUBLIC  _bBreakLoop
+PUBLIC  _glpWOQueue
+PUBLIC  _lpDeadHeads
+PUBLIC  _lpSilenceStart
+PUBLIC  _wSilenceSize
+PUBLIC  _gfWaveOutPaused
+PUBLIC  _glpWIQueue
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	MEMCOPYSRC:NEAR
+EXTRN	MEMCOPYDST:NEAR
+EXTRN	MEMFILLSILENT:NEAR
+EXTRN	DRIVERCALLBACK:FAR
+EXTRN	_STR_SPACE:BYTE
+_BSS      SEGMENT
+COMM NEAR	_dwLoopCount:	BYTE:	 4
+_BSS      ENDS
+EXTRN	_gfDMABusy:BYTE
+EXTRN	_wDebugLevel:WORD
+_DATA      SEGMENT
+_hpCurInData	DD	00H
+_dwCurInCount	DD	00H
+_hpCurData	DD	00H
+_dwCurCount	DD	00H
+_lpLoopStart	DD	00H
+_lpDeadHeads	DD	00H
+_bBreakLoop	DB	00H
+_gfWaveOutPaused	DB	00H
+_glpWOQueue	DD	00H
+_glpWIQueue	DD	00H
+_lpSilenceStart	DD	00H
+_wSilenceSize	DW	00H
+$SG2612	DB	'postALLdeadheads',  00H
+$SG2621	DB	'postdeadheads',  00H
+$SG2651	DB	'firstq',  00H
+$SG2654	DB	'dmabusy',  00H
+$SG2658	DB	'BREAKLOOP',  00H
+$SG2663	DB	'blockfin',  00H
+$SG2667	DB	'loop0',  00H
+$SG2674	DB	'loop--',  00H
+$SG2679	DB	'endofq',  00H
+$SG2684	DB	'loopStart',  00H
+$SG2689	DB	'zerolenfree',  00H
+$SG2705	DB	'blkfin',  00H
+$SG2721	DB	'loopfin',  00H
+$SG2724	DB	'endofq',  00H
+_DATA      ENDS
+_TEXT      SEGMENT
+	ASSUME	CS: _TEXT
+	PUBLIC	WODPOSTALLHEADERS
+WODPOSTALLHEADERS	PROC FAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   wavefix.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** /* Driver specific bit used to mark a wave header as being done with
+;|***  * all DMA activity--so we can post the WOM_DONE message at the correct
+;|***  * time.  See dmaLoadBuffer in wavefix.c for more information.
+;|***  */
+;|*** #define WHDR_REALLYDONE 0x80000000l /* internal driver flag for wave headers */
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     public data
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** HPSTR     hpCurInData     = NULL;  /* ptr to data block of current input hdr */
+;|*** DWORD     dwCurInCount    = 0L;    /* bytes left in current input block */
+;|*** HPSTR     hpCurData       = NULL;  /* ptr to data block of current output hdr */
+;|*** DWORD     dwCurCount      = 0L;    /* bytes left in current output block */
+;|*** LPWAVEHDR lpLoopStart     = NULL;  /* pointer to first block of a loop */
+;|*** LPWAVEHDR lpDeadHeads     = NULL;  /* death row for wave headers */
+;|*** DWORD     dwLoopCount;             /* count for current loop */
+;|*** BYTE      bBreakLoop      = 0;     /* set to non-zero to break loop */
+;|*** BYTE      gfWaveOutPaused = FALSE; /* are we paused? */
+;|*** LPWAVEHDR glpWOQueue      = NULL;  /* wave output data buffer queue */
+;|*** LPWAVEHDR glpWIQueue      = NULL;  /* wave input data buffer queue */
+;|*** LPSTR     lpSilenceStart  = NULL;  /* where the padded silence starts */
+;|*** WORD      wSilenceSize    = 0;     /* how big the padded silence is */
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** void FAR PASCAL wodPostAllHeaders( void )
+;|*** {
+; Line 43
+	*** 000000	c8 04 00 00 		enter	4,0
+;	lpNuke = -4
+;|*** LPWAVEHDR   lpNuke;             /* wavehdr to free */
+;|*** 
+;|***     D2("postALLdeadheads");
+; Line 46
+	*** 000004	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 000009	72 14 			jb	$L2731
+	*** 00000b	68 00 00 		push	SEG _STR_SPACE
+	*** 00000e	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000011	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000016	1e 			push	ds
+	*** 000017	68 00 00 		push	OFFSET DGROUP:$SG2612
+	*** 00001a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$L2731:
+;|*** 
+;|***     /* free the lpDeadHeads */
+;|***     while ( lpNuke = lpDeadHeads ) {
+; Line 49
+	*** 00001f	a1 00 00 		mov	ax,WORD PTR _lpDeadHeads
+	*** 000022	8b 16 02 00 		mov	dx,WORD PTR _lpDeadHeads+2
+	*** 000026	8b c8 			mov	cx,ax
+	*** 000028	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 00002b	0b d0 			or	dx,ax
+	*** 00002d	74 1d 			je	$EX2609
+;|***         lpDeadHeads = lpDeadHeads->lpNext;
+; Line 50
+	*** 00002f	c4 1e 00 00 		les	bx,DWORD PTR _lpDeadHeads
+	*** 000033	26 8b 47 18 		mov	ax,WORD PTR es:[bx+24]
+	*** 000037	26 8b 57 1a 		mov	dx,WORD PTR es:[bx+26]
+	*** 00003b	a3 00 00 		mov	WORD PTR _lpDeadHeads,ax
+	*** 00003e	89 16 02 00 		mov	WORD PTR _lpDeadHeads+2,dx
+;|***         wodBlockFinished( lpNuke );
+; Line 51
+	*** 000042	ff 76 fe 		push	WORD PTR [bp-2]
+	*** 000045	51 			push	cx
+	*** 000046	0e 			push	cs
+	*** 000047	e8 00 00 		call	NEAR PTR WODBLOCKFINISHED
+;|***     }
+; Line 52
+	*** 00004a	eb d3 			jmp	SHORT $L2731
+;|*** }
+; Line 53
+					$EX2609:
+	*** 00004c	c9 			leave	
+	*** 00004d	cb 			ret	
+
+WODPOSTALLHEADERS	ENDP
+	PUBLIC	WODPOSTDONEHEADERS
+WODPOSTDONEHEADERS	PROC NEAR
+;|*** 
+;|*** /***************************************************************************/
+;|*** 
+;|*** void NEAR PASCAL wodPostDoneHeaders( void )
+;|*** {
+; Line 58
+	*** 00004e	c8 08 00 00 		enter	8,0
+	*** 000052	57 			push	di
+	*** 000053	56 			push	si
+;	lpNuke = -8
+;	lpPrev = -4
+;|*** LPWAVEHDR   lpNuke;             /* wavehdr to free */
+;|*** LPWAVEHDR   lpPrev;             /* previous wavehdr (temporary) */
+;|*** 
+;|***     D2("postdeadheads");
+; Line 62
+	*** 000054	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 000059	72 14 			jb	$I2620
+	*** 00005b	68 00 00 		push	SEG _STR_SPACE
+	*** 00005e	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000061	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000066	1e 			push	ds
+	*** 000067	68 00 00 		push	OFFSET DGROUP:$SG2621
+	*** 00006a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     lpPrev = NULL;
+; Line 64
+					$I2620:
+	*** 00006f	33 c0 			xor	ax,ax
+	*** 000071	99 			cwd	
+	*** 000072	8b d8 			mov	bx,ax
+	*** 000074	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|***     for ( lpNuke = lpDeadHeads; lpNuke; lpNuke = lpNuke->lpNext ) {
+; Line 65
+	*** 000077	8b 0e 00 00 		mov	cx,WORD PTR _lpDeadHeads
+	*** 00007b	8b 3e 02 00 		mov	di,WORD PTR _lpDeadHeads+2
+	*** 00007f	8b f1 			mov	si,cx
+	*** 000081	89 7e fa 		mov	WORD PTR [bp-6],di
+	*** 000084	3b c8 			cmp	cx,ax
+	*** 000086	75 04 			jne	$L2736
+	*** 000088	3b fa 			cmp	di,dx
+	*** 00008a	74 6c 			je	$EX2617
+					$L2736:
+;|***         if ( lpNuke->dwFlags & WHDR_REALLYDONE ) {
+; Line 66
+	*** 00008c	8e 46 fa 		mov	es,WORD PTR [bp-6]
+	*** 00008f	26 f7 44 12 00 80 	test	WORD PTR es:[si+18],-32768	;8000H
+	*** 000095	75 1d 			jne	$L2734
+;|***             if ( lpPrev )
+;|***                 lpPrev->lpNext = NULL;
+;|***             else
+;|***                 lpDeadHeads = NULL;
+;|*** 
+;|***             /* from lpNuke down, we need to wodBlockFinished() */
+;|***             while ( lpPrev = lpNuke ) {
+;|***                 lpNuke = lpNuke->lpNext;
+;|***                 wodBlockFinished( lpPrev );
+;|***             }
+;|*** 
+;|***             /* break completely out of the for() loop */
+;|***             break;
+;|***         }
+;|*** 
+;|***         lpNuke->dwFlags |= WHDR_REALLYDONE;
+; Line 82
+	*** 000097	26 80 4c 13 80 		or	BYTE PTR es:[si+19],128	;0080H
+;|***         lpPrev = lpNuke;
+; Line 83
+	*** 00009c	8b de 			mov	bx,si
+	*** 00009e	8c 46 fe 		mov	WORD PTR [bp-2],es
+	*** 0000a1	26 8b 44 18 		mov	ax,WORD PTR es:[si+24]
+	*** 0000a5	26 8b 54 1a 		mov	dx,WORD PTR es:[si+26]
+	*** 0000a9	8b f0 			mov	si,ax
+	*** 0000ab	89 56 fa 		mov	WORD PTR [bp-6],dx
+	*** 0000ae	0b d0 			or	dx,ax
+	*** 0000b0	75 da 			jne	$L2736
+	*** 0000b2	eb 44 			jmp	SHORT $EX2617
+					$L2734:
+;|***             if ( lpPrev )
+; Line 67
+	*** 0000b4	8b 46 fe 		mov	ax,WORD PTR [bp-2]
+	*** 0000b7	0b c3 			or	ax,bx
+	*** 0000b9	74 0f 			je	$I2626
+;|***                 lpPrev->lpNext = NULL;
+; Line 68
+	*** 0000bb	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 0000be	2b c0 			sub	ax,ax
+	*** 0000c0	26 89 47 1a 		mov	WORD PTR es:[bx+26],ax
+	*** 0000c4	26 89 47 18 		mov	WORD PTR es:[bx+24],ax
+;|***             else
+; Line 69
+	*** 0000c8	eb 08 			jmp	SHORT $L2733
+					$I2626:
+;|***                 lpDeadHeads = NULL;
+; Line 70
+	*** 0000ca	2b c0 			sub	ax,ax
+	*** 0000cc	a3 02 00 		mov	WORD PTR _lpDeadHeads+2,ax
+	*** 0000cf	a3 00 00 		mov	WORD PTR _lpDeadHeads,ax
+					$L2733:
+;|*** 
+;|***             /* from lpNuke down, we need to wodBlockFinished() */
+;|***             while ( lpPrev = lpNuke ) {
+; Line 73
+	*** 0000d2	8b 46 fa 		mov	ax,WORD PTR [bp-6]
+	*** 0000d5	8b ce 			mov	cx,si
+	*** 0000d7	89 46 fe 		mov	WORD PTR [bp-2],ax
+	*** 0000da	0b c6 			or	ax,si
+	*** 0000dc	74 1a 			je	$EX2617
+;|***                 lpNuke = lpNuke->lpNext;
+; Line 74
+	*** 0000de	8e 46 fa 		mov	es,WORD PTR [bp-6]
+	*** 0000e1	26 8b 44 18 		mov	ax,WORD PTR es:[si+24]
+	*** 0000e5	26 8b 54 1a 		mov	dx,WORD PTR es:[si+26]
+	*** 0000e9	8b f0 			mov	si,ax
+	*** 0000eb	89 56 fa 		mov	WORD PTR [bp-6],dx
+;|***                 wodBlockFinished( lpPrev );
+; Line 75
+	*** 0000ee	ff 76 fe 		push	WORD PTR [bp-2]
+	*** 0000f1	51 			push	cx
+	*** 0000f2	0e 			push	cs
+	*** 0000f3	e8 00 00 		call	NEAR PTR WODBLOCKFINISHED
+;|***             }
+; Line 76
+	*** 0000f6	eb da 			jmp	SHORT $L2733
+;|*** 
+;|***             /* break completely out of the for() loop */
+;|***             break;
+;|***         }
+;|*** 
+;|***         lpNuke->dwFlags |= WHDR_REALLYDONE;
+;|***         lpPrev = lpNuke;
+;|***     }
+;|*** }
+; Line 85
+					$EX2617:
+	*** 0000f8	5e 			pop	si
+	*** 0000f9	5f 			pop	di
+	*** 0000fa	c9 			leave	
+	*** 0000fb	c3 			ret	
+
+WODPOSTDONEHEADERS	ENDP
+	PUBLIC	WODLOADDMABUFFER
+WODLOADDMABUFFER	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  * 
+;|***  * @api WORD | wodLoadDMABuffer | This function loads a DMA buffer from the
+;|***  *      data queue.
+;|***  * 
+;|***  * @parm LPSTR | lpBuffer | Far pointer to the DMA buffer.
+;|***  * 
+;|***  * @parm WORD | wBufSize | Size of the buffer in bytes.
+;|***  * 
+;|***  * @rdesc The return value is the number of bytes transferred. A value of zero
+;|***  *     indicates that there was no more data in the output queue.
+;|***  * 
+;|***  * @comm This routine is called once when DMA is started and then again at
+;|***  *     interrupt time when a DMA block is complete.  It will in turn call a
+;|***  *     callback funtion to the app if it empties a request queue block and a
+;|***  *     callback function is defined.
+;|***  ***************************************************************************/ 
+;|*** WORD FAR PASCAL wodLoadDMABuffer(LPSTR lpBuffer, WORD wBufSize)
+;|*** {
+; Line 106
+	*** 0000fc	c8 0e 00 00 		enter	14,0
+	*** 000100	57 			push	di
+	*** 000101	56 			push	si
+;	lpBuffer = 8
+;	wBufSize = 6
+;	wBytesTransferred = -14
+;	register si = wToGo
+;	lpNuke = -8
+;	lpQ = -12
+;	i = -2
+;	lpKillMe = -4
+;|*** WORD      wBytesTransferred; /* how many bytes transferred to DMA buffer */
+;|*** WORD      wToGo;             /* min(buf space left, bytes left in data block) */
+;|*** LPWAVEHDR lpNuke;            /* wavehdr to free */
+;|*** LPWAVEHDR lpQ;               /* wavehdr temp for traversing list (queue) */
+;|*** int       i;                 /* how many bytes to fill right */
+;|*** 
+;|***     /* if any 'deadheads' are around, post them back to the app */
+;|***     if ( lpDeadHeads )
+; Line 114
+	*** 000102	a1 02 00 		mov	ax,WORD PTR _lpDeadHeads+2
+	*** 000105	0b 06 00 00 		or	ax,WORD PTR _lpDeadHeads
+	*** 000109	74 03 			je	$I2642
+;|***         wodPostDoneHeaders();
+; Line 115
+	*** 00010b	e8 40 ff 		call	WODPOSTDONEHEADERS
+;|*** 
+;|***     /* don't destroy position of glpWOQueue (unless we are looping) */
+;|***     lpQ = glpWOQueue;
+; Line 118
+					$I2642:
+	*** 00010e	a1 00 00 		mov	ax,WORD PTR _glpWOQueue
+	*** 000111	8b 16 02 00 		mov	dx,WORD PTR _glpWOQueue+2
+	*** 000115	8b f8 			mov	di,ax
+	*** 000117	89 56 f6 		mov	WORD PTR [bp-10],dx
+;|***     wBytesTransferred = 0;
+; Line 119
+	*** 00011a	c7 46 f2 00 00 		mov	WORD PTR [bp-14],0	;wBytesTransferred
+;|*** 
+;|***     if ( !lpQ || gfWaveOutPaused )     /* no queue at all */
+; Line 121
+	*** 00011f	0b d0 			or	dx,ax
+	*** 000121	75 03 			jne	$JCC289
+	*** 000123	e9 6e 03 		jmp	$ldb_Fill_Silence2645
+					$JCC289:
+	*** 000126	80 3e 00 00 00 		cmp	BYTE PTR _gfWaveOutPaused,0
+	*** 00012b	74 03 			je	$JCC299
+	*** 00012d	e9 64 03 		jmp	$ldb_Fill_Silence2645
+					$JCC299:
+	*** 000130	89 46 f4 		mov	WORD PTR [bp-12],ax	;lpQ
+;|***         goto ldb_Fill_Silence;
+;|*** 
+;|***     while (wBytesTransferred < wBufSize) {
+; Line 124
+	*** 000133	83 7e 06 00 		cmp	WORD PTR [bp+6],0	;wBufSize
+	*** 000137	75 03 			jne	$JCC311
+	*** 000139	e9 04 03 		jmp	$FB2648
+					$JCC311:
+					$FC2647:
+;|***         /* we break if we have no data left or we complete the request */
+;|***         if (hpCurData == NULL) {
+; Line 126
+	*** 00013c	a1 02 00 		mov	ax,WORD PTR _hpCurData+2
+	*** 00013f	0b 06 00 00 		or	ax,WORD PTR _hpCurData
+	*** 000143	75 7b 			jne	$I2649
+;|***             /* first time in for this queue */
+;|***             D3("firstq");
+; Line 128
+	*** 000145	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 00014a	72 14 			jb	$I2650
+	*** 00014c	68 00 00 		push	SEG _STR_SPACE
+	*** 00014f	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000152	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000157	1e 			push	ds
+	*** 000158	68 00 00 		push	OFFSET DGROUP:$SG2651
+	*** 00015b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             if (gfDMABusy)
+; Line 129
+					$I2650:
+	*** 000160	80 3e 00 00 00 		cmp	BYTE PTR _gfDMABusy,0
+	*** 000165	74 1b 			je	$I2652
+;|***                 D3("dmabusy");
+; Line 130
+	*** 000167	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 00016c	72 14 			jb	$I2652
+	*** 00016e	68 00 00 		push	SEG _STR_SPACE
+	*** 000171	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000174	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000179	1e 			push	ds
+	*** 00017a	68 00 00 		push	OFFSET DGROUP:$SG2654
+	*** 00017d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             hpCurData = lpQ->lpData;
+; Line 131
+					$I2652:
+	*** 000182	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 000185	26 8b 05 		mov	ax,WORD PTR es:[di]
+	*** 000188	26 8b 55 02 		mov	dx,WORD PTR es:[di+2]
+	*** 00018c	a3 00 00 		mov	WORD PTR _hpCurData,ax
+	*** 00018f	89 16 02 00 		mov	WORD PTR _hpCurData+2,dx
+;|***             dwCurCount = lpQ->dwBufferLength;
+; Line 132
+	*** 000193	26 8b 45 04 		mov	ax,WORD PTR es:[di+4]
+	*** 000197	26 8b 55 06 		mov	dx,WORD PTR es:[di+6]
+	*** 00019b	a3 00 00 		mov	WORD PTR _dwCurCount,ax
+	*** 00019e	89 16 02 00 		mov	WORD PTR _dwCurCount+2,dx
+;|*** 
+;|***             /* check if this is the start of a loop */
+;|***             if (lpQ->dwFlags & WHDR_BEGINLOOP) {
+; Line 135
+	*** 0001a2	26 f6 45 10 04 		test	BYTE PTR es:[di+16],4
+	*** 0001a7	74 17 			je	$I2649
+;|***                 lpLoopStart = lpQ;
+; Line 136
+	*** 0001a9	89 3e 00 00 		mov	WORD PTR _lpLoopStart,di
+	*** 0001ad	8c 06 02 00 		mov	WORD PTR _lpLoopStart+2,es
+;|***                 dwLoopCount = lpQ->dwLoops;
+; Line 137
+	*** 0001b1	26 8b 45 14 		mov	ax,WORD PTR es:[di+20]
+	*** 0001b5	26 8b 55 16 		mov	dx,WORD PTR es:[di+22]
+	*** 0001b9	a3 00 00 		mov	WORD PTR _dwLoopCount,ax
+	*** 0001bc	89 16 02 00 		mov	WORD PTR _dwLoopCount+2,dx
+;|***             }
+;|***         }
+;|*** 
+;|***         /* test if there is a request to break the loop */
+;|***         if (bBreakLoop) {
+; Line 142
+					$I2649:
+	*** 0001c0	80 3e 00 00 00 		cmp	BYTE PTR _bBreakLoop,0
+	*** 0001c5	74 26 			je	$I2656
+;|***             D3("BREAKLOOP");
+; Line 143
+	*** 0001c7	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0001cc	72 14 			jb	$I2657
+	*** 0001ce	68 00 00 		push	SEG _STR_SPACE
+	*** 0001d1	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0001d4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001d9	1e 			push	ds
+	*** 0001da	68 00 00 		push	OFFSET DGROUP:$SG2658
+	*** 0001dd	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             dwLoopCount = 0L;
+; Line 144
+					$I2657:
+	*** 0001e2	2b c0 			sub	ax,ax
+	*** 0001e4	a3 02 00 		mov	WORD PTR _dwLoopCount+2,ax
+	*** 0001e7	a3 00 00 		mov	WORD PTR _dwLoopCount,ax
+;|***             bBreakLoop = 0;
+; Line 145
+	*** 0001ea	a2 00 00 		mov	BYTE PTR _bBreakLoop,al
+;|***         }
+;|*** 
+;|***         /* If we are looping and no more loops need executing, then copy */
+;|***         /* nothing.  We still need to go through the motions to keep */
+;|***         /* everything updated correctly. */
+;|***         if ( lpLoopStart && (dwLoopCount == 0) )
+; Line 151
+					$I2656:
+	*** 0001ed	a1 02 00 		mov	ax,WORD PTR _lpLoopStart+2
+	*** 0001f0	0b 06 00 00 		or	ax,WORD PTR _lpLoopStart
+	*** 0001f4	74 11 			je	$I2659
+	*** 0001f6	a1 02 00 		mov	ax,WORD PTR _dwLoopCount+2
+	*** 0001f9	0b 06 00 00 		or	ax,WORD PTR _dwLoopCount
+	*** 0001fd	75 08 			jne	$I2659
+;|***             dwCurCount = 0;
+; Line 152
+	*** 0001ff	2b c0 			sub	ax,ax
+	*** 000201	a3 02 00 		mov	WORD PTR _dwCurCount+2,ax
+	*** 000204	a3 00 00 		mov	WORD PTR _dwCurCount,ax
+;|*** 
+;|***         /* don't waste time if curcount is zero */
+;|***         if ( dwCurCount ) {
+; Line 155
+					$I2659:
+	*** 000207	a1 02 00 		mov	ax,WORD PTR _dwCurCount+2
+	*** 00020a	0b 06 00 00 		or	ax,WORD PTR _dwCurCount
+	*** 00020e	74 51 			je	$I2660
+;|***             /* hpCurData points to some chunk we can grab */
+;|***             wToGo = (WORD)min(dwCurCount,(DWORD)(wBufSize - wBytesTransferred));
+;|*** 
+;|***             /* fill the buffer */
+;|***             hpCurData = MemCopySrc(lpBuffer, hpCurData, wToGo);
+; Line 160
+	*** 000210	ff 76 0a 		push	WORD PTR [bp+10]
+	*** 000213	ff 76 08 		push	WORD PTR [bp+8]	;lpBuffer
+	*** 000216	ff 36 02 00 		push	WORD PTR _hpCurData+2
+	*** 00021a	ff 36 00 00 		push	WORD PTR _hpCurData
+	*** 00021e	8b 46 06 		mov	ax,WORD PTR [bp+6]	;wBufSize
+	*** 000221	2b 46 f2 		sub	ax,WORD PTR [bp-14]	;wBytesTransferred
+	*** 000224	2b d2 			sub	dx,dx
+	*** 000226	3b 16 02 00 		cmp	dx,WORD PTR _dwCurCount+2
+	*** 00022a	72 0b 			jb	$L2748
+	*** 00022c	77 06 			ja	$L2749
+	*** 00022e	3b 06 00 00 		cmp	ax,WORD PTR _dwCurCount
+	*** 000232	76 03 			jbe	$L2748
+					$L2749:
+	*** 000234	a1 00 00 		mov	ax,WORD PTR _dwCurCount
+					$L2748:
+	*** 000237	8b f0 			mov	si,ax
+	*** 000239	50 			push	ax
+	*** 00023a	e8 00 00 		call	MEMCOPYSRC
+	*** 00023d	a3 00 00 		mov	WORD PTR _hpCurData,ax
+	*** 000240	89 16 02 00 		mov	WORD PTR _hpCurData+2,dx
+;|***             lpBuffer += wToGo;
+; Line 161
+	*** 000244	01 76 08 		add	WORD PTR [bp+8],si	;lpBuffer
+;|***             dwCurCount -= wToGo;
+; Line 162
+	*** 000247	2b c0 			sub	ax,ax
+	*** 000249	29 36 00 00 		sub	WORD PTR _dwCurCount,si
+	*** 00024d	19 06 02 00 		sbb	WORD PTR _dwCurCount+2,ax
+;|***             wBytesTransferred += wToGo;
+; Line 163
+	*** 000251	01 76 f2 		add	WORD PTR [bp-14],si	;wBytesTransferred
+;|***             ((NPWAVEALLOC)LOWORD(lpQ->reserved))->dwByteCount += wToGo;
+; Line 164
+	*** 000254	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 000257	26 8b 5d 1c 		mov	bx,WORD PTR es:[di+28]
+	*** 00025b	01 77 0e 		add	WORD PTR [bx+14],si
+	*** 00025e	11 47 10 		adc	WORD PTR [bx+16],ax
+;|***         }
+;|*** 
+;|***         /* see if that emptied the current buffer */
+;|***         if (dwCurCount == 0) {
+; Line 168
+					$I2660:
+	*** 000261	a1 02 00 		mov	ax,WORD PTR _dwCurCount+2
+	*** 000264	0b 06 00 00 		or	ax,WORD PTR _dwCurCount
+	*** 000268	74 03 			je	$JCC616
+	*** 00026a	e9 97 01 		jmp	$L2741
+					$JCC616:
+;|***             D4("blockfin");
+; Line 169
+	*** 00026d	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000272	72 14 			jb	$I2662
+	*** 000274	68 00 00 		push	SEG _STR_SPACE
+	*** 000277	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00027a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00027f	1e 			push	ds
+	*** 000280	68 00 00 		push	OFFSET DGROUP:$SG2663
+	*** 000283	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             if (lpQ->dwFlags & WHDR_ENDLOOP) {
+; Line 171
+					$I2662:
+	*** 000288	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 00028b	26 f6 45 10 08 		test	BYTE PTR es:[di+16],8
+	*** 000290	75 03 			jne	$JCC656
+	*** 000292	e9 d0 00 		jmp	$I2664
+					$JCC656:
+;|***                 if (dwLoopCount == 0) {
+; Line 172
+	*** 000295	a1 02 00 		mov	ax,WORD PTR _dwLoopCount+2
+	*** 000298	0b 06 00 00 		or	ax,WORD PTR _dwLoopCount
+	*** 00029c	74 03 			je	$JCC668
+	*** 00029e	e9 8a 00 		jmp	$I2665
+					$JCC668:
+;|***                     D3("loop0");
+; Line 173
+	*** 0002a1	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0002a6	72 14 			jb	$I2666
+	*** 0002a8	68 00 00 		push	SEG _STR_SPACE
+	*** 0002ab	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0002ae	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0002b3	1e 			push	ds
+	*** 0002b4	68 00 00 		push	OFFSET DGROUP:$SG2667
+	*** 0002b7	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     lpNuke  = lpLoopStart;
+; Line 174
+					$I2666:
+	*** 0002bc	a1 00 00 		mov	ax,WORD PTR _lpLoopStart
+	*** 0002bf	8b 16 02 00 		mov	dx,WORD PTR _lpLoopStart+2
+	*** 0002c3	8b d8 			mov	bx,ax
+	*** 0002c5	89 56 fa 		mov	WORD PTR [bp-6],dx
+;|***                     lpQ = lpQ->lpNext;
+;|***                     while (lpNuke != lpQ) {
+; Line 176
+	*** 0002c8	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 0002cb	26 8b 4d 18 		mov	cx,WORD PTR es:[di+24]
+	*** 0002cf	26 8b 75 1a 		mov	si,WORD PTR es:[di+26]
+	*** 0002d3	8b f9 			mov	di,cx
+	*** 0002d5	89 4e f4 		mov	WORD PTR [bp-12],cx	;lpQ
+	*** 0002d8	89 76 f6 		mov	WORD PTR [bp-10],si
+	*** 0002db	3b c8 			cmp	cx,ax
+	*** 0002dd	75 04 			jne	$L2747
+	*** 0002df	3b f2 			cmp	si,dx
+	*** 0002e1	74 3b 			je	$FB2670
+					$L2747:
+	*** 0002e3	89 7e f4 		mov	WORD PTR [bp-12],di	;lpQ
+	*** 0002e6	8b 0e 00 00 		mov	cx,WORD PTR _lpDeadHeads
+					$FC2669:
+;|***                         /* free up loop blocks */
+;|***                         LPWAVEHDR lpKillMe;
+;|*** 
+;|***                         /* move the 'almost done' blocks to death row */
+;|***                         lpKillMe = lpNuke;
+;|***                         lpNuke = lpNuke->lpNext;
+; Line 182
+	*** 0002ea	8e 46 fa 		mov	es,WORD PTR [bp-6]
+	*** 0002ed	8b fb 			mov	di,bx
+	*** 0002ef	8c 46 fe 		mov	WORD PTR [bp-2],es	;i
+	*** 0002f2	26 8b 47 18 		mov	ax,WORD PTR es:[bx+24]
+	*** 0002f6	26 8b 57 1a 		mov	dx,WORD PTR es:[bx+26]
+	*** 0002fa	8b d8 			mov	bx,ax
+	*** 0002fc	89 56 fa 		mov	WORD PTR [bp-6],dx
+;|***                         lpKillMe->lpNext = lpDeadHeads;
+; Line 183
+	*** 0002ff	a1 02 00 		mov	ax,WORD PTR _lpDeadHeads+2
+	*** 000302	26 89 4d 18 		mov	WORD PTR es:[di+24],cx
+	*** 000306	26 89 45 1a 		mov	WORD PTR es:[di+26],ax
+;|***                         lpDeadHeads = lpKillMe;
+; Line 184
+	*** 00030a	8b cf 			mov	cx,di
+	*** 00030c	8c 06 02 00 		mov	WORD PTR _lpDeadHeads+2,es
+;|***                     }
+; Line 185
+	*** 000310	39 5e f4 		cmp	WORD PTR [bp-12],bx	;lpQ
+	*** 000313	75 d5 			jne	$FC2669
+	*** 000315	39 56 f6 		cmp	WORD PTR [bp-10],dx
+	*** 000318	75 d0 			jne	$FC2669
+	*** 00031a	89 3e 00 00 		mov	WORD PTR _lpDeadHeads,di
+					$FB2670:
+;|***                     lpLoopStart = NULL;
+; Line 186
+	*** 00031e	2b c0 			sub	ax,ax
+	*** 000320	a3 02 00 		mov	WORD PTR _lpLoopStart+2,ax
+	*** 000323	a3 00 00 		mov	WORD PTR _lpLoopStart,ax
+	*** 000326	8b 7e f4 		mov	di,WORD PTR [bp-12]	;lpQ
+;|***                 }
+;|***                 else {
+; Line 188
+	*** 000329	eb 6c 			jmp	SHORT $I2675
+					$I2665:
+;|***                     D3("loop--");
+; Line 189
+	*** 00032b	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 000330	72 14 			jb	$I2673
+	*** 000332	68 00 00 		push	SEG _STR_SPACE
+	*** 000335	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000338	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00033d	1e 			push	ds
+	*** 00033e	68 00 00 		push	OFFSET DGROUP:$SG2674
+	*** 000341	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     dwLoopCount--;
+; Line 190
+					$I2673:
+	*** 000346	83 2e 00 00 01 		sub	WORD PTR _dwLoopCount,1
+	*** 00034b	83 1e 02 00 00 		sbb	WORD PTR _dwLoopCount+2,0
+;|*** 
+;|***                     /* back to the beginning of the loop */
+;|***                     lpQ = glpWOQueue = lpLoopStart;
+; Line 193
+	*** 000350	a1 00 00 		mov	ax,WORD PTR _lpLoopStart
+	*** 000353	8b 16 02 00 		mov	dx,WORD PTR _lpLoopStart+2
+	*** 000357	a3 00 00 		mov	WORD PTR _glpWOQueue,ax
+	*** 00035a	89 16 02 00 		mov	WORD PTR _glpWOQueue+2,dx
+	*** 00035e	8b f8 			mov	di,ax
+	*** 000360	89 56 f6 		mov	WORD PTR [bp-10],dx
+;|***                 }
+;|***             }
+;|***             else {
+; Line 196
+	*** 000363	eb 32 			jmp	SHORT $I2675
+					$I2664:
+;|***                 /* move the 'almost done' block into the lpDeadHeads list */
+;|***                 lpNuke = lpQ;
+; Line 198
+	*** 000365	8b df 			mov	bx,di
+	*** 000367	8c 46 fa 		mov	WORD PTR [bp-6],es
+;|***                 lpQ = lpQ->lpNext;
+; Line 199
+	*** 00036a	26 8b 45 18 		mov	ax,WORD PTR es:[di+24]
+	*** 00036e	26 8b 55 1a 		mov	dx,WORD PTR es:[di+26]
+	*** 000372	8b f8 			mov	di,ax
+	*** 000374	89 56 f6 		mov	WORD PTR [bp-10],dx
+;|***                 if (lpLoopStart == NULL) {
+; Line 200
+	*** 000377	a1 02 00 		mov	ax,WORD PTR _lpLoopStart+2
+	*** 00037a	0b 06 00 00 		or	ax,WORD PTR _lpLoopStart
+	*** 00037e	75 17 			jne	$I2675
+;|***                     lpNuke->lpNext = lpDeadHeads;
+; Line 201
+	*** 000380	a1 00 00 		mov	ax,WORD PTR _lpDeadHeads
+	*** 000383	8b 16 02 00 		mov	dx,WORD PTR _lpDeadHeads+2
+	*** 000387	26 89 47 18 		mov	WORD PTR es:[bx+24],ax
+	*** 00038b	26 89 57 1a 		mov	WORD PTR es:[bx+26],dx
+;|***                     lpDeadHeads = lpNuke;
+; Line 202
+	*** 00038f	89 1e 00 00 		mov	WORD PTR _lpDeadHeads,bx
+	*** 000393	8c 06 02 00 		mov	WORD PTR _lpDeadHeads+2,es
+;|***                 }
+;|***             }
+; Line 204
+					$I2675:
+;|*** 
+;|***             if (lpQ == NULL) {
+; Line 206
+	*** 000397	8b 46 f6 		mov	ax,WORD PTR [bp-10]
+	*** 00039a	0b c7 			or	ax,di
+	*** 00039c	74 76 			je	$L2743
+;|***                 /* end of the list */
+;|***                 D3("endofq");
+;|***                 hpCurData = NULL;
+;|***                 dwCurCount = 0L;
+;|*** 
+;|***                 /* from the while loop (return wBytesTransferred) */
+;|***                 break;
+;|***             }
+;|*** 
+;|***             else {
+;|***                 hpCurData = lpQ->lpData;
+; Line 217
+	*** 00039e	8e 46 f6 		mov	es,WORD PTR [bp-10]
+	*** 0003a1	26 8b 05 		mov	ax,WORD PTR es:[di]
+	*** 0003a4	26 8b 55 02 		mov	dx,WORD PTR es:[di+2]
+	*** 0003a8	a3 00 00 		mov	WORD PTR _hpCurData,ax
+	*** 0003ab	89 16 02 00 		mov	WORD PTR _hpCurData+2,dx
+;|***                 dwCurCount = lpQ->dwBufferLength;
+; Line 218
+	*** 0003af	26 8b 45 04 		mov	ax,WORD PTR es:[di+4]
+	*** 0003b3	26 8b 55 06 		mov	dx,WORD PTR es:[di+6]
+	*** 0003b7	a3 00 00 		mov	WORD PTR _dwCurCount,ax
+	*** 0003ba	89 16 02 00 		mov	WORD PTR _dwCurCount+2,dx
+;|***                 if (lpLoopStart == NULL) {
+; Line 219
+	*** 0003be	a1 02 00 		mov	ax,WORD PTR _lpLoopStart+2
+	*** 0003c1	0b 06 00 00 		or	ax,WORD PTR _lpLoopStart
+	*** 0003c5	75 3d 			jne	$L2741
+;|***                     /* check if this is the start of a loop */
+;|***                     if (lpQ->dwFlags & WHDR_BEGINLOOP) {
+; Line 221
+	*** 0003c7	26 f6 45 10 04 		test	BYTE PTR es:[di+16],4
+	*** 0003cc	74 36 			je	$L2741
+;|***                         D3("loopStart");
+; Line 222
+	*** 0003ce	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 0003d3	72 14 			jb	$I2683
+	*** 0003d5	68 00 00 		push	SEG _STR_SPACE
+	*** 0003d8	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0003db	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003e0	1e 			push	ds
+	*** 0003e1	68 00 00 		push	OFFSET DGROUP:$SG2684
+	*** 0003e4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                         lpLoopStart = lpQ;
+; Line 223
+					$I2683:
+	*** 0003e9	8b 46 f6 		mov	ax,WORD PTR [bp-10]
+	*** 0003ec	89 3e 00 00 		mov	WORD PTR _lpLoopStart,di
+	*** 0003f0	a3 02 00 		mov	WORD PTR _lpLoopStart+2,ax
+;|***                         dwLoopCount = lpQ->dwLoops;
+; Line 224
+	*** 0003f3	8e c0 			mov	es,ax
+	*** 0003f5	26 8b 45 14 		mov	ax,WORD PTR es:[di+20]
+	*** 0003f9	26 8b 55 16 		mov	dx,WORD PTR es:[di+22]
+	*** 0003fd	a3 00 00 		mov	WORD PTR _dwLoopCount,ax
+	*** 000400	89 16 02 00 		mov	WORD PTR _dwLoopCount+2,dx
+					$L2741:
+;|***                     }
+;|***                 }
+;|***             }
+;|***         }
+;|***     }
+; Line 229
+	*** 000404	8b 46 06 		mov	ax,WORD PTR [bp+6]	;wBufSize
+	*** 000407	39 46 f2 		cmp	WORD PTR [bp-14],ax	;wBytesTransferred
+	*** 00040a	73 03 			jae	$JCC1034
+	*** 00040c	e9 2d fd 		jmp	$FC2647
+					$JCC1034:
+	*** 00040f	89 7e f4 		mov	WORD PTR [bp-12],di	;lpQ
+	*** 000412	eb 2c 			jmp	SHORT $FB2648
+					$L2743:
+	*** 000414	89 7e f4 		mov	WORD PTR [bp-12],di	;lpQ
+;|***                 D3("endofq");
+; Line 208
+	*** 000417	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 00041c	72 14 			jb	$I2678
+	*** 00041e	68 00 00 		push	SEG _STR_SPACE
+	*** 000421	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000424	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000429	1e 			push	ds
+	*** 00042a	68 00 00 		push	OFFSET DGROUP:$SG2679
+	*** 00042d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 hpCurData = NULL;
+; Line 209
+					$I2678:
+	*** 000432	2b c0 			sub	ax,ax
+	*** 000434	a3 02 00 		mov	WORD PTR _hpCurData+2,ax
+	*** 000437	a3 00 00 		mov	WORD PTR _hpCurData,ax
+;|***                 dwCurCount = 0L;
+; Line 210
+	*** 00043a	a3 02 00 		mov	WORD PTR _dwCurCount+2,ax
+	*** 00043d	a3 00 00 		mov	WORD PTR _dwCurCount,ax
+;|*** 
+;|***                 /* from the while loop (return wBytesTransferred) */
+;|***                 break;
+;|***             }
+;|*** 
+;|***             else {
+;|***                 hpCurData = lpQ->lpData;
+;|***                 dwCurCount = lpQ->dwBufferLength;
+;|***                 if (lpLoopStart == NULL) {
+;|***                     /* check if this is the start of a loop */
+;|***                     if (lpQ->dwFlags & WHDR_BEGINLOOP) {
+;|***                         D3("loopStart");
+;|***                         lpLoopStart = lpQ;
+;|***                         dwLoopCount = lpQ->dwLoops;
+;|***                     }
+;|***                 }
+;|***             }
+;|***         }
+;|***     }
+; Line 229
+					$FB2648:
+;|*** 
+;|***     if ( !(glpWOQueue = lpQ) && lpLoopStart )
+; Line 231
+	*** 000440	8b 46 f4 		mov	ax,WORD PTR [bp-12]	;lpQ
+	*** 000443	8b 56 f6 		mov	dx,WORD PTR [bp-10]
+	*** 000446	a3 00 00 		mov	WORD PTR _glpWOQueue,ax
+	*** 000449	89 16 02 00 		mov	WORD PTR _glpWOQueue+2,dx
+	*** 00044d	0b d0 			or	dx,ax
+	*** 00044f	75 17 			jne	$I2685
+	*** 000451	a1 02 00 		mov	ax,WORD PTR _lpLoopStart+2
+	*** 000454	0b 06 00 00 		or	ax,WORD PTR _lpLoopStart
+	*** 000458	74 0e 			je	$I2685
+;|***         glpWOQueue = lpLoopStart;
+; Line 232
+	*** 00045a	a1 00 00 		mov	ax,WORD PTR _lpLoopStart
+	*** 00045d	8b 16 02 00 		mov	dx,WORD PTR _lpLoopStart+2
+	*** 000461	a3 00 00 		mov	WORD PTR _glpWOQueue,ax
+	*** 000464	89 16 02 00 		mov	WORD PTR _glpWOQueue+2,dx
+;|*** 
+;|***     if (wBytesTransferred == 0) {
+; Line 234
+					$I2685:
+	*** 000468	83 7e f2 00 		cmp	WORD PTR [bp-14],0	;wBytesTransferred
+	*** 00046c	75 26 			jne	$ldb_Fill_Silence2645
+;|***         /* if DMA not active, release all deadheads - this gets rid of any */
+;|***         /* zero length waveheaders.  A zero length buffer will not kick */
+;|***         /* interrupts into action, so we MUST post these headers back NOW. */
+;|***         if (!gfDMABusy) {
+; Line 238
+	*** 00046e	80 3e 00 00 00 		cmp	BYTE PTR _gfDMABusy,0
+	*** 000473	75 1f 			jne	$ldb_Fill_Silence2645
+;|***             D2("zerolenfree");
+; Line 239
+	*** 000475	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 00047a	72 14 			jb	$I2688
+	*** 00047c	68 00 00 		push	SEG _STR_SPACE
+	*** 00047f	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000482	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000487	1e 			push	ds
+	*** 000488	68 00 00 		push	OFFSET DGROUP:$SG2689
+	*** 00048b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             wodPostAllHeaders();
+; Line 240
+					$I2688:
+	*** 000490	0e 			push	cs
+	*** 000491	e8 00 00 		call	NEAR PTR WODPOSTALLHEADERS
+;|***         }
+;|***     }
+;|*** 
+;|*** ldb_Fill_Silence:
+; Line 244
+					$ldb_Fill_Silence2645:
+;|*** 
+;|***     /* pad out with silence */
+;|***     if ( i = wBufSize - wBytesTransferred ) {
+; Line 247
+	*** 000494	8b 46 06 		mov	ax,WORD PTR [bp+6]	;wBufSize
+	*** 000497	2b 46 f2 		sub	ax,WORD PTR [bp-14]	;wBytesTransferred
+	*** 00049a	89 46 fe 		mov	WORD PTR [bp-2],ax	;i
+	*** 00049d	0b c0 			or	ax,ax
+	*** 00049f	74 1c 			je	$I2690
+;|***         lpSilenceStart = lpBuffer;
+; Line 248
+	*** 0004a1	8b 46 08 		mov	ax,WORD PTR [bp+8]	;lpBuffer
+	*** 0004a4	8b 56 0a 		mov	dx,WORD PTR [bp+10]
+	*** 0004a7	a3 00 00 		mov	WORD PTR _lpSilenceStart,ax
+	*** 0004aa	89 16 02 00 		mov	WORD PTR _lpSilenceStart+2,dx
+;|***         wSilenceSize = i;
+; Line 249
+	*** 0004ae	8b 4e fe 		mov	cx,WORD PTR [bp-2]	;i
+	*** 0004b1	89 0e 00 00 		mov	WORD PTR _wSilenceSize,cx
+;|***         MemFillSilent(lpSilenceStart, wSilenceSize);
+; Line 250
+	*** 0004b5	52 			push	dx
+	*** 0004b6	50 			push	ax
+	*** 0004b7	51 			push	cx
+	*** 0004b8	e8 00 00 		call	MEMFILLSILENT
+;|***     }
+;|*** 
+;|***     else {
+; Line 253
+	*** 0004bb	eb 08 			jmp	SHORT $I2691
+					$I2690:
+;|***         lpSilenceStart = NULL;
+; Line 254
+	*** 0004bd	2b c0 			sub	ax,ax
+	*** 0004bf	a3 02 00 		mov	WORD PTR _lpSilenceStart+2,ax
+	*** 0004c2	a3 00 00 		mov	WORD PTR _lpSilenceStart,ax
+;|***     }
+; Line 255
+					$I2691:
+;|*** 
+;|***     return wBytesTransferred;
+; Line 257
+	*** 0004c5	8b 46 f2 		mov	ax,WORD PTR [bp-14]	;wBytesTransferred
+;|*** }
+; Line 258
+	*** 0004c8	5e 			pop	si
+	*** 0004c9	5f 			pop	di
+	*** 0004ca	c9 			leave	
+	*** 0004cb	ca 06 00 		ret	6
+
+WODLOADDMABUFFER	ENDP
+	PUBLIC	WAVECALLBACK
+WAVECALLBACK	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | waveCallback | This calls DriverCallback for a WAVEHDR.
+;|***  *
+;|***  * @parm PWAVEALLOC | pWave | Pointer to wave device.
+;|***  *
+;|***  * @parm WORD | msg | The message.
+;|***  *
+;|***  * @parm DWORD | dw1 | message DWORD (dw2 is always set to 0).
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL waveCallback(NPWAVEALLOC pWave, WORD msg, DWORD dw1)
+;|*** {
+; Line 274
+	*** 0004ce	55 			push	bp
+	*** 0004cf	8b ec 			mov	bp,sp
+	*** 0004d1	56 			push	si
+;	pWave = 12
+;	msg = 10
+;	dw1 = 6
+	*** 0004d2	8b 76 0c 		mov	si,WORD PTR [bp+12]	;pWave
+;|*** 
+;|***     /* Invoke the callback function, if it exists.  dwFlags contains
+;|***      * wave driver specific flags in the LOWORD and generic driver
+;|***      * flags in the HIWORD.
+;|***      * 
+;|***      * DON'T switch stacks in DriverCallback - we already did at the
+;|***      * beginning of our ISR (using StackEnter).  No need to burn another
+;|***      * stack, as we should have plenty of room for the callback.  Also,
+;|***      * we may not have been called from an ISR.  In that case, we know
+;|***      * that we are on an app's stack, and this should be ok.
+;|***      */
+;|*** 
+;|***     if (pWave->dwCallback)
+; Line 287
+	*** 0004d5	8b 44 02 		mov	ax,WORD PTR [si+2]
+	*** 0004d8	0b 04 			or	ax,WORD PTR [si]
+	*** 0004da	74 26 			je	$EX2698
+;|***         DriverCallback(pWave->dwCallback,       /* user's callback DWORD */
+;|***                        HIWORD(pWave->dwFlags) | DCB_NOSWITCH,  /* flags */
+;|***                        pWave->hWave,            /* handle to the wave device */
+;|***                        msg,                     /* the message */
+;|***                        pWave->dwInstance,       /* user's instance data */
+;|***                        dw1,                     /* first DWORD */
+;|***                        0L);                     /* second DWORD */
+; Line 294
+	*** 0004dc	ff 74 02 		push	WORD PTR [si+2]
+	*** 0004df	ff 34 			push	WORD PTR [si]
+	*** 0004e1	8b 44 0c 		mov	ax,WORD PTR [si+12]
+	*** 0004e4	0c 08 			or	al,8
+	*** 0004e6	50 			push	ax
+	*** 0004e7	ff 74 08 		push	WORD PTR [si+8]
+	*** 0004ea	ff 76 0a 		push	WORD PTR [bp+10]	;msg
+	*** 0004ed	ff 74 06 		push	WORD PTR [si+6]
+	*** 0004f0	ff 74 04 		push	WORD PTR [si+4]
+	*** 0004f3	ff 76 08 		push	WORD PTR [bp+8]
+	*** 0004f6	ff 76 06 		push	WORD PTR [bp+6]	;dw1
+	*** 0004f9	6a 00 			push	0
+	*** 0004fb	6a 00 			push	0
+	*** 0004fd	9a 00 00 00 00 		call	FAR PTR DRIVERCALLBACK
+;|*** }
+; Line 295
+					$EX2698:
+	*** 000502	5e 			pop	si
+	*** 000503	c9 			leave	
+	*** 000504	ca 08 00 		ret	8
+	*** 000507	90 			nop	
+
+WAVECALLBACK	ENDP
+	PUBLIC	WODBLOCKFINISHED
+WODBLOCKFINISHED	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | wodBlockFinished | This function sets the done bit and invokes
+;|***  *     the callback function if there is one.
+;|***  *
+;|***  * @parm LPWAVEHDR | lpHdr | Far pointer to the header.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL wodBlockFinished(LPWAVEHDR lpHdr)
+;|*** {
+; Line 308
+	*** 000508	55 			push	bp
+	*** 000509	8b ec 			mov	bp,sp
+	*** 00050b	56 			push	si
+;	lpHdr = 6
+;	pWav = -2
+;|*** NPWAVEALLOC pWav;
+;|*** 
+;|***     D3("blkfin");
+; Line 311
+	*** 00050c	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 000511	72 14 			jb	$I2704
+	*** 000513	68 00 00 		push	SEG _STR_SPACE
+	*** 000516	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000519	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00051e	1e 			push	ds
+	*** 00051f	68 00 00 		push	OFFSET DGROUP:$SG2705
+	*** 000522	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     /* set the 'done' bit */
+;|***     lpHdr->dwFlags |= WHDR_DONE;
+; Line 314
+					$I2704:
+	*** 000527	8b 76 06 		mov	si,WORD PTR [bp+6]	;lpHdr
+	*** 00052a	8e 46 08 		mov	es,WORD PTR [bp+8]
+	*** 00052d	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|*** 
+;|***     /* We are giving the block back to the application.  The header is no
+;|***      * longer in our queue, so we reset the WHDR_INQUEUE bit.  Also, we
+;|***      * clear our driver specific bit and cauterize the lpNext pointer.
+;|***      */
+;|***     lpHdr->dwFlags &= ~(WHDR_INQUEUE | WHDR_REALLYDONE);
+; Line 320
+	*** 000532	26 80 64 10 ef 		and	BYTE PTR es:[si+16],239	;00efH
+	*** 000537	26 80 64 13 7f 		and	BYTE PTR es:[si+19],127	;007fH
+;|***     lpHdr->lpNext = NULL;
+; Line 321
+	*** 00053c	2b c0 			sub	ax,ax
+	*** 00053e	26 89 44 1a 		mov	WORD PTR es:[si+26],ax
+	*** 000542	26 89 44 18 		mov	WORD PTR es:[si+24],ax
+;|*** 
+;|***     pWav = (NPWAVEALLOC)(lpHdr->reserved);
+;|*** 
+;|***     /* invoke the callback function */
+;|***     waveCallback(pWav, WOM_DONE, (DWORD)lpHdr);
+; Line 326
+	*** 000546	26 ff 74 1c 		push	WORD PTR es:[si+28]
+	*** 00054a	68 bd 03 		push	957	;03bdH
+	*** 00054d	06 			push	es
+	*** 00054e	56 			push	si
+	*** 00054f	0e 			push	cs
+	*** 000550	e8 00 00 		call	NEAR PTR WAVECALLBACK
+;|*** }
+; Line 327
+	*** 000553	5e 			pop	si
+	*** 000554	c9 			leave	
+	*** 000555	ca 04 00 		ret	4
+
+WODBLOCKFINISHED	ENDP
+	PUBLIC	WIDFILLBUFFER
+WIDFILLBUFFER	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  * 
+;|***  * @api WORD | widFillBuffer | This function fills a buffer from the DMA
+;|***  *     buffer.
+;|***  * 
+;|***  * @parm LPSTR | lpBuffer | Far pointer to the DMA buffer.
+;|***  * 
+;|***  * @parm WORD | wBufSize | Size of the buffer in bytes.
+;|***  * 
+;|***  * @rdesc The return value is the number of bytes Transferred. A value of zero
+;|***  *     indicates that there was no more data in the input queue.
+;|***  * 
+;|***  * @comm This routine is called once when DMA is started and then again at
+;|***  *     interrupt time when a DMA block is complete.  It will in turn call a
+;|***  *     callback funtion to the app if it fills a request queue block and a
+;|***  *     callback function is defined.
+;|***  ***************************************************************************/ 
+;|*** WORD NEAR PASCAL widFillBuffer(LPSTR lpBuffer, WORD wBufSize)
+;|*** {
+; Line 348
+	*** 000558	c8 04 00 00 		enter	4,0
+	*** 00055c	57 			push	di
+	*** 00055d	56 			push	si
+;	lpBuffer = 6
+;	wBufSize = 4
+;	register di = wBytesTransferred
+;	register si = wToGo
+;	lpNext = -4
+	*** 00055e	8b 1e 00 00 		mov	bx,WORD PTR _glpWIQueue
+;|*** WORD      wBytesTransferred; /* how many bytes transferred to DMA buffer */
+;|*** WORD      wToGo;             /* min(buf space left, bytes left in data block) */
+;|*** LPWAVEHDR lpNext;            /* next WAVEHDR in queue */
+;|*** 
+;|***     /* if no queue, vamoose */
+;|***     if (!glpWIQueue)
+; Line 354
+	*** 000562	a1 02 00 		mov	ax,WORD PTR _glpWIQueue+2
+	*** 000565	0b c3 			or	ax,bx
+	*** 000567	75 05 			jne	$I2714
+;|***         return 0;
+; Line 355
+	*** 000569	33 c0 			xor	ax,ax
+	*** 00056b	e9 54 01 		jmp	$EX2710
+;|*** 
+;|***     wBytesTransferred = 0;
+; Line 357
+					$I2714:
+	*** 00056e	33 ff 			xor	di,di
+;|***     while (wBytesTransferred < wBufSize) {
+; Line 358
+	*** 000570	39 7e 04 		cmp	WORD PTR [bp+4],di	;wBufSize
+	*** 000573	75 03 			jne	$JCC1395
+	*** 000575	e9 48 01 		jmp	$FB2717
+					$JCC1395:
+					$FC2716:
+;|***         /* we break if we have no data left or we complete the request */
+;|***         if (hpCurInData == NULL) {
+; Line 360
+	*** 000578	a1 02 00 		mov	ax,WORD PTR _hpCurInData+2
+	*** 00057b	0b 06 00 00 		or	ax,WORD PTR _hpCurInData
+	*** 00057f	75 2b 			jne	$I2718
+;|***             /* first time in for this queue */
+;|***             hpCurInData = glpWIQueue->lpData;
+; Line 362
+	*** 000581	8e 06 02 00 		mov	es,WORD PTR _glpWIQueue+2
+	*** 000585	26 8b 07 		mov	ax,WORD PTR es:[bx]
+	*** 000588	26 8b 57 02 		mov	dx,WORD PTR es:[bx+2]
+	*** 00058c	a3 00 00 		mov	WORD PTR _hpCurInData,ax
+	*** 00058f	89 16 02 00 		mov	WORD PTR _hpCurInData+2,dx
+;|***             dwCurInCount = glpWIQueue->dwBufferLength;
+; Line 363
+	*** 000593	26 8b 47 04 		mov	ax,WORD PTR es:[bx+4]
+	*** 000597	26 8b 57 06 		mov	dx,WORD PTR es:[bx+6]
+	*** 00059b	a3 00 00 		mov	WORD PTR _dwCurInCount,ax
+	*** 00059e	89 16 02 00 		mov	WORD PTR _dwCurInCount+2,dx
+;|***             glpWIQueue->dwBytesRecorded = 0;
+; Line 364
+	*** 0005a2	2b c0 			sub	ax,ax
+	*** 0005a4	26 89 47 0a 		mov	WORD PTR es:[bx+10],ax
+	*** 0005a8	26 89 47 08 		mov	WORD PTR es:[bx+8],ax
+;|***         }
+;|*** 
+;|***         /* hpCurInData points to an empty spot in a buffer */
+;|***         wToGo = (WORD)min(dwCurInCount, (DWORD)(wBufSize - wBytesTransferred));
+; Line 368
+					$I2718:
+;|*** 
+;|***         /* fill the buffer */
+;|***         hpCurInData = MemCopyDst(hpCurInData, lpBuffer, wToGo);
+; Line 371
+	*** 0005ac	ff 36 02 00 		push	WORD PTR _hpCurInData+2
+	*** 0005b0	ff 36 00 00 		push	WORD PTR _hpCurInData
+	*** 0005b4	ff 76 08 		push	WORD PTR [bp+8]
+	*** 0005b7	ff 76 06 		push	WORD PTR [bp+6]	;lpBuffer
+	*** 0005ba	8b 46 04 		mov	ax,WORD PTR [bp+4]	;wBufSize
+	*** 0005bd	2b c7 			sub	ax,di
+	*** 0005bf	2b d2 			sub	dx,dx
+	*** 0005c1	3b 16 02 00 		cmp	dx,WORD PTR _dwCurInCount+2
+	*** 0005c5	72 0b 			jb	$L2756
+	*** 0005c7	77 06 			ja	$L2757
+	*** 0005c9	3b 06 00 00 		cmp	ax,WORD PTR _dwCurInCount
+	*** 0005cd	76 03 			jbe	$L2756
+					$L2757:
+	*** 0005cf	a1 00 00 		mov	ax,WORD PTR _dwCurInCount
+					$L2756:
+	*** 0005d2	8b f0 			mov	si,ax
+	*** 0005d4	50 			push	ax
+	*** 0005d5	e8 00 00 		call	MEMCOPYDST
+	*** 0005d8	a3 00 00 		mov	WORD PTR _hpCurInData,ax
+	*** 0005db	89 16 02 00 		mov	WORD PTR _hpCurInData+2,dx
+;|***         lpBuffer += wToGo;
+; Line 372
+	*** 0005df	01 76 06 		add	WORD PTR [bp+6],si	;lpBuffer
+;|***         dwCurInCount -= wToGo;
+; Line 373
+	*** 0005e2	2b c0 			sub	ax,ax
+	*** 0005e4	29 36 00 00 		sub	WORD PTR _dwCurInCount,si
+	*** 0005e8	19 06 02 00 		sbb	WORD PTR _dwCurInCount+2,ax
+;|***         wBytesTransferred += wToGo;
+; Line 374
+	*** 0005ec	03 fe 			add	di,si
+;|***         glpWIQueue->dwBytesRecorded += wToGo;
+; Line 375
+	*** 0005ee	c4 1e 00 00 		les	bx,DWORD PTR _glpWIQueue
+	*** 0005f2	26 01 77 08 		add	WORD PTR es:[bx+8],si
+	*** 0005f6	26 11 47 0a 		adc	WORD PTR es:[bx+10],ax
+;|***         ((NPWAVEALLOC)LOWORD(glpWIQueue->reserved))->dwByteCount += wToGo;
+; Line 376
+	*** 0005fa	26 8b 5f 1c 		mov	bx,WORD PTR es:[bx+28]
+	*** 0005fe	01 77 0e 		add	WORD PTR [bx+14],si
+	*** 000601	11 47 10 		adc	WORD PTR [bx+16],ax
+;|*** 
+;|***         /* see if that filled the current buffer */
+;|***         if (dwCurInCount == 0) {
+; Line 379
+	*** 000604	a1 02 00 		mov	ax,WORD PTR _dwCurInCount+2
+	*** 000607	0b 06 00 00 		or	ax,WORD PTR _dwCurInCount
+	*** 00060b	74 03 			je	$JCC1547
+	*** 00060d	e9 81 00 		jmp	$L2754
+					$JCC1547:
+;|***             D4("loopfin");
+; Line 380
+	*** 000610	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000615	72 14 			jb	$I2720
+	*** 000617	68 00 00 		push	SEG _STR_SPACE
+	*** 00061a	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00061d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000622	1e 			push	ds
+	*** 000623	68 00 00 		push	OFFSET DGROUP:$SG2721
+	*** 000626	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* move on to the next block in the queue */
+;|***             lpNext = glpWIQueue->lpNext;
+; Line 383
+					$I2720:
+	*** 00062b	c4 1e 00 00 		les	bx,DWORD PTR _glpWIQueue
+	*** 00062f	26 8b 47 18 		mov	ax,WORD PTR es:[bx+24]
+	*** 000633	26 8b 57 1a 		mov	dx,WORD PTR es:[bx+26]
+	*** 000637	8b f0 			mov	si,ax
+	*** 000639	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|***             glpWIQueue->dwFlags |= WHDR_DONE;
+; Line 384
+	*** 00063c	26 80 4f 10 01 		or	BYTE PTR es:[bx+16],1
+;|***             glpWIQueue->dwFlags &= ~WHDR_INQUEUE;
+; Line 385
+	*** 000641	26 80 67 10 ef 		and	BYTE PTR es:[bx+16],239	;00efH
+;|*** 
+;|***             /* release the data block */
+;|***             widBlockFinished(glpWIQueue);
+; Line 388
+	*** 000646	06 			push	es
+	*** 000647	53 			push	bx
+	*** 000648	0e 			push	cs
+	*** 000649	e8 00 00 		call	NEAR PTR WIDBLOCKFINISHED
+;|***             glpWIQueue = lpNext;
+;|*** 
+;|***             if (glpWIQueue == NULL) {
+; Line 391
+	*** 00064c	8b 46 fe 		mov	ax,WORD PTR [bp-2]
+	*** 00064f	89 36 00 00 		mov	WORD PTR _glpWIQueue,si
+	*** 000653	a3 02 00 		mov	WORD PTR _glpWIQueue+2,ax
+	*** 000656	0b c6 			or	ax,si
+	*** 000658	74 3d 			je	$L2752
+	*** 00065a	8b de 			mov	bx,si
+;|***                 /* end of the list */
+;|***                 D3("endofq");
+;|***                 hpCurInData = NULL;
+;|***                 dwCurInCount = 0L;
+;|*** 
+;|***                 /* from the while loop (return wBytesTransferred) */
+;|***                 break;
+;|***             }
+;|*** 
+;|***             else {
+;|***                 hpCurInData = glpWIQueue->lpData;
+; Line 402
+	*** 00065c	8e 06 02 00 		mov	es,WORD PTR _glpWIQueue+2
+	*** 000660	26 8b 07 		mov	ax,WORD PTR es:[bx]
+	*** 000663	26 8b 57 02 		mov	dx,WORD PTR es:[bx+2]
+	*** 000667	a3 00 00 		mov	WORD PTR _hpCurInData,ax
+	*** 00066a	89 16 02 00 		mov	WORD PTR _hpCurInData+2,dx
+;|***                 dwCurInCount = glpWIQueue->dwBufferLength;
+; Line 403
+	*** 00066e	26 8b 47 04 		mov	ax,WORD PTR es:[bx+4]
+	*** 000672	26 8b 57 06 		mov	dx,WORD PTR es:[bx+6]
+	*** 000676	a3 00 00 		mov	WORD PTR _dwCurInCount,ax
+	*** 000679	89 16 02 00 		mov	WORD PTR _dwCurInCount+2,dx
+;|***                 glpWIQueue->dwBytesRecorded = 0;
+; Line 404
+	*** 00067d	2b c0 			sub	ax,ax
+	*** 00067f	26 89 47 0a 		mov	WORD PTR es:[bx+10],ax
+	*** 000683	26 89 47 08 		mov	WORD PTR es:[bx+8],ax
+					$L2753:
+;|***             }
+;|***         }
+;|***     }
+; Line 407
+	*** 000687	39 7e 04 		cmp	WORD PTR [bp+4],di	;wBufSize
+	*** 00068a	76 03 			jbe	$JCC1674
+	*** 00068c	e9 e9 fe 		jmp	$FC2716
+					$JCC1674:
+	*** 00068f	eb 2f 			jmp	SHORT $FB2717
+					$L2754:
+	*** 000691	8b 1e 00 00 		mov	bx,WORD PTR _glpWIQueue
+	*** 000695	eb f0 			jmp	SHORT $L2753
+					$L2752:
+;|***                 D3("endofq");
+; Line 393
+	*** 000697	83 3e 00 00 03 		cmp	WORD PTR _wDebugLevel,3
+	*** 00069c	72 14 			jb	$I2723
+	*** 00069e	68 00 00 		push	SEG _STR_SPACE
+	*** 0006a1	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0006a4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0006a9	1e 			push	ds
+	*** 0006aa	68 00 00 		push	OFFSET DGROUP:$SG2724
+	*** 0006ad	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 hpCurInData = NULL;
+; Line 394
+					$I2723:
+	*** 0006b2	2b c0 			sub	ax,ax
+	*** 0006b4	a3 02 00 		mov	WORD PTR _hpCurInData+2,ax
+	*** 0006b7	a3 00 00 		mov	WORD PTR _hpCurInData,ax
+;|***                 dwCurInCount = 0L;
+; Line 395
+	*** 0006ba	a3 02 00 		mov	WORD PTR _dwCurInCount+2,ax
+	*** 0006bd	a3 00 00 		mov	WORD PTR _dwCurInCount,ax
+;|*** 
+;|***                 /* from the while loop (return wBytesTransferred) */
+;|***                 break;
+;|***             }
+;|*** 
+;|***             else {
+;|***                 hpCurInData = glpWIQueue->lpData;
+;|***                 dwCurInCount = glpWIQueue->dwBufferLength;
+;|***                 glpWIQueue->dwBytesRecorded = 0;
+;|***             }
+;|***         }
+;|***     }
+; Line 407
+					$FB2717:
+;|*** 
+;|***     return wBytesTransferred;
+; Line 409
+	*** 0006c0	8b c7 			mov	ax,di
+;|*** }
+; Line 410
+					$EX2710:
+	*** 0006c2	5e 			pop	si
+	*** 0006c3	5f 			pop	di
+	*** 0006c4	c9 			leave	
+	*** 0006c5	c2 06 00 		ret	6
+
+WIDFILLBUFFER	ENDP
+	PUBLIC	WIDBLOCKFINISHED
+WIDBLOCKFINISHED	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | widBlockFinished | This function sets the done bit and invokes
+;|***  *     the callback function if there is one.
+;|***  *
+;|***  * @parm LPWAVEHDR | lpHdr | Far pointer to the header.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL widBlockFinished(LPWAVEHDR lpHdr)
+;|*** {
+; Line 423
+	*** 0006c8	55 			push	bp
+	*** 0006c9	8b ec 			mov	bp,sp
+	*** 0006cb	56 			push	si
+;	lpHdr = 6
+;	pInClient = -2
+	*** 0006cc	8b 76 06 		mov	si,WORD PTR [bp+6]	;lpHdr
+;|*** NPWAVEALLOC  pInClient;
+;|*** 
+;|***     /* if it's an empty block, set the 'done' bit and length field */
+;|***     if (!(lpHdr->dwFlags & WHDR_DONE)) {
+; Line 427
+	*** 0006cf	8e 46 08 		mov	es,WORD PTR [bp+8]
+	*** 0006d2	26 f6 44 10 01 		test	BYTE PTR es:[si+16],1
+	*** 0006d7	75 14 			jne	$I2730
+;|***         lpHdr->dwFlags |= WHDR_DONE;
+; Line 428
+	*** 0006d9	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|***         lpHdr->dwFlags &= ~WHDR_INQUEUE;
+; Line 429
+	*** 0006de	26 80 64 10 ef 		and	BYTE PTR es:[si+16],239	;00efH
+;|***         lpHdr->dwBytesRecorded = 0;
+; Line 430
+	*** 0006e3	2b c0 			sub	ax,ax
+	*** 0006e5	26 89 44 0a 		mov	WORD PTR es:[si+10],ax
+	*** 0006e9	26 89 44 08 		mov	WORD PTR es:[si+8],ax
+;|***     }
+;|*** 
+;|***     pInClient = (NPWAVEALLOC)(lpHdr->reserved);
+; Line 433
+					$I2730:
+;|*** 
+;|***     /* call client's callback */
+;|***     waveCallback(pInClient, WIM_DATA, (DWORD)lpHdr);
+; Line 436
+	*** 0006ed	26 ff 74 1c 		push	WORD PTR es:[si+28]
+	*** 0006f1	68 c0 03 		push	960	;03c0H
+	*** 0006f4	06 			push	es
+	*** 0006f5	56 			push	si
+	*** 0006f6	0e 			push	cs
+	*** 0006f7	e8 00 00 		call	NEAR PTR WAVECALLBACK
+;|*** }
+; Line 437
+	*** 0006fa	5e 			pop	si
+	*** 0006fb	c9 			leave	
+	*** 0006fc	ca 04 00 		ret	4
+	*** 0006ff	90 			nop	
+
+WIDBLOCKFINISHED	ENDP
+_TEXT	ENDS
+END

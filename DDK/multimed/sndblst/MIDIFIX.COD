@@ -1,0 +1,2458 @@
+;	Static Name Aliases
+;
+	TITLE   midifix.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+_TEXT	SEGMENT  WORD PUBLIC 'CODE'
+_TEXT	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+PUBLIC  _gbMidiOutCurrentStatus
+PUBLIC  _gdwDebugMODWriteErrors
+PUBLIC  _gdwDebugMODataWrites
+PUBLIC  _gdwDebugMOShortMsgs
+PUBLIC  _gdwDebugMOShortMsgsRS
+PUBLIC  _gdwDebugMOShortMsgsBogus
+PUBLIC  _gdwDebugMOLongMsgs
+PUBLIC  _gdwDebugMIBytesRcvd
+PUBLIC  _gdwDebugMIShortMsgsRcvd
+PUBLIC  _gdwDebugMILongMsgsRcvd
+PUBLIC  _gwDebugMILongErrors
+PUBLIC  _gwDebugMIShortErrors
+PUBLIC  _gdwDebugMidiDrvCallbacks
+PUBLIC  _gabMsgLenChannel
+PUBLIC  _gabMsgLenSystem
+EXTRN	MODACQUIREHARDWARE:FAR
+EXTRN	MODRELEASEHARDWARE:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	INITDISPLAYCONFIGERRORS:FAR
+EXTRN	__AHSHIFT:FAR
+EXTRN	MODDATAWRITE:NEAR
+EXTRN	__AHINCR:FAR
+EXTRN	ASSERTBREAK:FAR
+EXTRN	DRIVERCALLBACK:FAR
+EXTRN	MODGETDEVCAPS:FAR
+EXTRN	TIMEGETTIME:FAR
+EXTRN	_STR_CRLF:BYTE
+EXTRN	_STR_SPACE:BYTE
+_BSS      SEGMENT
+COMM NEAR	_gMidiInClient:	BYTE:	 14
+_BSS      ENDS
+EXTRN	_gfEnabled:BYTE
+EXTRN	_wDebugLevel:WORD
+_BSS      SEGMENT
+COMM NEAR	_gMIMC:	BYTE:	 24
+COMM NEAR	_gMidiOutClient:	BYTE:	 14
+_BSS      ENDS
+_DATA      SEGMENT
+_gbMidiOutCurrentStatus	DB	00H
+	ORG	$+1
+_gdwDebugMODWriteErrors	DD	00H
+_gdwDebugMODataWrites	DD	00H
+_gdwDebugMOShortMsgs	DD	00H
+_gdwDebugMOShortMsgsRS	DD	00H
+_gdwDebugMOShortMsgsBogus	DD	00H
+_gdwDebugMOLongMsgs	DD	00H
+_gdwDebugMIBytesRcvd	DD	00H
+_gdwDebugMIShortMsgsRcvd	DD	00H
+_gdwDebugMILongMsgsRcvd	DD	00H
+_gwDebugMILongErrors	DW	00H
+_gwDebugMIShortErrors	DW	00H
+_gdwDebugMidiDrvCallbacks	DD	00H
+_gabMsgLenChannel	DB	03H
+	DB	03H
+	DB	03H
+	DB	03H
+	DB	02H
+	DB	02H
+	DB	03H
+	ORG	$+1
+_gabMsgLenSystem	DB	01H
+	DB	02H
+	DB	03H
+	DB	02H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+	DB	01H
+$SG2641	DB	'MIM_ERROR',  00H
+$SG2644	DB	'MIM_LONGERROR',  00H
+$SG2656	DB	'bufferdone',  00H
+$SG2664	DB	'rt',  00H
+$SG2670	DB	'AssertT failed (gMIMC.bStatus)',  00H
+$SG2674	DB	'bogusshortmsg',  00H
+$SG2682	DB	'sysexbegin',  00H
+$SG2685	DB	'sysexeox error',  00H
+$SG2689	DB	'common0',  00H
+$SG2692	DB	'common1',  00H
+$SG2695	DB	'common2',  00H
+$SG2698	DB	'VERY VERY BAD SYSTEM STATUS MSG!!!',  00H
+$SG2701	DB	'AssertT failed (1)',  00H
+$SG2704	DB	'voice',  00H
+$SG2708	DB	'VERY VERY BAD CHANNEL STATUS MSG!!!',  00H
+$SG2711	DB	'AssertT failed (1)',  00H
+$SG2716	DB	'sx',  00H
+$SG2720	DB	'data',  00H
+$SG2727	DB	'baddata',  00H
+$SG2764	DB	'modresetBEGIN',  00H
+$SG2772	DB	'modresetEND',  00H
+$SG2789	DB	'MODM_INIT',  00H
+$SG2791	DB	'modMessage called while disabled',  00H
+$SG2794	DB	'invalid midi device id',  00H
+$SG2801	DB	'MODM_GETNUMDEVS',  00H
+$SG2804	DB	'MODM_GETDEVCAPS',  00H
+$SG2807	DB	'MODM_OPEN',  00H
+$SG2810	DB	'MIDI output hardware is unavailable!',  00H
+$SG2813	DB	'MODM_CLOSE',  00H
+$SG2816	DB	'MIDI output hardware could NOT be released!',  00H
+$SG2819	DB	'MODM_RESET',  00H
+$SG2822	DB	'MODM_DATA reentered!',  00H
+$SG2826	DB	'MODM_DATA',  00H
+$SG2829	DB	'MODM_DATA reentered!',  00H
+$SG2833	DB	'MODM_LONGDATA',  00H
+$SG2836	DB	'MODM_LONGDATA reentered!',  00H
+$SG2841	DB	'AssertF failed (0)',  00H
+_DATA      ENDS
+_TEXT      SEGMENT
+	ASSUME	CS: _TEXT
+	PUBLIC	MIDICALLBACK
+MIDICALLBACK	PROC FAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   midifix.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  *   NOTE - This code makes assumptions about machine architecture. It
+;|***  *      is written relying on 'Intel' lo-byte, hi-byte data storage.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include <mmddk.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     MIDI defines
+;|*** 
+;|***  ***************************************************************************/
+;|*** 
+;|*** #define MIDI_DATA_FIRST             0x00
+;|*** #define MIDI_DATA_LAST              0x7F
+;|*** #define MIDI_STATUS_FIRST           0x80
+;|*** #define MIDI_STATUS_LAST            0xFF
+;|*** 
+;|*** 
+;|*** /* 'channel' status bytes */
+;|*** #define MIDI_STATUS_CHANNEL_FIRST   0x80
+;|*** #define MIDI_STATUS_CHANNEL_LAST    0xE0
+;|*** #define MIDI_STATUS_CHANNEL_MASK    0xF0
+;|*** 
+;|*** /* channel voice messages */
+;|*** #define MIDI_VOICE_NOTE_OFF         0x80
+;|*** #define MIDI_VOICE_NOTE_ON          0x90
+;|*** #define MIDI_VOICE_POLY_PRESSURE    0xA0
+;|*** #define MIDI_VOICE_CONTROL_CHANGE   0xB0
+;|*** #define MIDI_VOICE_PROGRAM_CHANGE   0xC0
+;|*** #define MIDI_VOICE_CHANNEL_PRESSURE 0xD0
+;|*** #define MIDI_VOICE_PITCH_BEND       0xE0
+;|*** 
+;|*** /* channel mode messages */
+;|*** #define MIDI_MODE_CHANNEL           MIDI_VOICE_CONTROL_CHANGE
+;|*** 
+;|*** 
+;|*** /* 'system' status bytes */
+;|*** #define MIDI_STATUS_SYSTEM_FIRST    0xF0
+;|*** #define MIDI_STATUS_SYSTEM_LAST     0xFF
+;|*** 
+;|*** /* system exclusive messages */
+;|*** #define MIDI_SYSEX_BEGIN            0xF0
+;|*** #define MIDI_SYSEX_EOX              0xF7
+;|*** 
+;|*** /* system common messages */
+;|*** #define MIDI_COMMON_TCQF            0xF1    /* time code quarter frame  */
+;|*** #define MIDI_COMMON_SONG_POSITION   0xF2
+;|*** #define MIDI_COMMON_SONG_SELECT     0xF3
+;|*** #define MIDI_COMMON_UNDEFINED_F4    0xF4
+;|*** #define MIDI_COMMON_UNDEFINED_F5    0xF5
+;|*** #define MIDI_COMMON_TUNE_REQUEST    0xF6
+;|*** 
+;|*** /* system real-time messages */
+;|*** #define MIDI_RTIME_TIMING_CLOCK     0xF8
+;|*** #define MIDI_RTIME_UNDEFINED_F9     0xF9
+;|*** #define MIDI_RTIME_START            0xFA
+;|*** #define MIDI_RTIME_CONTINUE         0xFB
+;|*** #define MIDI_RTIME_STOP             0xFC
+;|*** #define MIDI_RTIME_UNDEFINED_FD     0xFD
+;|*** #define MIDI_RTIME_ACTIVE_SENSING   0xFE
+;|*** #define MIDI_RTIME_SYSTEM_RESET     0xFF
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     public data
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** PORTALLOC       gMidiInClient;      /* input client information structure */
+;|*** MIDIINMSGCLIENT gMIMC;              /* MIDI input msg client */
+;|*** 
+;|*** /*****************************************************************************
+;|*** 
+;|***     local data
+;|*** 
+;|***  ****************************************************************************/ 
+;|*** 
+;|*** static PORTALLOC    gMidiOutClient;         /* client information */
+;|*** static BYTE         gbMidiOutCurrentStatus  = 0;
+;|*** 
+;|*** #ifdef DEBUG
+;|*** #define D(x)    {x;}
+;|*** DWORD   gdwDebugMODWriteErrors  = 0;
+;|*** DWORD   gdwDebugMODataWrites    = 0;
+;|*** DWORD   gdwDebugMOShortMsgs     = 0;
+;|*** DWORD   gdwDebugMOShortMsgsRS   = 0;
+;|*** DWORD   gdwDebugMOShortMsgsBogus= 0;
+;|*** DWORD   gdwDebugMOLongMsgs      = 0;
+;|*** 
+;|*** DWORD   gdwDebugMIBytesRcvd     = 0;
+;|*** DWORD   gdwDebugMIShortMsgsRcvd = 0;
+;|*** DWORD   gdwDebugMILongMsgsRcvd  = 0;
+;|*** WORD    gwDebugMILongErrors     = 0;
+;|*** WORD    gwDebugMIShortErrors    = 0;
+;|*** 
+;|*** DWORD   gdwDebugMidiDrvCallbacks= 0;
+;|*** #else
+;|*** #define D(x)
+;|*** #endif
+;|*** 
+;|*** 
+;|*** #define MSGLENCHANNEL(bStatus)  gabMsgLenChannel[(BYTE)((bStatus) >> 4) - (BYTE)8]
+;|*** #define MSGLENSYSTEM(bStatus)   gabMsgLenSystem[(BYTE)(bStatus - MIDI_STATUS_SYSTEM_FIRST)];
+;|*** 
+;|*** /* channel status message lengths */
+;|*** static BYTE gabMsgLenChannel[] =
+;|*** {
+;|***     3,      /* 0x80 note off        */
+;|***     3,      /* 0x90 note on         */
+;|***     3,      /* 0xA0 key pressure    */
+;|***     3,      /* 0xB0 control change  */
+;|***     2,      /* 0xC0 program change  */
+;|***     2,      /* 0xD0 channel pressure*/
+;|***     3       /* 0xE0 pitch bend      */
+;|*** };
+;|*** 
+;|*** /** system status message lengths **/
+;|*** static BYTE gabMsgLenSystem[] =
+;|*** {
+;|***     1,      /* 0xF0 sysex begin     */
+;|***     2,      /* 0xF1 midi tcqf       */
+;|***     3,      /* 0xF2 song position   */
+;|***     2,      /* 0xF3 song select     */
+;|***     1,      /* 0xF4 undefined       */
+;|***     1,      /* 0xF5 undefined       */
+;|***     1,      /* 0xF6 tune request    */
+;|***     1,      /* 0xF7 sysex eox       */
+;|*** 
+;|***     1,      /* 0xF8 timing clock    */
+;|***     1,      /* 0xF9 undefined       */
+;|***     1,      /* 0xFA start           */
+;|***     1,      /* 0xFB continue        */
+;|***     1,      /* 0xFC stop            */
+;|***     1,      /* 0xFD undefined       */
+;|***     1,      /* 0xFE active sensing  */
+;|***     1       /* 0xFF system reset    */
+;|*** };
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | midiCallback | This calls DriverCallback for a midi device.
+;|***  *
+;|***  * @parm NPPORTALLOC| pPort | Pointer to the PORTALLOC.
+;|***  *
+;|***  * @parm WORD | msg | The message to send.
+;|***  *
+;|***  * @parm DWORD | dw1 | Message-dependent parameter.
+;|***  *
+;|***  * @parm DWORD | dw2 | Message-dependent parameter.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** void FAR PASCAL midiCallback(NPPORTALLOC pPort, WORD msg, DWORD dw1, DWORD dw2)
+;|*** {
+; Line 165
+	*** 000000	55 			push	bp
+	*** 000001	8b ec 			mov	bp,sp
+;	pPort = 16
+;	msg = 14
+;	dw1 = 10
+;	dw2 = 6
+;|*** #ifdef DEBUG
+;|***     switch (msg) {
+; Line 167
+	*** 000003	8b 46 0e 		mov	ax,WORD PTR [bp+14]	;msg
+;|***         case MIM_DATA:
+;|***             gdwDebugMIShortMsgsRcvd++;
+;|***             break;
+;|*** 
+;|***         case MIM_LONGDATA:
+;|***             gdwDebugMILongMsgsRcvd++;
+;|***             break;
+;|*** 
+;|***         case MIM_ERROR:
+;|***             D2("MIM_ERROR");
+;|***             gwDebugMIShortErrors++;
+;|***             break;
+;|*** 
+;|***         case MIM_LONGERROR:
+;|***             D2("MIM_LONGERROR");
+;|***             gwDebugMILongErrors++;
+;|***             break;
+;|***     }
+; Line 185
+	*** 000006	2d c3 03 		sub	ax,963	;03c3H
+	*** 000009	74 0b 			je	$SC2637
+	*** 00000b	48 			dec	ax
+	*** 00000c	74 14 			je	$SC2638
+	*** 00000e	48 			dec	ax
+	*** 00000f	74 1d 			je	$SC2639
+	*** 000011	48 			dec	ax
+	*** 000012	74 3b 			je	$SC2642
+	*** 000014	eb 58 			jmp	SHORT $SB2634
+;|***         case MIM_DATA:
+; Line 168
+					$SC2637:
+;|***             gdwDebugMIShortMsgsRcvd++;
+; Line 169
+	*** 000016	83 06 00 00 01 		add	WORD PTR _gdwDebugMIShortMsgsRcvd,1
+	*** 00001b	83 16 02 00 00 		adc	WORD PTR _gdwDebugMIShortMsgsRcvd+2,0
+;|***             break;
+; Line 170
+	*** 000020	eb 4c 			jmp	SHORT $SB2634
+;|*** 
+;|***         case MIM_LONGDATA:
+; Line 172
+					$SC2638:
+;|***             gdwDebugMILongMsgsRcvd++;
+; Line 173
+	*** 000022	83 06 00 00 01 		add	WORD PTR _gdwDebugMILongMsgsRcvd,1
+	*** 000027	83 16 02 00 00 		adc	WORD PTR _gdwDebugMILongMsgsRcvd+2,0
+;|***             break;
+; Line 174
+	*** 00002c	eb 40 			jmp	SHORT $SB2634
+;|*** 
+;|***         case MIM_ERROR:
+; Line 176
+					$SC2639:
+;|***             D2("MIM_ERROR");
+; Line 177
+	*** 00002e	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 000033	72 14 			jb	$I2640
+	*** 000035	68 00 00 		push	SEG _STR_SPACE
+	*** 000038	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00003b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000040	1e 			push	ds
+	*** 000041	68 00 00 		push	OFFSET DGROUP:$SG2641
+	*** 000044	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             gwDebugMIShortErrors++;
+; Line 178
+					$I2640:
+	*** 000049	ff 06 00 00 		inc	WORD PTR _gwDebugMIShortErrors
+;|***             break;
+; Line 179
+	*** 00004d	eb 1f 			jmp	SHORT $SB2634
+;|*** 
+;|***         case MIM_LONGERROR:
+; Line 181
+					$SC2642:
+;|***             D2("MIM_LONGERROR");
+; Line 182
+	*** 00004f	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 000054	72 14 			jb	$I2643
+	*** 000056	68 00 00 		push	SEG _STR_SPACE
+	*** 000059	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00005c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000061	1e 			push	ds
+	*** 000062	68 00 00 		push	OFFSET DGROUP:$SG2644
+	*** 000065	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             gwDebugMILongErrors++;
+; Line 183
+					$I2643:
+	*** 00006a	ff 06 00 00 		inc	WORD PTR _gwDebugMILongErrors
+;|***             break;
+;|***     }
+; Line 185
+					$SB2634:
+;|***     gdwDebugMidiDrvCallbacks++;
+; Line 186
+	*** 00006e	83 06 00 00 01 		add	WORD PTR _gdwDebugMidiDrvCallbacks,1
+	*** 000073	83 16 02 00 00 		adc	WORD PTR _gdwDebugMidiDrvCallbacks+2,0
+;|*** #endif
+;|*** 
+;|***     /*  Invoke the callback function, if it exists.  dwFlags contains driver-
+;|***      *  specific flags in the LOWORD and generic driver flags in the HIWORD
+;|***      *
+;|***      *  DON'T switch stacks in DriverCallback - we already did at the
+;|***      *  beginning of our ISR (using StackEnter).  No need to burn another
+;|***      *  stack, we should have plenty of room for the callback.  Also,
+;|***      *  we may not have been called from an ISR.  In that case, we know
+;|***      *  that we are on an app's stack, and this should be ok.
+;|***      */
+;|***     if (pPort->dwCallback)
+; Line 198
+	*** 000078	8b 5e 10 		mov	bx,WORD PTR [bp+16]	;pPort
+	*** 00007b	8b 47 02 		mov	ax,WORD PTR [bx+2]
+	*** 00007e	0b 07 			or	ax,WORD PTR [bx]
+	*** 000080	74 28 			je	$EX2632
+;|***         DriverCallback(pPort->dwCallback,       /* client's callback DWORD */
+;|***                        HIWORD(pPort->dwFlags) | DCB_NOSWITCH,  /* flags */
+;|***                        pPort->hMidi,            /* handle to the wave device */
+;|***                        msg,                     /* the message */
+;|***                        pPort->dwInstance,       /* client's instance data */
+;|***                        dw1,                     /* first DWORD */
+;|***                        dw2);                    /* second DWORD */
+; Line 205
+	*** 000082	ff 77 02 		push	WORD PTR [bx+2]
+	*** 000085	ff 37 			push	WORD PTR [bx]
+	*** 000087	8b 47 0c 		mov	ax,WORD PTR [bx+12]
+	*** 00008a	0c 08 			or	al,8
+	*** 00008c	50 			push	ax
+	*** 00008d	ff 77 08 		push	WORD PTR [bx+8]
+	*** 000090	ff 76 0e 		push	WORD PTR [bp+14]	;msg
+	*** 000093	ff 77 06 		push	WORD PTR [bx+6]
+	*** 000096	ff 77 04 		push	WORD PTR [bx+4]
+	*** 000099	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 00009c	ff 76 0a 		push	WORD PTR [bp+10]	;dw1
+	*** 00009f	ff 76 08 		push	WORD PTR [bp+8]
+	*** 0000a2	ff 76 06 		push	WORD PTR [bp+6]	;dw2
+	*** 0000a5	9a 00 00 00 00 		call	FAR PTR DRIVERCALLBACK
+;|*** }
+; Line 206
+					$EX2632:
+	*** 0000aa	c9 			leave	
+	*** 0000ab	ca 0c 00 		ret	12	;0000000cH
+
+MIDICALLBACK	ENDP
+	PUBLIC	MIDBUFFERWRITE
+MIDBUFFERWRITE	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | midBufferWrite | This function writes a byte into the long
+;|***  *      message buffer.  If the buffer is full or end-of-sysex byte is
+;|***  *      received, the buffer is marked as 'done' and it's owner is called
+;|***  *      back.
+;|***  *
+;|***  * @parm BYTE | byte | The byte received.
+;|***  *
+;|***  * @rdesc There is no return value
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL midBufferWrite( BYTE bByte )
+;|*** {
+; Line 221
+	*** 0000ae	c8 04 00 00 		enter	4,0
+	*** 0000b2	56 			push	si
+;	bByte = 4
+;	lpmh = -4
+;|*** LPMIDIHDR   lpmh;
+;|*** 
+;|***     /* if no buffers, nothing happens */
+;|***     if ( !(lpmh = gMIMC.lpmhQueue) ) 
+; Line 225
+	*** 0000b3	a1 14 00 		mov	ax,WORD PTR _gMIMC+20
+	*** 0000b6	8b 16 16 00 		mov	dx,WORD PTR _gMIMC+22
+	*** 0000ba	8b f0 			mov	si,ax
+	*** 0000bc	89 56 fe 		mov	WORD PTR [bp-2],dx
+	*** 0000bf	0b d0 			or	dx,ax
+	*** 0000c1	75 03 			jne	$JCC193
+	*** 0000c3	e9 c1 00 		jmp	$EX2649
+					$JCC193:
+;|***         return;
+;|*** 
+;|***     /* if the long message is being terminated, only save eox byte */
+;|***     if ( (bByte < MIDI_STATUS_FIRST) || (bByte == MIDI_SYSEX_EOX) || (bByte == MIDI_SYSEX_BEGIN) ) {
+; Line 229
+	*** 0000c6	80 7e 04 80 		cmp	BYTE PTR [bp+4],128	;0080H	;bByte
+	*** 0000ca	72 0c 			jb	$I2653
+	*** 0000cc	80 7e 04 f7 		cmp	BYTE PTR [bp+4],247	;00f7H	;bByte
+	*** 0000d0	74 06 			je	$I2653
+	*** 0000d2	80 7e 04 f0 		cmp	BYTE PTR [bp+4],240	;00f0H	;bByte
+	*** 0000d6	75 49 			jne	$L2843
+					$I2653:
+;|***         /* write the data into the long message buffer */
+;|***         *((HPSTR)(lpmh->lpData) + gMIMC.dwCurData++) = bByte;
+; Line 231
+	*** 0000d8	a1 10 00 		mov	ax,WORD PTR _gMIMC+16
+	*** 0000db	8b 16 12 00 		mov	dx,WORD PTR _gMIMC+18
+	*** 0000df	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 0000e2	26 03 04 		add	ax,WORD PTR es:[si]
+	*** 0000e5	83 d2 00 		adc	dx,0
+	*** 0000e8	b9 00 00 		mov	cx,OFFSET __AHSHIFT
+	*** 0000eb	d3 e2 			shl	dx,cl
+	*** 0000ed	26 03 54 02 		add	dx,WORD PTR es:[si+2]
+	*** 0000f1	8e c2 			mov	es,dx
+	*** 0000f3	8b d8 			mov	bx,ax
+	*** 0000f5	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 0000f8	26 88 07 		mov	BYTE PTR es:[bx],al
+	*** 0000fb	83 06 10 00 01 		add	WORD PTR _gMIMC+16,1
+	*** 000100	83 16 12 00 00 		adc	WORD PTR _gMIMC+18,0
+;|*** 
+;|***         /* if !(end of sysex or buffer full), return */
+;|***         if ( !((bByte == MIDI_SYSEX_EOX) || (gMIMC.dwCurData >= lpmh->dwBufferLength)) )
+; Line 234
+	*** 000105	3c f7 			cmp	al,247	;00f7H
+	*** 000107	74 18 			je	$L2843
+	*** 000109	a1 10 00 		mov	ax,WORD PTR _gMIMC+16
+	*** 00010c	8b 16 12 00 		mov	dx,WORD PTR _gMIMC+18
+	*** 000110	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 000113	26 39 54 06 		cmp	WORD PTR es:[si+6],dx
+	*** 000117	77 6e 			ja	$EX2649
+	*** 000119	72 06 			jb	$L2843
+	*** 00011b	26 39 44 04 		cmp	WORD PTR es:[si+4],ax
+	*** 00011f	77 66 			ja	$EX2649
+					$L2843:
+;|***             return;
+;|***     }
+;|*** 
+;|***     /* send client back the data buffer */
+;|***     D4("bufferdone");
+; Line 239
+	*** 000121	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000126	72 14 			jb	$I2655
+	*** 000128	68 00 00 		push	SEG _STR_SPACE
+	*** 00012b	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00012e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000133	1e 			push	ds
+	*** 000134	68 00 00 		push	OFFSET DGROUP:$SG2656
+	*** 000137	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***     gMIMC.lpmhQueue       = gMIMC.lpmhQueue->lpNext;
+; Line 240
+					$I2655:
+	*** 00013c	c4 1e 14 00 		les	bx,DWORD PTR _gMIMC+20
+	*** 000140	26 8b 47 14 		mov	ax,WORD PTR es:[bx+20]
+	*** 000144	26 8b 57 16 		mov	dx,WORD PTR es:[bx+22]
+	*** 000148	a3 14 00 		mov	WORD PTR _gMIMC+20,ax
+	*** 00014b	89 16 16 00 		mov	WORD PTR _gMIMC+22,dx
+;|***     lpmh->dwBytesRecorded = gMIMC.dwCurData;
+; Line 241
+	*** 00014f	a1 10 00 		mov	ax,WORD PTR _gMIMC+16
+	*** 000152	8b 16 12 00 		mov	dx,WORD PTR _gMIMC+18
+	*** 000156	8e 46 fe 		mov	es,WORD PTR [bp-2]
+	*** 000159	26 89 44 08 		mov	WORD PTR es:[si+8],ax
+	*** 00015d	26 89 54 0a 		mov	WORD PTR es:[si+10],dx
+;|***     gMIMC.dwCurData       = 0L;
+; Line 242
+	*** 000161	2b c0 			sub	ax,ax
+	*** 000163	a3 12 00 		mov	WORD PTR _gMIMC+18,ax
+	*** 000166	a3 10 00 		mov	WORD PTR _gMIMC+16,ax
+;|***     lpmh->dwFlags        |= MHDR_DONE;
+; Line 243
+	*** 000169	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|***     lpmh->dwFlags        &= ~MHDR_INQUEUE;
+; Line 244
+	*** 00016e	26 80 64 10 fb 		and	BYTE PTR es:[si+16],251	;00fbH
+;|***     midiCallback( &gMidiInClient, MIM_LONGDATA, (DWORD)lpmh, gMIMC.dwMsgTime );
+; Line 245
+	*** 000173	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 000176	68 c4 03 		push	964	;03c4H
+	*** 000179	06 			push	es
+	*** 00017a	56 			push	si
+	*** 00017b	ff 36 0a 00 		push	WORD PTR _gMIMC+10
+	*** 00017f	ff 36 08 00 		push	WORD PTR _gMIMC+8
+	*** 000183	0e 			push	cs
+	*** 000184	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|*** }
+; Line 246
+					$EX2649:
+	*** 000187	5e 			pop	si
+	*** 000188	c9 			leave	
+	*** 000189	c2 02 00 		ret	2
+
+MIDBUFFERWRITE	ENDP
+	PUBLIC	MIDBYTEREC
+MIDBYTEREC	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | midByteRec | This function constructs the complete midi
+;|***  *      messages from the individual bytes received and passes the message
+;|***  *      to the client via his callback.
+;|***  *
+;|***  * @rdesc There is no return value
+;|***  *
+;|***  * @comm NOTE: running status is not turned off on errors
+;|***  ***************************************************************************/
+;|*** void NEAR PASCAL midByteRec( BYTE bByte )
+;|*** {
+; Line 260
+	*** 00018c	c8 04 00 00 		enter	4,0
+;	bByte = 4
+;	dwCurTime = -4
+;|*** DWORD   dwCurTime;
+;|*** 
+;|***     /* time byte received */
+;|***     dwCurTime = timeGetTime() - gMIMC.dwRefTime;
+; Line 264
+	*** 000190	9a 00 00 00 00 		call	FAR PTR TIMEGETTIME
+	*** 000195	2b 06 0c 00 		sub	ax,WORD PTR _gMIMC+12
+	*** 000199	1b 16 0e 00 		sbb	dx,WORD PTR _gMIMC+14
+	*** 00019d	89 46 fc 		mov	WORD PTR [bp-4],ax	;dwCurTime
+	*** 0001a0	89 56 fe 		mov	WORD PTR [bp-2],dx
+;|*** 
+;|***     D( gdwDebugMIBytesRcvd++ );
+; Line 266
+	*** 0001a3	83 06 00 00 01 		add	WORD PTR _gdwDebugMIBytesRcvd,1
+	*** 0001a8	83 16 02 00 00 		adc	WORD PTR _gdwDebugMIBytesRcvd+2,0
+;|*** 
+;|***     /*  System Real-Time Messages (SRTM) range from 0xF8 to 0xFF.
+;|***      *
+;|***      *  There are no data bytes attached to SRTM status bytes and
+;|***      *  they can appear _anywhere_ in the data stream.  They should
+;|***      *  affect _nothing_.  They do not terminate SysEx, do not reset
+;|***      *  running status, nothing.  Just send them up.
+;|***      */
+;|***     if ( bByte >= MIDI_RTIME_TIMING_CLOCK ) {
+; Line 275
+	*** 0001ad	80 7e 04 f8 		cmp	BYTE PTR [bp+4],248	;00f8H	;bByte
+	*** 0001b1	72 32 			jb	$I2662
+;|***         D4("rt");
+; Line 276
+	*** 0001b3	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 0001b8	72 14 			jb	$I2663
+	*** 0001ba	68 00 00 		push	SEG _STR_SPACE
+	*** 0001bd	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0001c0	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0001c5	1e 			push	ds
+	*** 0001c6	68 00 00 		push	OFFSET DGROUP:$SG2664
+	*** 0001c9	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         midiCallback( &gMidiInClient, MIM_DATA, (DWORD)bByte, dwCurTime );
+; Line 277
+					$I2663:
+	*** 0001ce	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 0001d1	68 c3 03 		push	963	;03c3H
+	*** 0001d4	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 0001d7	2a e4 			sub	ah,ah
+	*** 0001d9	6a 00 			push	0
+	*** 0001db	50 			push	ax
+	*** 0001dc	ff 76 fe 		push	WORD PTR [bp-2]
+	*** 0001df	ff 76 fc 		push	WORD PTR [bp-4]	;dwCurTime
+	*** 0001e2	e9 65 03 		jmp	$L2860
+					$I2662:
+	*** 0001e5	80 7e 04 80 		cmp	BYTE PTR [bp+4],128	;0080H	;bByte
+	*** 0001e9	73 03 			jae	$JCC489
+	*** 0001eb	e9 70 02 		jmp	$I2666
+					$JCC489:
+;|***     }
+;|*** 
+;|***     /* if the high bit is set (>= 0x80), then it is a status byte */
+;|***     else if ( bByte >= (BYTE)MIDI_STATUS_FIRST ) {
+;|***         /*  SysEx, if going, can be terminated by either an End of 
+;|***          *  Exclusion (EOX, 0xF7) or any other Status Byte (except real-
+;|***          *  time messages which are handled above).  An EOX _should_
+;|***          *  always be sent at the end of a SysEx message, but any status
+;|***          *  byte is legal.
+;|***          */
+;|***         if ( gMIMC.fSysEx ) {
+; Line 288
+	*** 0001ee	80 3e 00 00 00 		cmp	BYTE PTR _gMIMC,0
+	*** 0001f3	74 3c 			je	$I2667
+;|***             /* bStatus should never be set if in SysEx */
+;|***             AssertT( gMIMC.bStatus );
+; Line 290
+	*** 0001f5	80 3e 01 00 00 		cmp	BYTE PTR _gMIMC+1,0
+	*** 0001fa	74 20 			je	$I2668
+	*** 0001fc	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000201	72 14 			jb	$I2669
+	*** 000203	68 00 00 		push	SEG _STR_CRLF
+	*** 000206	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000209	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00020e	1e 			push	ds
+	*** 00020f	68 00 00 		push	OFFSET DGROUP:$SG2670
+	*** 000212	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$I2669:
+	*** 000217	9a 00 00 00 00 		call	FAR PTR ASSERTBREAK
+					$I2668:
+;|*** 
+;|***             /* reset SysEx flag--it has been terminated */
+;|***             gMIMC.fSysEx = FALSE;
+; Line 293
+	*** 00021c	c6 06 00 00 00 		mov	BYTE PTR _gMIMC,0
+;|*** 
+;|***             /* post sysex data back to caller */
+;|***             midBufferWrite( bByte );
+; Line 296
+	*** 000221	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 000224	50 			push	ax
+	*** 000225	e8 86 fe 		call	MIDBUFFERWRITE
+;|*** 
+;|***             /*  If this was an EOX, then we are done.  If it is a different
+;|***              *  status byte, then we have terminated the SysEx, but we still
+;|***              *  need to process the new status byte.
+;|***              */
+;|***             if ( bByte == MIDI_SYSEX_EOX )
+; Line 302
+	*** 000228	80 7e 04 f7 		cmp	BYTE PTR [bp+4],247	;00f7H	;bByte
+	*** 00022c	75 03 			jne	$JCC556
+	*** 00022e	e9 1d 03 		jmp	$EX2660
+					$JCC556:
+;|***                 return;
+;|***         }
+;|*** 
+;|***         /*  If there is a partially recorded short message, then post
+;|***          *  it with an error (it's considered garbage).  The first byte
+;|***          *  of the message is non-zero if partly recorded.
+;|***          */
+;|***         if ( (BYTE)gMIMC.dwShortMsg ) {
+; Line 310
+					$I2667:
+	*** 000231	80 3e 04 00 00 		cmp	BYTE PTR _gMIMC+4,0
+	*** 000236	74 3d 			je	$I2672
+;|***             D2("bogusshortmsg");
+; Line 311
+	*** 000238	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 00023d	72 14 			jb	$I2673
+	*** 00023f	68 00 00 		push	SEG _STR_SPACE
+	*** 000242	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000245	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00024a	1e 			push	ds
+	*** 00024b	68 00 00 		push	OFFSET DGROUP:$SG2674
+	*** 00024e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             midiCallback( &gMidiInClient, MIM_ERROR, gMIMC.dwShortMsg, gMIMC.dwMsgTime );
+; Line 312
+					$I2673:
+	*** 000253	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 000256	68 c5 03 		push	965	;03c5H
+	*** 000259	ff 36 06 00 		push	WORD PTR _gMIMC+6
+	*** 00025d	ff 36 04 00 		push	WORD PTR _gMIMC+4
+	*** 000261	ff 36 0a 00 		push	WORD PTR _gMIMC+10
+	*** 000265	ff 36 08 00 		push	WORD PTR _gMIMC+8
+	*** 000269	0e 			push	cs
+	*** 00026a	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|***             gMIMC.dwShortMsg = 0L;
+; Line 313
+	*** 00026d	2b c0 			sub	ax,ax
+	*** 00026f	a3 06 00 		mov	WORD PTR _gMIMC+6,ax
+	*** 000272	a3 04 00 		mov	WORD PTR _gMIMC+4,ax
+;|***         }
+;|*** 
+;|***         /*  The message time is always the time at which the 'status' byte
+;|***          *  for the message was received.  So set this.
+;|***          */
+;|***         gMIMC.dwMsgTime = dwCurTime;
+; Line 319
+					$I2672:
+	*** 000275	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;dwCurTime
+	*** 000278	8b 56 fe 		mov	dx,WORD PTR [bp-2]
+	*** 00027b	a3 08 00 		mov	WORD PTR _gMIMC+8,ax
+	*** 00027e	89 16 0a 00 		mov	WORD PTR _gMIMC+10,dx
+;|*** 
+;|***         /*  There are two different types of messages that bByte could
+;|***          *  represent: channel messages (0x80 - 0xE0) or system messages
+;|***          *  (0xF0 - 0xFF).  We already took care of the system 'real-time
+;|***          *  messages' (0xF8 - 0xFF) above, so we don't need to check for
+;|***          *  them.
+;|***          *
+;|***          *  So is it a 'system' status byte or a 'channel' status byte?
+;|***          */
+;|***         if ( bByte >= MIDI_STATUS_SYSTEM_FIRST ) {
+; Line 329
+	*** 000282	80 7e 04 f0 		cmp	BYTE PTR [bp+4],240	;00f0H	;bByte
+	*** 000286	73 03 			jae	$JCC646
+	*** 000288	e9 4c 01 		jmp	$I2675
+					$JCC646:
+;|***             /* running status applies to channel messages only */
+;|***             gMIMC.bStatus = 0;
+; Line 331
+	*** 00028b	c6 06 01 00 00 		mov	BYTE PTR _gMIMC+1,0
+;|*** 
+;|***             switch ( bByte ) {
+; Line 333
+	*** 000290	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 000293	2a e4 			sub	ah,ah
+;|***                 case MIDI_SYSEX_BEGIN:
+;|***                     D4("sysexbegin");
+;|***                     gMIMC.fSysEx = TRUE;
+;|***                     midBufferWrite( bByte );
+;|***                     break;
+;|*** 
+;|***                 case MIDI_SYSEX_EOX:
+;|***                     D4("sysexeox error");
+;|***                     gMIMC.bBytePos = 0;
+;|***                     goto midByteRecBadData;
+;|*** 
+;|***                 case MIDI_COMMON_UNDEFINED_F4:
+;|***                 case MIDI_COMMON_UNDEFINED_F5:
+;|***                 case MIDI_COMMON_TUNE_REQUEST:
+;|***                     D4("common0");
+;|***                     midiCallback( &gMidiInClient, MIM_DATA, (DWORD)bByte, gMIMC.dwMsgTime );
+;|***                     gMIMC.bBytePos = 0;
+;|***                     break;
+;|*** 
+;|***                 case MIDI_COMMON_TCQF:
+;|***                 case MIDI_COMMON_SONG_SELECT:
+;|***                     D4("common1");
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+;|***                     gMIMC.bBytesLeft = 1;
+;|***                     gMIMC.bBytePos = 1;
+;|***                     break;
+;|*** 
+;|***                 case MIDI_COMMON_SONG_POSITION:
+;|***                     D4("common2");
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+;|***                     gMIMC.bBytesLeft = 2;
+;|***                     gMIMC.bBytePos = 1;
+;|***                     break;
+;|*** 
+;|*** #ifdef DEBUG
+;|***                 default:
+;|***                     D1("VERY VERY BAD SYSTEM STATUS MSG!!!");
+;|***                     AssertT( 1 );
+;|***                     break;
+;|*** #endif
+;|***             }
+; Line 374
+	*** 000295	2d f0 00 		sub	ax,240	;00f0H
+	*** 000298	3d 07 00 		cmp	ax,7
+	*** 00029b	77 18 			ja	$SD2696
+	*** 00029d	03 c0 			add	ax,ax
+	*** 00029f	93 			xchg	ax,bx
+	*** 0002a0	2e ff a7 00 00 		jmp	WORD PTR cs:$L2844[bx]
+					$L2844:
+	*** 0002a5	00 00 				DW	$SC2680
+	*** 0002a7	00 00 				DW	$SC2690
+	*** 0002a9	00 00 				DW	$SC2693
+	*** 0002ab	00 00 				DW	$SC2690
+	*** 0002ad	00 00 				DW	$SC2687
+	*** 0002af	00 00 				DW	$SC2687
+	*** 0002b1	00 00 				DW	$SC2687
+	*** 0002b3	00 00 				DW	$SC2683
+;|***                 default:
+; Line 369
+					$SD2696:
+;|***                     D1("VERY VERY BAD SYSTEM STATUS MSG!!!");
+; Line 370
+	*** 0002b5	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0002ba	72 14 			jb	$I2697
+	*** 0002bc	68 00 00 		push	SEG _STR_CRLF
+	*** 0002bf	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0002c2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0002c7	1e 			push	ds
+	*** 0002c8	68 00 00 		push	OFFSET DGROUP:$SG2698
+	*** 0002cb	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     AssertT( 1 );
+; Line 371
+					$I2697:
+	*** 0002d0	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0002d5	72 14 			jb	$I2700
+	*** 0002d7	68 00 00 		push	SEG _STR_CRLF
+	*** 0002da	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0002dd	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0002e2	1e 			push	ds
+	*** 0002e3	68 00 00 		push	OFFSET DGROUP:$SG2701
+	*** 0002e6	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$I2700:
+	*** 0002eb	9a 00 00 00 00 		call	FAR PTR ASSERTBREAK
+;|***                     break;
+; Line 372
+	*** 0002f0	e9 5b 02 		jmp	$EX2660
+;|***                 case MIDI_SYSEX_BEGIN:
+; Line 334
+					$SC2680:
+;|***                     D4("sysexbegin");
+; Line 335
+	*** 0002f3	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 0002f8	72 14 			jb	$I2681
+	*** 0002fa	68 00 00 		push	SEG _STR_SPACE
+	*** 0002fd	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000300	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000305	1e 			push	ds
+	*** 000306	68 00 00 		push	OFFSET DGROUP:$SG2682
+	*** 000309	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     gMIMC.fSysEx = TRUE;
+; Line 336
+					$I2681:
+	*** 00030e	c6 06 00 00 01 		mov	BYTE PTR _gMIMC,1
+;|***                     midBufferWrite( bByte );
+; Line 337
+					$L2861:
+	*** 000313	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 000316	50 			push	ax
+	*** 000317	e8 94 fd 		call	MIDBUFFERWRITE
+;|***                     break;
+; Line 338
+	*** 00031a	e9 31 02 		jmp	$EX2660
+;|*** 
+;|***                 case MIDI_SYSEX_EOX:
+;|***                     D4("sysexeox error");
+;|***                     gMIMC.bBytePos = 0;
+;|***                     goto midByteRecBadData;
+;|*** 
+;|***                 case MIDI_COMMON_UNDEFINED_F4:
+;|***                 case MIDI_COMMON_UNDEFINED_F5:
+;|***                 case MIDI_COMMON_TUNE_REQUEST:
+;|***                     D4("common0");
+;|***                     midiCallback( &gMidiInClient, MIM_DATA, (DWORD)bByte, gMIMC.dwMsgTime );
+;|***                     gMIMC.bBytePos = 0;
+;|***                     break;
+;|*** 
+;|***                 case MIDI_COMMON_TCQF:
+; Line 353
+					$SC2690:
+;|***                 case MIDI_COMMON_SONG_SELECT:
+;|***                     D4("common1");
+; Line 355
+	*** 00031d	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000322	72 14 			jb	$I2691
+	*** 000324	68 00 00 		push	SEG _STR_SPACE
+	*** 000327	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00032a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00032f	1e 			push	ds
+	*** 000330	68 00 00 		push	OFFSET DGROUP:$SG2692
+	*** 000333	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+; Line 356
+					$I2691:
+	*** 000338	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 00033b	a2 04 00 		mov	BYTE PTR _gMIMC+4,al
+;|***                     gMIMC.bBytesLeft = 1;
+;|***                     gMIMC.bBytePos = 1;
+; Line 358
+	*** 00033e	b0 01 			mov	al,1
+	*** 000340	a2 02 00 		mov	BYTE PTR _gMIMC+2,al
+	*** 000343	a2 03 00 		mov	BYTE PTR _gMIMC+3,al
+;|***                     break;
+; Line 359
+	*** 000346	e9 05 02 		jmp	$EX2660
+;|*** 
+;|***                 case MIDI_COMMON_SONG_POSITION:
+; Line 361
+					$SC2693:
+;|***                     D4("common2");
+; Line 362
+	*** 000349	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 00034e	72 14 			jb	$I2694
+	*** 000350	68 00 00 		push	SEG _STR_SPACE
+	*** 000353	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000356	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00035b	1e 			push	ds
+	*** 00035c	68 00 00 		push	OFFSET DGROUP:$SG2695
+	*** 00035f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+; Line 363
+					$I2694:
+	*** 000364	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 000367	a2 04 00 		mov	BYTE PTR _gMIMC+4,al
+;|***                     gMIMC.bBytesLeft = 2;
+; Line 364
+	*** 00036a	c6 06 02 00 02 		mov	BYTE PTR _gMIMC+2,2
+;|***                     gMIMC.bBytePos = 1;
+; Line 365
+					$L2862:
+	*** 00036f	c6 06 03 00 01 		mov	BYTE PTR _gMIMC+3,1
+;|***                     break;
+; Line 366
+	*** 000374	e9 d7 01 		jmp	$EX2660
+;|***                 case MIDI_COMMON_UNDEFINED_F4:
+; Line 345
+					$SC2687:
+;|***                 case MIDI_COMMON_UNDEFINED_F5:
+;|***                 case MIDI_COMMON_TUNE_REQUEST:
+;|***                     D4("common0");
+; Line 348
+	*** 000377	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 00037c	72 14 			jb	$I2688
+	*** 00037e	68 00 00 		push	SEG _STR_SPACE
+	*** 000381	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000384	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000389	1e 			push	ds
+	*** 00038a	68 00 00 		push	OFFSET DGROUP:$SG2689
+	*** 00038d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     midiCallback( &gMidiInClient, MIM_DATA, (DWORD)bByte, gMIMC.dwMsgTime );
+; Line 349
+					$I2688:
+	*** 000392	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 000395	68 c3 03 		push	963	;03c3H
+	*** 000398	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 00039b	2a e4 			sub	ah,ah
+	*** 00039d	6a 00 			push	0
+	*** 00039f	50 			push	ax
+	*** 0003a0	ff 36 0a 00 		push	WORD PTR _gMIMC+10
+	*** 0003a4	ff 36 08 00 		push	WORD PTR _gMIMC+8
+	*** 0003a8	0e 			push	cs
+	*** 0003a9	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|***                     gMIMC.bBytePos = 0;
+; Line 350
+					$L2863:
+	*** 0003ac	c6 06 03 00 00 		mov	BYTE PTR _gMIMC+3,0
+;|***                     break;
+; Line 351
+	*** 0003b1	e9 9a 01 		jmp	$EX2660
+;|***                 case MIDI_SYSEX_EOX:
+; Line 340
+					$SC2683:
+;|***                     D4("sysexeox error");
+; Line 341
+	*** 0003b4	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 0003b9	72 14 			jb	$I2684
+	*** 0003bb	68 00 00 		push	SEG _STR_SPACE
+	*** 0003be	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0003c1	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003c6	1e 			push	ds
+	*** 0003c7	68 00 00 		push	OFFSET DGROUP:$SG2685
+	*** 0003ca	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     gMIMC.bBytePos = 0;
+; Line 342
+					$I2684:
+	*** 0003cf	c6 06 03 00 00 		mov	BYTE PTR _gMIMC+3,0
+;|***                     goto midByteRecBadData;
+; Line 343
+	*** 0003d4	e9 5d 01 		jmp	$midByteRecBadData2686
+;|*** 
+;|***                 case MIDI_COMMON_UNDEFINED_F4:
+;|***                 case MIDI_COMMON_UNDEFINED_F5:
+;|***                 case MIDI_COMMON_TUNE_REQUEST:
+;|***                     D4("common0");
+;|***                     midiCallback( &gMidiInClient, MIM_DATA, (DWORD)bByte, gMIMC.dwMsgTime );
+;|***                     gMIMC.bBytePos = 0;
+;|***                     break;
+;|*** 
+;|***                 case MIDI_COMMON_TCQF:
+;|***                 case MIDI_COMMON_SONG_SELECT:
+;|***                     D4("common1");
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+;|***                     gMIMC.bBytesLeft = 1;
+;|***                     gMIMC.bBytePos = 1;
+;|***                     break;
+;|*** 
+;|***                 case MIDI_COMMON_SONG_POSITION:
+;|***                     D4("common2");
+;|***                     (BYTE)gMIMC.dwShortMsg = bByte;
+;|***                     gMIMC.bBytesLeft = 2;
+;|***                     gMIMC.bBytePos = 1;
+;|***                     break;
+;|*** 
+;|*** #ifdef DEBUG
+;|***                 default:
+;|***                     D1("VERY VERY BAD SYSTEM STATUS MSG!!!");
+;|***                     AssertT( 1 );
+;|***                     break;
+;|*** #endif
+;|***             }
+;|***         }
+;|*** 
+;|***         /* it is a 'channel' voice status byte (0x80 - 0xE0) */
+;|***         else {
+; Line 378
+					$I2675:
+;|***             D4("voice");
+; Line 379
+	*** 0003d7	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 0003dc	72 14 			jb	$I2703
+	*** 0003de	68 00 00 		push	SEG _STR_SPACE
+	*** 0003e1	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0003e4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0003e9	1e 			push	ds
+	*** 0003ea	68 00 00 		push	OFFSET DGROUP:$SG2704
+	*** 0003ed	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* running status applies to channel messages only */
+;|***             gMIMC.bStatus = bByte;
+; Line 382
+					$I2703:
+	*** 0003f2	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 0003f5	a2 01 00 		mov	BYTE PTR _gMIMC+1,al
+;|***             (BYTE)gMIMC.dwShortMsg = bByte;
+; Line 383
+	*** 0003f8	a2 04 00 		mov	BYTE PTR _gMIMC+4,al
+;|***             gMIMC.bBytePos = 1;
+; Line 384
+	*** 0003fb	c6 06 03 00 01 		mov	BYTE PTR _gMIMC+3,1
+;|*** 
+;|*** #ifdef DEBUG
+;|***             /* this cannot happen with the current code logic */
+;|***             if ((bByte < MIDI_STATUS_CHANNEL_FIRST) || (bByte >= MIDI_STATUS_SYSTEM_FIRST)) {
+; Line 388
+	*** 000400	3c 80 			cmp	al,128	;0080H
+	*** 000402	72 17 			jb	$I2706
+	*** 000404	3c f0 			cmp	al,240	;00f0H
+	*** 000406	73 13 			jae	$I2706
+;|***                 D1("VERY VERY BAD CHANNEL STATUS MSG!!!");
+;|***                 AssertT( 1 );
+;|***                 gMIMC.bBytesLeft = 0;
+;|***             }
+;|***             else
+;|*** #endif
+;|***             /* convert channel status byte to number of bytes remaining */
+;|***             gMIMC.bBytesLeft = MSGLENCHANNEL(bByte) - (BYTE)1;
+; Line 396
+	*** 000408	8a d8 			mov	bl,al
+	*** 00040a	c0 eb 04 		shr	bl,4
+	*** 00040d	2a ff 			sub	bh,bh
+	*** 00040f	8a 87 f8 ff 		mov	al,BYTE PTR _gabMsgLenChannel[bx-8]
+	*** 000413	fe c8 			dec	al
+	*** 000415	a2 02 00 		mov	BYTE PTR _gMIMC+2,al
+;|***         }
+;|***     } /* if (bByte == status byte) */
+;|*** 
+;|***     /*  bByte is not a status byte (it is <= 0x7F and is considered a data
+;|***      *  byte).
+;|***      */
+;|***     else {
+; Line 403
+	*** 000418	e9 33 01 		jmp	$EX2660
+;|***             if ((bByte < MIDI_STATUS_CHANNEL_FIRST) || (bByte >= MIDI_STATUS_SYSTEM_FIRST)) {
+; Line 388
+					$I2706:
+;|***                 D1("VERY VERY BAD CHANNEL STATUS MSG!!!");
+; Line 389
+	*** 00041b	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000420	72 14 			jb	$I2707
+	*** 000422	68 00 00 		push	SEG _STR_CRLF
+	*** 000425	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000428	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00042d	1e 			push	ds
+	*** 00042e	68 00 00 		push	OFFSET DGROUP:$SG2708
+	*** 000431	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 AssertT( 1 );
+; Line 390
+					$I2707:
+	*** 000436	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00043b	72 14 			jb	$I2710
+	*** 00043d	68 00 00 		push	SEG _STR_CRLF
+	*** 000440	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000443	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000448	1e 			push	ds
+	*** 000449	68 00 00 		push	OFFSET DGROUP:$SG2711
+	*** 00044c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+					$I2710:
+	*** 000451	9a 00 00 00 00 		call	FAR PTR ASSERTBREAK
+;|***                 gMIMC.bBytesLeft = 0;
+; Line 391
+	*** 000456	c6 06 02 00 00 		mov	BYTE PTR _gMIMC+2,0
+;|***             }
+;|***             else
+; Line 393
+	*** 00045b	e9 f0 00 		jmp	$EX2660
+;|*** #endif
+;|***             /* convert channel status byte to number of bytes remaining */
+;|***             gMIMC.bBytesLeft = MSGLENCHANNEL(bByte) - (BYTE)1;
+;|***         }
+;|***     } /* if (bByte == status byte) */
+;|*** 
+;|***     /*  bByte is not a status byte (it is <= 0x7F and is considered a data
+;|***      *  byte).
+;|***      */
+;|***     else {
+; Line 403
+					$I2666:
+;|***         /* if in SysEx receive mode, then record byte in long message */
+;|***         if ( gMIMC.fSysEx ) {
+; Line 405
+	*** 00045e	80 3e 00 00 00 		cmp	BYTE PTR _gMIMC,0
+	*** 000463	74 21 			je	$I2714
+;|***             D4("sx");
+; Line 406
+	*** 000465	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 00046a	73 03 			jae	$JCC1130
+	*** 00046c	e9 a4 fe 		jmp	$L2861
+					$JCC1130:
+	*** 00046f	68 00 00 		push	SEG _STR_SPACE
+	*** 000472	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000475	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00047a	1e 			push	ds
+	*** 00047b	68 00 00 		push	OFFSET DGROUP:$SG2716
+	*** 00047e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* write in long message buffer */
+;|***             midBufferWrite( bByte );
+; Line 409
+	*** 000483	e9 8d fe 		jmp	$L2861
+					$I2714:
+	*** 000486	80 3e 03 00 00 		cmp	BYTE PTR _gMIMC+3,0
+	*** 00048b	75 03 			jne	$JCC1163
+	*** 00048d	e9 89 00 		jmp	$I2718
+					$JCC1163:
+;|***         }
+;|*** 
+;|***         /* else if it's an expected data byte for a short message */
+;|***         else if ( gMIMC.bBytePos != 0 ) {
+;|***             D4("data");
+; Line 414
+	*** 000490	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000495	72 14 			jb	$I2719
+	*** 000497	68 00 00 		push	SEG _STR_SPACE
+	*** 00049a	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00049d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0004a2	1e 			push	ds
+	*** 0004a3	68 00 00 		push	OFFSET DGROUP:$SG2720
+	*** 0004a6	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* if running status */
+;|***             if ( gMIMC.bStatus && (gMIMC.bBytePos == 1) ) {
+; Line 417
+					$I2719:
+	*** 0004ab	80 3e 01 00 00 		cmp	BYTE PTR _gMIMC+1,0
+	*** 0004b0	74 1a 			je	$I2721
+	*** 0004b2	80 3e 03 00 01 		cmp	BYTE PTR _gMIMC+3,1
+	*** 0004b7	75 13 			jne	$I2721
+;|***                 /* setup for next short message */
+;|***                 (BYTE)gMIMC.dwShortMsg = gMIMC.bStatus;
+; Line 419
+	*** 0004b9	a0 01 00 		mov	al,BYTE PTR _gMIMC+1
+	*** 0004bc	a2 04 00 		mov	BYTE PTR _gMIMC+4,al
+;|***                 gMIMC.dwMsgTime = dwCurTime;
+; Line 420
+	*** 0004bf	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;dwCurTime
+	*** 0004c2	8b 56 fe 		mov	dx,WORD PTR [bp-2]
+	*** 0004c5	a3 08 00 		mov	WORD PTR _gMIMC+8,ax
+	*** 0004c8	89 16 0a 00 		mov	WORD PTR _gMIMC+10,dx
+;|***             }
+;|*** 
+;|***             /*** not portable! (like most of the code) ***/
+;|***             ((LPBYTE)&gMIMC.dwShortMsg)[ gMIMC.bBytePos++ ] = bByte;
+; Line 424
+					$I2721:
+	*** 0004cc	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 0004cf	8a 1e 03 00 		mov	bl,BYTE PTR _gMIMC+3
+	*** 0004d3	2a ff 			sub	bh,bh
+	*** 0004d5	88 87 04 00 		mov	BYTE PTR _gMIMC[bx+4],al
+	*** 0004d9	fe 06 03 00 		inc	BYTE PTR _gMIMC+3
+;|*** 
+;|***             if ( --(gMIMC.bBytesLeft) == 0 ) {
+; Line 426
+	*** 0004dd	fe 0e 02 00 		dec	BYTE PTR _gMIMC+2
+	*** 0004e1	75 6b 			jne	$EX2660
+;|***                 midiCallback( &gMidiInClient, MIM_DATA, gMIMC.dwShortMsg, gMIMC.dwMsgTime );
+; Line 427
+	*** 0004e3	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 0004e6	68 c3 03 		push	963	;03c3H
+	*** 0004e9	ff 36 06 00 		push	WORD PTR _gMIMC+6
+	*** 0004ed	ff 36 04 00 		push	WORD PTR _gMIMC+4
+	*** 0004f1	ff 36 0a 00 		push	WORD PTR _gMIMC+10
+	*** 0004f5	ff 36 08 00 		push	WORD PTR _gMIMC+8
+	*** 0004f9	0e 			push	cs
+	*** 0004fa	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|***                 gMIMC.dwShortMsg = 0L;
+; Line 428
+	*** 0004fd	2b c0 			sub	ax,ax
+	*** 0004ff	a3 06 00 		mov	WORD PTR _gMIMC+6,ax
+	*** 000502	a3 04 00 		mov	WORD PTR _gMIMC+4,ax
+;|*** 
+;|***                 if ( gMIMC.bStatus ) {
+; Line 430
+	*** 000505	38 06 01 00 		cmp	BYTE PTR _gMIMC+1,al
+	*** 000509	75 03 			jne	$JCC1289
+	*** 00050b	e9 9e fe 		jmp	$L2863
+					$JCC1289:
+;|***                     gMIMC.bBytesLeft = gMIMC.bBytePos - (BYTE)1;
+; Line 431
+	*** 00050e	a0 03 00 		mov	al,BYTE PTR _gMIMC+3
+	*** 000511	fe c8 			dec	al
+	*** 000513	a2 02 00 		mov	BYTE PTR _gMIMC+2,al
+	*** 000516	e9 56 fe 		jmp	$L2862
+					$I2718:
+;|***                     gMIMC.bBytePos = 1;
+;|***                 }
+;|*** 
+;|***                 else
+;|***                     gMIMC.bBytePos = 0;
+;|***             }
+;|***         }
+;|*** 
+;|***         else {
+;|***             D2("baddata");
+; Line 441
+	*** 000519	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 00051e	72 14 			jb	$midByteRecBadData2686
+	*** 000520	68 00 00 		push	SEG _STR_SPACE
+	*** 000523	68 00 00 		push	OFFSET _STR_SPACE
+	*** 000526	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00052b	1e 			push	ds
+	*** 00052c	68 00 00 		push	OFFSET DGROUP:$SG2727
+	*** 00052f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|*** midByteRecBadData:
+; Line 443
+					$midByteRecBadData2686:
+;|***             midiCallback( &gMidiInClient, MIM_ERROR, (DWORD)bByte, gMIMC.dwMsgTime );
+; Line 444
+	*** 000534	68 00 00 		push	OFFSET DGROUP:_gMidiInClient
+	*** 000537	68 c5 03 		push	965	;03c5H
+	*** 00053a	8a 46 04 		mov	al,BYTE PTR [bp+4]	;bByte
+	*** 00053d	2a e4 			sub	ah,ah
+	*** 00053f	6a 00 			push	0
+	*** 000541	50 			push	ax
+	*** 000542	ff 36 0a 00 		push	WORD PTR _gMIMC+10
+	*** 000546	ff 36 08 00 		push	WORD PTR _gMIMC+8
+					$L2860:
+	*** 00054a	0e 			push	cs
+	*** 00054b	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|***         }
+;|***     }
+;|*** }
+; Line 447
+					$EX2660:
+	*** 00054e	c9 			leave	
+	*** 00054f	c2 02 00 		ret	2
+
+MIDBYTEREC	ENDP
+	PUBLIC	MODSENDDATA
+MODSENDDATA	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | modSendData | This function sends RAW MIDI data; keeping
+;|***  *      track of the running status correctly.
+;|***  *
+;|***  * @rdesc The is no return value.
+;|***  *
+;|***  * @comm 
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL modSendData( HPSTR lpBuf, DWORD dwLength )
+;|*** {
+; Line 460
+	*** 000552	c8 02 00 00 		enter	2,0
+;	lpBuf = 8
+;	dwLength = 4
+;	bByte = -1
+;|*** BYTE    bByte;
+;|*** 
+;|***     while ( dwLength-- ) {
+; Line 463
+					$FC2736:
+	*** 000556	8b 46 04 		mov	ax,WORD PTR [bp+4]	;dwLength
+	*** 000559	8b 56 06 		mov	dx,WORD PTR [bp+6]
+	*** 00055c	83 6e 04 01 		sub	WORD PTR [bp+4],1	;dwLength
+	*** 000560	83 5e 06 00 		sbb	WORD PTR [bp+6],0
+	*** 000564	0b d0 			or	dx,ax
+	*** 000566	74 50 			je	$EX2733
+;|***         bByte = *lpBuf++;
+;|*** 
+;|***         if ( (bByte >= MIDI_STATUS_FIRST) && (bByte < MIDI_RTIME_TIMING_CLOCK) )
+; Line 466
+	*** 000568	c4 5e 08 		les	bx,DWORD PTR [bp+8]	;lpBuf
+	*** 00056b	83 46 08 01 		add	WORD PTR [bp+8],1	;lpBuf
+	*** 00056f	73 05 			jae	$L2848
+	*** 000571	81 46 0a 00 00 		add	WORD PTR [bp+10],OFFSET __AHINCR
+					$L2848:
+	*** 000576	26 8a 07 		mov	al,BYTE PTR es:[bx]
+	*** 000579	88 46 ff 		mov	BYTE PTR [bp-1],al	;bByte
+	*** 00057c	3c 80 			cmp	al,128	;0080H
+	*** 00057e	72 15 			jb	$I2738
+	*** 000580	3c f8 			cmp	al,248	;00f8H
+	*** 000582	73 11 			jae	$I2738
+;|***         {
+;|***             gbMidiOutCurrentStatus = (BYTE)((bByte < MIDI_STATUS_SYSTEM_FIRST) ? bByte : 0);
+; Line 468
+	*** 000584	3c f0 			cmp	al,240	;00f0H
+	*** 000586	72 07 			jb	$L2845
+	*** 000588	c6 06 00 00 00 		mov	BYTE PTR _gbMidiOutCurrentStatus,0
+	*** 00058d	eb 06 			jmp	SHORT $I2738
+					$L2845:
+	*** 00058f	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bByte
+	*** 000592	a2 00 00 		mov	BYTE PTR _gbMidiOutCurrentStatus,al
+;|***         }
+;|*** 
+;|*** #ifdef DEBUG
+;|***         if ( modDataWrite( bByte ) )
+; Line 472
+					$I2738:
+	*** 000595	8a 46 ff 		mov	al,BYTE PTR [bp-1]	;bByte
+	*** 000598	50 			push	ax
+	*** 000599	e8 00 00 		call	MODDATAWRITE
+	*** 00059c	0b c0 			or	ax,ax
+	*** 00059e	74 0c 			je	$I2739
+;|***             gdwDebugMODWriteErrors++;
+; Line 473
+	*** 0005a0	83 06 00 00 01 		add	WORD PTR _gdwDebugMODWriteErrors,1
+	*** 0005a5	83 16 02 00 00 		adc	WORD PTR _gdwDebugMODWriteErrors+2,0
+;|***         else
+; Line 474
+	*** 0005aa	eb aa 			jmp	SHORT $FC2736
+					$I2739:
+;|***             gdwDebugMODataWrites++;
+; Line 475
+	*** 0005ac	83 06 00 00 01 		add	WORD PTR _gdwDebugMODataWrites,1
+	*** 0005b1	83 16 02 00 00 		adc	WORD PTR _gdwDebugMODataWrites+2,0
+;|*** #else
+;|***         modDataWrite( bByte );
+;|*** #endif
+;|***     }
+; Line 479
+	*** 0005b6	eb 9e 			jmp	SHORT $FC2736
+;|*** }
+; Line 480
+					$EX2733:
+	*** 0005b8	c9 			leave	
+	*** 0005b9	c2 08 00 		ret	8
+
+MODSENDDATA	ENDP
+	PUBLIC	MODSENDLONGDATA
+MODSENDLONGDATA	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | modSendLongData | This function sends a long message.
+;|***  *
+;|***  * @rdesc The return value is an error code (0L if success).
+;|***  ***************************************************************************/
+;|*** static DWORD NEAR PASCAL modSendLongData( LPMIDIHDR lpHdr )
+;|*** {
+; Line 490
+	*** 0005bc	55 			push	bp
+	*** 0005bd	8b ec 			mov	bp,sp
+	*** 0005bf	56 			push	si
+;	lpHdr = 4
+	*** 0005c0	8b 76 04 		mov	si,WORD PTR [bp+4]	;lpHdr
+;|***     D( gdwDebugMOLongMsgs++ );
+; Line 491
+	*** 0005c3	83 06 00 00 01 		add	WORD PTR _gdwDebugMOLongMsgs,1
+	*** 0005c8	83 16 02 00 00 		adc	WORD PTR _gdwDebugMOLongMsgs+2,0
+;|*** 
+;|***     /*  Check if it's been prepared.  NOTE: this check is ONLY necessary
+;|***      *  for compatibility with V1.0 of MMSYSTEM.  All later versions of
+;|***      *  MMSYSTEM validate this flag before the driver is called.
+;|***      */
+;|***     if ( lpHdr->dwFlags & MHDR_PREPARED ) {
+; Line 497
+	*** 0005cd	8e 46 06 		mov	es,WORD PTR [bp+6]
+	*** 0005d0	26 f6 44 10 02 		test	BYTE PTR es:[si+16],2
+	*** 0005d5	74 2e 			je	$I2745
+;|***         /*  NOTE: clearing the DONE bit or setting the INQUEUE bit
+;|***          *  isn't necessary here since this function is synchronous -
+;|***          *  the client will not get control back until it's done.
+;|***          */
+;|***         modSendData( lpHdr->lpData, lpHdr->dwBufferLength );
+; Line 502
+	*** 0005d7	26 ff 74 02 		push	WORD PTR es:[si+2]
+	*** 0005db	26 ff 34 		push	WORD PTR es:[si]
+	*** 0005de	26 ff 74 06 		push	WORD PTR es:[si+6]
+	*** 0005e2	26 ff 74 04 		push	WORD PTR es:[si+4]
+	*** 0005e6	e8 69 ff 		call	MODSENDDATA
+;|*** 
+;|***         /* set the done bit */
+;|***         lpHdr->dwFlags |= MHDR_DONE;
+; Line 505
+	*** 0005e9	8e 46 06 		mov	es,WORD PTR [bp+6]
+	*** 0005ec	26 80 4c 10 01 		or	BYTE PTR es:[si+16],1
+;|*** 
+;|***         /* notify client */
+;|***         midiCallback(&gMidiOutClient, MOM_DONE, (DWORD)lpHdr, 0L);
+; Line 508
+	*** 0005f1	68 00 00 		push	OFFSET DGROUP:_gMidiOutClient
+	*** 0005f4	68 c9 03 		push	969	;03c9H
+	*** 0005f7	06 			push	es
+	*** 0005f8	56 			push	si
+	*** 0005f9	6a 00 			push	0
+	*** 0005fb	6a 00 			push	0
+	*** 0005fd	0e 			push	cs
+	*** 0005fe	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|***         return 0L;
+; Line 509
+	*** 000601	33 c0 			xor	ax,ax
+	*** 000603	eb 03 			jmp	SHORT $L2864
+;|***     }
+;|*** 
+;|***     /* oops! */
+;|***     else
+; Line 513
+					$I2745:
+;|***         return MIDIERR_UNPREPARED;
+; Line 514
+	*** 000605	b8 40 00 		mov	ax,64	;0040H
+					$L2864:
+	*** 000608	33 d2 			xor	dx,dx
+;|*** }
+; Line 515
+	*** 00060a	5e 			pop	si
+	*** 00060b	c9 			leave	
+	*** 00060c	c2 04 00 		ret	4
+	*** 00060f	90 			nop	
+
+MODSENDLONGDATA	ENDP
+	PUBLIC	MODSENDSHORTMSG
+MODSENDSHORTMSG	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | modSendShortMsg | This function sends a short message.
+;|***  *
+;|***  * @rdesc The return value is the number of bytes transmitted.
+;|***  ***************************************************************************/
+;|*** static BYTE NEAR PASCAL modSendShortMsg( DWORD dwShortMsg )
+;|*** {
+; Line 525
+	*** 000610	c8 02 00 00 		enter	2,0
+;	bLength = -2
+;	dwShortMsg = 4
+;	bByte = -1
+;|*** BYTE    bByte   = (BYTE)dwShortMsg;
+;|*** BYTE    bLength;
+;|*** 
+;|***     /* if the short msg starts with a status msg, compute length */
+;|***     if ( bByte >= MIDI_STATUS_FIRST ) {
+; Line 530
+	*** 000614	8a 46 04 		mov	al,BYTE PTR [bp+4]	;dwShortMsg
+	*** 000617	88 46 ff 		mov	BYTE PTR [bp-1],al	;bByte
+	*** 00061a	3c 80 			cmp	al,128	;0080H
+	*** 00061c	72 2c 			jb	$I2753
+;|***         bLength = (bByte < MIDI_STATUS_SYSTEM_FIRST) ? MSGLENCHANNEL(bByte) : MSGLENSYSTEM(bByte);
+; Line 531
+	*** 00061e	3c f0 			cmp	al,240	;00f0H
+	*** 000620	72 0d 			jb	$L2850
+	*** 000622	8a d8 			mov	bl,al
+	*** 000624	80 c3 10 		add	bl,16	;0010H
+	*** 000627	2a ff 			sub	bh,bh
+	*** 000629	8a 87 00 00 		mov	al,BYTE PTR _gabMsgLenSystem[bx]
+	*** 00062d	eb 0c 			jmp	SHORT $L2865
+					$L2850:
+	*** 00062f	8a 5e ff 		mov	bl,BYTE PTR [bp-1]	;bByte
+	*** 000632	c0 eb 04 		shr	bl,4
+	*** 000635	2a ff 			sub	bh,bh
+	*** 000637	8a 87 f8 ff 		mov	al,BYTE PTR _gabMsgLenChannel[bx-8]
+					$L2865:
+	*** 00063b	88 46 fe 		mov	BYTE PTR [bp-2],al	;bLength
+;|***         D( gdwDebugMOShortMsgs++ );
+; Line 532
+	*** 00063e	83 06 00 00 01 		add	WORD PTR _gdwDebugMOShortMsgs,1
+	*** 000643	83 16 02 00 00 		adc	WORD PTR _gdwDebugMOShortMsgs+2,0
+;|***     }
+;|*** 
+;|***     /* use previous running status length */
+;|***     else if ( !gbMidiOutCurrentStatus ) {
+; Line 536
+	*** 000648	eb 31 			jmp	SHORT $I2754
+					$I2753:
+	*** 00064a	80 3e 00 00 00 		cmp	BYTE PTR _gbMidiOutCurrentStatus,0
+	*** 00064f	75 0e 			jne	$I2755
+;|***         D( gdwDebugMOShortMsgsBogus++ );
+; Line 537
+	*** 000651	83 06 00 00 01 		add	WORD PTR _gdwDebugMOShortMsgsBogus,1
+	*** 000656	83 16 02 00 00 		adc	WORD PTR _gdwDebugMOShortMsgsBogus+2,0
+;|***         return 0;
+; Line 538
+	*** 00065b	32 c0 			xor	al,al
+	*** 00065d	eb 2f 			jmp	SHORT $EX2750
+;|***     }
+;|*** 
+;|***     /* subtract one because we don't have a status byte */
+;|***     else {
+; Line 542
+					$I2755:
+;|***         bLength = MSGLENCHANNEL(gbMidiOutCurrentStatus) - (BYTE)1;
+; Line 543
+	*** 00065f	8a 1e 00 00 		mov	bl,BYTE PTR _gbMidiOutCurrentStatus
+	*** 000663	c0 eb 04 		shr	bl,4
+	*** 000666	2a ff 			sub	bh,bh
+	*** 000668	8a 87 f8 ff 		mov	al,BYTE PTR _gabMsgLenChannel[bx-8]
+	*** 00066c	fe c8 			dec	al
+	*** 00066e	88 46 fe 		mov	BYTE PTR [bp-2],al	;bLength
+;|***         D( gdwDebugMOShortMsgsRS++ );
+; Line 544
+	*** 000671	83 06 00 00 01 		add	WORD PTR _gdwDebugMOShortMsgsRS,1
+	*** 000676	83 16 02 00 00 		adc	WORD PTR _gdwDebugMOShortMsgsRS+2,0
+;|***     }
+; Line 545
+					$I2754:
+;|*** 
+;|***     /* send the data */
+;|***     modSendData( (HPSTR)&dwShortMsg, bLength );
+; Line 548
+	*** 00067b	8d 46 04 		lea	ax,WORD PTR [bp+4]	;dwShortMsg
+	*** 00067e	16 			push	ss
+	*** 00067f	50 			push	ax
+	*** 000680	8a 46 fe 		mov	al,BYTE PTR [bp-2]	;bLength
+	*** 000683	2a e4 			sub	ah,ah
+	*** 000685	6a 00 			push	0
+	*** 000687	50 			push	ax
+	*** 000688	e8 c7 fe 		call	MODSENDDATA
+;|*** 
+;|***     /* return number of bytes sent */
+;|***     return ( bLength );
+; Line 551
+	*** 00068b	8a 46 fe 		mov	al,BYTE PTR [bp-2]	;bLength
+;|*** }
+; Line 552
+					$EX2750:
+	*** 00068e	c9 			leave	
+	*** 00068f	c2 04 00 		ret	4
+
+MODSENDSHORTMSG	ENDP
+	PUBLIC	MODRESET
+MODRESET	PROC NEAR
+;|*** 
+;|*** /****************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api void | modReset | This function turns all notes OFF.
+;|***  *
+;|***  * @rdesc There is no return value.
+;|***  ***************************************************************************/
+;|*** static void NEAR PASCAL modReset( void )
+;|*** {
+; Line 562
+	*** 000692	c8 04 00 00 		enter	4,0
+	*** 000696	57 			push	di
+	*** 000697	56 			push	si
+;	i = -2
+;	register si = j
+;	wOldDebugLevel = -4
+	*** 000698	8b 1e 00 00 		mov	bx,WORD PTR _wDebugLevel
+;|*** WORD    i, j;
+;|*** 
+;|*** #ifdef DEBUG
+;|***     WORD wOldDebugLevel = wDebugLevel;
+;|*** 
+;|***     /* for normal debugging, don't flood output with note off msgs! */
+;|***     if ( (wDebugLevel > 2) && (wDebugLevel < 5) )
+; Line 569
+	*** 00069c	89 5e fc 		mov	WORD PTR [bp-4],bx	;wOldDebugLevel
+	*** 00069f	83 fb 02 		cmp	bx,2
+	*** 0006a2	76 08 			jbe	$I2762
+	*** 0006a4	83 fb 05 		cmp	bx,5
+	*** 0006a7	73 03 			jae	$I2762
+;|***         wDebugLevel = 2;
+; Line 570
+	*** 0006a9	bb 02 00 		mov	bx,2
+;|*** #endif
+;|*** 
+;|***     D2("modresetBEGIN");
+; Line 573
+					$I2762:
+	*** 0006ac	89 1e 00 00 		mov	WORD PTR _wDebugLevel,bx
+	*** 0006b0	83 fb 02 		cmp	bx,2
+	*** 0006b3	72 14 			jb	$I2763
+	*** 0006b5	68 00 00 		push	SEG _STR_SPACE
+	*** 0006b8	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0006bb	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0006c0	1e 			push	ds
+	*** 0006c1	68 00 00 		push	OFFSET DGROUP:$SG2764
+	*** 0006c4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***     /*  !!! this is not recommended by midi spec !!!
+;|***      *  send a note off to each key on each channel
+;|***      */
+;|***     for ( i = 0; i < 16; i++ ) {
+; Line 578
+					$I2763:
+	*** 0006c9	33 ff 			xor	di,di
+					$F2765:
+;|***         /* turn off damper pedal (sustain) */
+;|***         modSendShortMsg( (WORD)0x40B0 | i );
+; Line 580
+	*** 0006cb	8b c7 			mov	ax,di
+	*** 0006cd	0d b0 40 		or	ax,16560	;40b0H
+	*** 0006d0	6a 00 			push	0
+	*** 0006d2	50 			push	ax
+	*** 0006d3	e8 3a ff 		call	MODSENDSHORTMSG
+;|*** 
+;|***         /* prime the running status for 'Note Off' events */
+;|***         modSendShortMsg( 0x00400080 | i );
+; Line 583
+	*** 0006d6	8b c7 			mov	ax,di
+	*** 0006d8	2b d2 			sub	dx,dx
+	*** 0006da	0c 80 			or	al,128	;0080H
+	*** 0006dc	b2 40 			mov	dl,64	;0040H
+	*** 0006de	52 			push	dx
+	*** 0006df	50 			push	ax
+	*** 0006e0	e8 2d ff 		call	MODSENDSHORTMSG
+;|*** 
+;|***         /* using running status, send 'Note Off's on all patches */
+;|***         for ( j = 1; j < 128; j++ )
+; Line 586
+	*** 0006e3	be 01 00 		mov	si,1
+					$F2768:
+;|***             modSendShortMsg( ((WORD)0x4000 | j) );
+; Line 587
+	*** 0006e6	8b c6 			mov	ax,si
+	*** 0006e8	80 cc 40 		or	ah,64	;0040H
+	*** 0006eb	6a 00 			push	0
+	*** 0006ed	50 			push	ax
+	*** 0006ee	e8 1f ff 		call	MODSENDSHORTMSG
+	*** 0006f1	46 			inc	si
+	*** 0006f2	81 fe 80 00 		cmp	si,128	;0080H
+	*** 0006f6	72 ee 			jb	$F2768
+;|***     for ( i = 0; i < 16; i++ ) {
+; Line 578
+	*** 0006f8	47 			inc	di
+	*** 0006f9	83 ff 10 		cmp	di,16	;0010H
+	*** 0006fc	72 cd 			jb	$F2765
+;|***         /* turn off damper pedal (sustain) */
+;|***         modSendShortMsg( (WORD)0x40B0 | i );
+;|*** 
+;|***         /* prime the running status for 'Note Off' events */
+;|***         modSendShortMsg( 0x00400080 | i );
+;|*** 
+;|***         /* using running status, send 'Note Off's on all patches */
+;|***         for ( j = 1; j < 128; j++ )
+;|***             modSendShortMsg( ((WORD)0x4000 | j) );
+;|***     }
+;|*** 
+;|***     D2("modresetEND");
+; Line 590
+	*** 0006fe	83 3e 00 00 02 		cmp	WORD PTR _wDebugLevel,2
+	*** 000703	72 14 			jb	$I2771
+	*** 000705	68 00 00 		push	SEG _STR_SPACE
+	*** 000708	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00070b	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000710	1e 			push	ds
+	*** 000711	68 00 00 		push	OFFSET DGROUP:$SG2772
+	*** 000714	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|*** #ifdef DEBUG
+;|***     wDebugLevel = wOldDebugLevel;
+; Line 593
+					$I2771:
+	*** 000719	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;wOldDebugLevel
+	*** 00071c	a3 00 00 		mov	WORD PTR _wDebugLevel,ax
+;|*** 
+;|***     gdwDebugMODWriteErrors  = 0;
+; Line 595
+	*** 00071f	2b c0 			sub	ax,ax
+	*** 000721	a3 02 00 		mov	WORD PTR _gdwDebugMODWriteErrors+2,ax
+	*** 000724	a3 00 00 		mov	WORD PTR _gdwDebugMODWriteErrors,ax
+;|***     gdwDebugMODataWrites    = 0;
+; Line 596
+	*** 000727	a3 02 00 		mov	WORD PTR _gdwDebugMODataWrites+2,ax
+	*** 00072a	a3 00 00 		mov	WORD PTR _gdwDebugMODataWrites,ax
+;|***     gdwDebugMOShortMsgs     = 0;
+; Line 597
+	*** 00072d	a3 02 00 		mov	WORD PTR _gdwDebugMOShortMsgs+2,ax
+	*** 000730	a3 00 00 		mov	WORD PTR _gdwDebugMOShortMsgs,ax
+;|***     gdwDebugMOShortMsgsRS   = 0;
+; Line 598
+	*** 000733	a3 02 00 		mov	WORD PTR _gdwDebugMOShortMsgsRS+2,ax
+	*** 000736	a3 00 00 		mov	WORD PTR _gdwDebugMOShortMsgsRS,ax
+;|***     gdwDebugMOShortMsgsBogus= 0;
+; Line 599
+	*** 000739	a3 02 00 		mov	WORD PTR _gdwDebugMOShortMsgsBogus+2,ax
+	*** 00073c	a3 00 00 		mov	WORD PTR _gdwDebugMOShortMsgsBogus,ax
+;|***     gdwDebugMOLongMsgs      = 0;
+; Line 600
+	*** 00073f	a3 02 00 		mov	WORD PTR _gdwDebugMOLongMsgs+2,ax
+	*** 000742	a3 00 00 		mov	WORD PTR _gdwDebugMOLongMsgs,ax
+;|*** 
+;|***     gdwDebugMIBytesRcvd     = 0;
+; Line 602
+	*** 000745	a3 02 00 		mov	WORD PTR _gdwDebugMIBytesRcvd+2,ax
+	*** 000748	a3 00 00 		mov	WORD PTR _gdwDebugMIBytesRcvd,ax
+;|***     gdwDebugMIShortMsgsRcvd = 0;
+; Line 603
+	*** 00074b	a3 02 00 		mov	WORD PTR _gdwDebugMIShortMsgsRcvd+2,ax
+	*** 00074e	a3 00 00 		mov	WORD PTR _gdwDebugMIShortMsgsRcvd,ax
+;|***     gdwDebugMILongMsgsRcvd  = 0;
+; Line 604
+	*** 000751	a3 02 00 		mov	WORD PTR _gdwDebugMILongMsgsRcvd+2,ax
+	*** 000754	a3 00 00 		mov	WORD PTR _gdwDebugMILongMsgsRcvd,ax
+;|***     gwDebugMILongErrors     = 0;
+;|***     gwDebugMIShortErrors    = 0;
+; Line 606
+	*** 000757	a3 00 00 		mov	WORD PTR _gwDebugMILongErrors,ax
+	*** 00075a	a3 00 00 		mov	WORD PTR _gwDebugMIShortErrors,ax
+;|*** 
+;|***     gdwDebugMidiDrvCallbacks= 0;
+; Line 608
+	*** 00075d	a3 02 00 		mov	WORD PTR _gdwDebugMidiDrvCallbacks+2,ax
+	*** 000760	a3 00 00 		mov	WORD PTR _gdwDebugMidiDrvCallbacks,ax
+;|*** #endif
+;|*** 
+;|***     /* !!! reset running status */
+;|***     gbMidiOutCurrentStatus = 0;
+; Line 612
+	*** 000763	a2 00 00 		mov	BYTE PTR _gbMidiOutCurrentStatus,al
+;|*** }
+; Line 613
+	*** 000766	5e 			pop	si
+	*** 000767	5f 			pop	di
+	*** 000768	c9 			leave	
+	*** 000769	c3 			ret	
+
+MODRESET	ENDP
+	PUBLIC	MODMESSAGE
+MODMESSAGE	PROC FAR
+;|*** 
+;|*** /****************************************************************************
+;|*** 
+;|***     This function conforms to the standard MIDI output driver message proc
+;|*** 
+;|***  ***************************************************************************/
+;|*** DWORD FAR PASCAL _loadds modMessage(WORD id, UINT msg, DWORD dwUser, DWORD dwParam1, DWORD dwParam2)
+;|*** {
+; Line 621
+	*** 00076a	c8 04 00 00 		enter	4,0
+	*** 00076e	56 			push	si
+	*** 00076f	1e 			push	ds
+	*** 000770	b8 00 00 		mov	ax,DGROUP
+	*** 000773	8e d8 			mov	ds,ax
+	ASSUME DS: DGROUP
+;	id = 20
+;	msg = 18
+;	dwUser = 14
+;	dwParam1 = 10
+;	dwParam2 = 6
+;	wMidiOutEntered = -2
+;	dwReturn = -4
+;|*** static WORD wMidiOutEntered = 0;        /* reentrancy check */
+; Line 622
+	*** 000775	c7 46 fe 00 00 		mov	WORD PTR [bp-2],0	;wMidiOutEntered
+;|*** DWORD       dwReturn;
+;|*** 
+;|***     if ( !gfEnabled ) {
+; Line 625
+	*** 00077a	80 3e 00 00 00 		cmp	BYTE PTR _gfEnabled,0
+	*** 00077f	75 58 			jne	$I2786
+	*** 000781	8b 76 12 		mov	si,WORD PTR [bp+18]	;msg
+;|***         if ( msg == MODM_INIT ) {
+; Line 626
+	*** 000784	83 fe 64 		cmp	si,100	;0064H
+	*** 000787	75 22 			jne	$I2787
+;|***             D1("MODM_INIT");
+; Line 627
+	*** 000789	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00078e	72 14 			jb	$I2788
+	*** 000790	68 00 00 		push	SEG _STR_CRLF
+	*** 000793	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000796	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00079b	1e 			push	ds
+	*** 00079c	68 00 00 		push	OFFSET DGROUP:$SG2789
+	*** 00079f	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             InitDisplayConfigErrors();
+; Line 628
+					$I2788:
+	*** 0007a4	9a 00 00 00 00 		call	FAR PTR INITDISPLAYCONFIGERRORS
+;|***             return 0L;
+; Line 629
+	*** 0007a9	eb 20 			jmp	SHORT $L2869
+;|***         }
+;|*** 
+;|***         D1("modMessage called while disabled");
+; Line 632
+					$I2787:
+	*** 0007ab	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0007b0	72 14 			jb	$I2790
+	*** 0007b2	68 00 00 		push	SEG _STR_CRLF
+	*** 0007b5	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0007b8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0007bd	1e 			push	ds
+	*** 0007be	68 00 00 		push	OFFSET DGROUP:$SG2791
+	*** 0007c1	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return ( (msg == MODM_GETNUMDEVS) ? 0L : MMSYSERR_NOTENABLED );
+; Line 633
+					$I2790:
+	*** 0007c6	83 fe 01 		cmp	si,1
+	*** 0007c9	75 07 			jne	$L2857
+					$L2869:
+	*** 0007cb	33 c0 			xor	ax,ax
+					$L2868:
+	*** 0007cd	33 d2 			xor	dx,dx
+	*** 0007cf	e9 7c 02 		jmp	$EX2783
+					$L2857:
+	*** 0007d2	b8 03 00 		mov	ax,3
+	*** 0007d5	99 			cwd	
+	*** 0007d6	e9 75 02 		jmp	$EX2783
+;|***     }
+;|*** 
+;|***     /* this driver only supports one device */
+;|***     if ( id != 0 ) {
+; Line 637
+					$I2786:
+	*** 0007d9	83 7e 14 00 		cmp	WORD PTR [bp+20],0	;id
+	*** 0007dd	74 20 			je	$I2792
+;|***         D1("invalid midi device id");
+; Line 638
+	*** 0007df	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0007e4	72 14 			jb	$I2793
+	*** 0007e6	68 00 00 		push	SEG _STR_CRLF
+	*** 0007e9	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0007ec	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0007f1	1e 			push	ds
+	*** 0007f2	68 00 00 		push	OFFSET DGROUP:$SG2794
+	*** 0007f5	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***         return MMSYSERR_BADDEVICEID;
+; Line 639
+					$I2793:
+	*** 0007fa	b8 02 00 		mov	ax,2
+	*** 0007fd	eb ce 			jmp	SHORT $L2868
+;|***     }
+;|*** 
+;|***     switch ( msg ) {
+; Line 642
+					$I2792:
+	*** 0007ff	8b 46 12 		mov	ax,WORD PTR [bp+18]	;msg
+;|***         case MODM_GETNUMDEVS:
+;|***             D1("MODM_GETNUMDEVS");
+;|***             return 1L;
+;|*** 
+;|***         case MODM_GETDEVCAPS:
+;|***             D1("MODM_GETDEVCAPS");
+;|***             modGetDevCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+;|***             return 0L;
+;|*** 
+;|***         case MODM_OPEN:
+;|***             D1("MODM_OPEN");
+;|*** 
+;|***             /* now attempt to 'acquire' the MIDI output hardware */
+;|***             if ( modAcquireHardware() ) {
+;|***                 D1("MIDI output hardware is unavailable!");
+;|***                 return MMSYSERR_ALLOCATED;
+;|***             }
+;|*** 
+;|***             /* save client information */
+;|***             gMidiOutClient.dwCallback = ((LPMIDIOPENDESC)dwParam1)->dwCallback;
+;|***             gMidiOutClient.dwInstance = ((LPMIDIOPENDESC)dwParam1)->dwInstance;
+;|***             gMidiOutClient.hMidi      = ((LPMIDIOPENDESC)dwParam1)->hMidi;
+;|***             gMidiOutClient.dwFlags    = dwParam2;
+;|*** 
+;|***             /* !!! reset running status */
+;|***             gbMidiOutCurrentStatus = 0;
+;|***             
+;|***             /* notify client */
+;|***             midiCallback(&gMidiOutClient, MOM_OPEN, 0L, 0L);
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case MODM_CLOSE:
+;|***             D1("MODM_CLOSE");
+;|*** 
+;|***             /* notify client */
+;|***             midiCallback(&gMidiOutClient, MOM_CLOSE, 0L, 0L);
+;|*** 
+;|***             /* now 'release' the MIDI output hardware */
+;|***             if ( modReleaseHardware() ) {
+;|***                 D1("MIDI output hardware could NOT be released!");
+;|***             }
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case MODM_RESET:
+;|***             D1("MODM_RESET");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_DATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     /* turn all notes off */
+;|***                     modReset();
+;|***                     dwReturn = 0L;
+;|***                 }
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         case MODM_DATA:             /* message is in dwParam1 */
+;|***             D4("MODM_DATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_DATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     modSendShortMsg( dwParam1 );
+;|***                     dwReturn = 0L;
+;|***                 }
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         case MODM_LONGDATA:         /* far pointer to header in dwParam1 */
+;|***             D4("MODM_LONGDATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_LONGDATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else
+;|***                     dwReturn = modSendLongData( (LPMIDIHDR)dwParam1 );
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+; Line 746
+	*** 000802	48 			dec	ax
+	*** 000803	3d 08 00 		cmp	ax,8
+	*** 000806	77 1a 			ja	$SD2838
+	*** 000808	03 c0 			add	ax,ax
+	*** 00080a	93 			xchg	ax,bx
+	*** 00080b	2e ff a7 00 00 		jmp	WORD PTR cs:$L2859[bx]
+					$L2859:
+	*** 000810	00 00 				DW	$SC2799
+	*** 000812	00 00 				DW	$SC2802
+	*** 000814	00 00 				DW	$SC2805
+	*** 000816	00 00 				DW	$SC2811
+	*** 000818	00 00 				DW	$SD2838
+	*** 00081a	00 00 				DW	$SD2838
+	*** 00081c	00 00 				DW	$SC2824
+	*** 00081e	00 00 				DW	$SC2831
+	*** 000820	00 00 				DW	$SC2817
+;|***         default:
+; Line 744
+					$SD2838:
+;|***             return MMSYSERR_NOTSUPPORTED;
+; Line 745
+	*** 000822	b8 08 00 		mov	ax,8
+	*** 000825	eb a6 			jmp	SHORT $L2868
+;|***         case MODM_GETNUMDEVS:
+; Line 643
+					$SC2799:
+;|***             D1("MODM_GETNUMDEVS");
+; Line 644
+	*** 000827	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00082c	72 14 			jb	$I2800
+	*** 00082e	68 00 00 		push	SEG _STR_CRLF
+	*** 000831	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000834	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000839	1e 			push	ds
+	*** 00083a	68 00 00 		push	OFFSET DGROUP:$SG2801
+	*** 00083d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             return 1L;
+; Line 645
+					$I2800:
+	*** 000842	b8 01 00 		mov	ax,1
+	*** 000845	eb 86 			jmp	SHORT $L2868
+;|*** 
+;|***         case MODM_GETDEVCAPS:
+; Line 647
+					$SC2802:
+;|***             D1("MODM_GETDEVCAPS");
+; Line 648
+	*** 000847	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00084c	72 14 			jb	$I2803
+	*** 00084e	68 00 00 		push	SEG _STR_CRLF
+	*** 000851	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000854	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000859	1e 			push	ds
+	*** 00085a	68 00 00 		push	OFFSET DGROUP:$SG2804
+	*** 00085d	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             modGetDevCaps((LPBYTE)dwParam1, (WORD)dwParam2);
+; Line 649
+					$I2803:
+	*** 000862	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 000865	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 000868	ff 76 06 		push	WORD PTR [bp+6]	;dwParam2
+	*** 00086b	9a 00 00 00 00 		call	FAR PTR MODGETDEVCAPS
+	*** 000870	e9 58 ff 		jmp	$L2869
+;|***             return 0L;
+;|*** 
+;|***         case MODM_OPEN:
+; Line 652
+					$SC2805:
+;|***             D1("MODM_OPEN");
+; Line 653
+	*** 000873	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000878	72 14 			jb	$I2806
+	*** 00087a	68 00 00 		push	SEG _STR_CRLF
+	*** 00087d	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000880	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000885	1e 			push	ds
+	*** 000886	68 00 00 		push	OFFSET DGROUP:$SG2807
+	*** 000889	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* now attempt to 'acquire' the MIDI output hardware */
+;|***             if ( modAcquireHardware() ) {
+; Line 656
+					$I2806:
+	*** 00088e	9a 00 00 00 00 		call	FAR PTR MODACQUIREHARDWARE
+	*** 000893	0b c0 			or	ax,ax
+	*** 000895	74 21 			je	$I2808
+;|***                 D1("MIDI output hardware is unavailable!");
+; Line 657
+	*** 000897	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00089c	72 14 			jb	$I2809
+	*** 00089e	68 00 00 		push	SEG _STR_CRLF
+	*** 0008a1	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0008a4	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0008a9	1e 			push	ds
+	*** 0008aa	68 00 00 		push	OFFSET DGROUP:$SG2810
+	*** 0008ad	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                 return MMSYSERR_ALLOCATED;
+; Line 658
+					$I2809:
+	*** 0008b2	b8 04 00 		mov	ax,4
+	*** 0008b5	e9 15 ff 		jmp	$L2868
+;|***             }
+;|*** 
+;|***             /* save client information */
+;|***             gMidiOutClient.dwCallback = ((LPMIDIOPENDESC)dwParam1)->dwCallback;
+; Line 662
+					$I2808:
+	*** 0008b8	c4 5e 0a 		les	bx,DWORD PTR [bp+10]	;dwParam1
+	*** 0008bb	26 8b 47 02 		mov	ax,WORD PTR es:[bx+2]
+	*** 0008bf	26 8b 57 04 		mov	dx,WORD PTR es:[bx+4]
+	*** 0008c3	a3 00 00 		mov	WORD PTR _gMidiOutClient,ax
+	*** 0008c6	89 16 02 00 		mov	WORD PTR _gMidiOutClient+2,dx
+;|***             gMidiOutClient.dwInstance = ((LPMIDIOPENDESC)dwParam1)->dwInstance;
+; Line 663
+	*** 0008ca	26 8b 47 06 		mov	ax,WORD PTR es:[bx+6]
+	*** 0008ce	26 8b 57 08 		mov	dx,WORD PTR es:[bx+8]
+	*** 0008d2	a3 04 00 		mov	WORD PTR _gMidiOutClient+4,ax
+	*** 0008d5	89 16 06 00 		mov	WORD PTR _gMidiOutClient+6,dx
+;|***             gMidiOutClient.hMidi      = ((LPMIDIOPENDESC)dwParam1)->hMidi;
+; Line 664
+	*** 0008d9	26 8b 07 		mov	ax,WORD PTR es:[bx]
+	*** 0008dc	a3 08 00 		mov	WORD PTR _gMidiOutClient+8,ax
+;|***             gMidiOutClient.dwFlags    = dwParam2;
+; Line 665
+	*** 0008df	8b 46 06 		mov	ax,WORD PTR [bp+6]	;dwParam2
+	*** 0008e2	8b 56 08 		mov	dx,WORD PTR [bp+8]
+	*** 0008e5	a3 0a 00 		mov	WORD PTR _gMidiOutClient+10,ax
+	*** 0008e8	89 16 0c 00 		mov	WORD PTR _gMidiOutClient+12,dx
+;|*** 
+;|***             /* !!! reset running status */
+;|***             gbMidiOutCurrentStatus = 0;
+; Line 668
+	*** 0008ec	c6 06 00 00 00 		mov	BYTE PTR _gbMidiOutCurrentStatus,0
+;|***             
+;|***             /* notify client */
+;|***             midiCallback(&gMidiOutClient, MOM_OPEN, 0L, 0L);
+; Line 671
+	*** 0008f1	68 00 00 		push	OFFSET DGROUP:_gMidiOutClient
+	*** 0008f4	68 c7 03 		push	967	;03c7H
+	*** 0008f7	6a 00 			push	0
+	*** 0008f9	6a 00 			push	0
+	*** 0008fb	6a 00 			push	0
+	*** 0008fd	6a 00 			push	0
+	*** 0008ff	0e 			push	cs
+	*** 000900	e8 00 00 		call	NEAR PTR MIDICALLBACK
+	*** 000903	e9 c5 fe 		jmp	$L2869
+;|*** 
+;|***             return 0L;
+;|*** 
+;|***         case MODM_CLOSE:
+; Line 675
+					$SC2811:
+;|***             D1("MODM_CLOSE");
+; Line 676
+	*** 000906	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00090b	72 14 			jb	$I2812
+	*** 00090d	68 00 00 		push	SEG _STR_CRLF
+	*** 000910	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000913	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000918	1e 			push	ds
+	*** 000919	68 00 00 		push	OFFSET DGROUP:$SG2813
+	*** 00091c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* notify client */
+;|***             midiCallback(&gMidiOutClient, MOM_CLOSE, 0L, 0L);
+; Line 679
+					$I2812:
+	*** 000921	68 00 00 		push	OFFSET DGROUP:_gMidiOutClient
+	*** 000924	68 c8 03 		push	968	;03c8H
+	*** 000927	6a 00 			push	0
+	*** 000929	6a 00 			push	0
+	*** 00092b	6a 00 			push	0
+	*** 00092d	6a 00 			push	0
+	*** 00092f	0e 			push	cs
+	*** 000930	e8 00 00 		call	NEAR PTR MIDICALLBACK
+;|*** 
+;|***             /* now 'release' the MIDI output hardware */
+;|***             if ( modReleaseHardware() ) {
+; Line 682
+	*** 000933	9a 00 00 00 00 		call	FAR PTR MODRELEASEHARDWARE
+	*** 000938	0b c0 			or	ax,ax
+	*** 00093a	74 07 			je	$L2874
+;|***                 D1("MIDI output hardware could NOT be released!");
+; Line 683
+	*** 00093c	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000941	73 03 			jae	$L2873
+					$L2874:
+	*** 000943	e9 85 fe 		jmp	$L2869
+					$L2873:
+	*** 000946	68 00 00 		push	SEG _STR_CRLF
+	*** 000949	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00094c	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000951	1e 			push	ds
+	*** 000952	68 00 00 		push	OFFSET DGROUP:$SG2816
+	*** 000955	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             }
+;|*** 
+;|***             return 0L;
+; Line 686
+	*** 00095a	e9 6e fe 		jmp	$L2869
+;|*** 
+;|***         case MODM_RESET:
+;|***             D1("MODM_RESET");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_DATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     /* turn all notes off */
+;|***                     modReset();
+;|***                     dwReturn = 0L;
+;|***                 }
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         case MODM_DATA:             /* message is in dwParam1 */
+; Line 708
+					$SC2824:
+;|***             D4("MODM_DATA");
+; Line 709
+	*** 00095d	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 000962	72 14 			jb	$I2825
+	*** 000964	68 00 00 		push	SEG _STR_SPACE
+	*** 000967	68 00 00 		push	OFFSET _STR_SPACE
+	*** 00096a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00096f	1e 			push	ds
+	*** 000970	68 00 00 		push	OFFSET DGROUP:$SG2826
+	*** 000973	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+; Line 712
+					$I2825:
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+; Line 714
+	*** 000978	b8 01 00 		mov	ax,1
+	*** 00097b	89 46 fe 		mov	WORD PTR [bp-2],ax	;wMidiOutEntered
+	*** 00097e	48 			dec	ax
+	*** 00097f	74 18 			je	$I2827
+;|***                     D1("MODM_DATA reentered!");
+; Line 715
+	*** 000981	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000986	72 5c 			jb	$I2835
+	*** 000988	68 00 00 		push	SEG _STR_CRLF
+	*** 00098b	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00098e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000993	1e 			push	ds
+	*** 000994	68 00 00 		push	OFFSET DGROUP:$SG2829
+	*** 000997	eb 46 			jmp	SHORT $L2872
+					$I2827:
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     modSendShortMsg( dwParam1 );
+; Line 720
+	*** 000999	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 00099c	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 00099f	e8 6e fc 		call	MODSENDSHORTMSG
+	*** 0009a2	e9 9b 00 		jmp	$L2871
+;|***                     dwReturn = 0L;
+;|***                 }
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         case MODM_LONGDATA:         /* far pointer to header in dwParam1 */
+; Line 727
+					$SC2831:
+;|***             D4("MODM_LONGDATA");
+; Line 728
+	*** 0009a5	83 3e 00 00 04 		cmp	WORD PTR _wDebugLevel,4
+	*** 0009aa	72 14 			jb	$I2832
+	*** 0009ac	68 00 00 		push	SEG _STR_SPACE
+	*** 0009af	68 00 00 		push	OFFSET _STR_SPACE
+	*** 0009b2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0009b7	1e 			push	ds
+	*** 0009b8	68 00 00 		push	OFFSET DGROUP:$SG2833
+	*** 0009bb	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+; Line 731
+					$I2832:
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+; Line 733
+	*** 0009c0	b8 01 00 		mov	ax,1
+	*** 0009c3	89 46 fe 		mov	WORD PTR [bp-2],ax	;wMidiOutEntered
+	*** 0009c6	48 			dec	ax
+	*** 0009c7	74 27 			je	$I2834
+;|***                     D1("MODM_LONGDATA reentered!");
+; Line 734
+	*** 0009c9	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0009ce	72 14 			jb	$I2835
+	*** 0009d0	68 00 00 		push	SEG _STR_CRLF
+	*** 0009d3	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0009d6	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0009db	1e 			push	ds
+	*** 0009dc	68 00 00 		push	OFFSET DGROUP:$SG2836
+					$L2872:
+	*** 0009df	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***                     dwReturn = MIDIERR_NOTREADY;
+; Line 735
+					$I2835:
+	*** 0009e4	c7 46 fc 43 00 		mov	WORD PTR [bp-4],67	;0043H	;dwReturn
+	*** 0009e9	c7 46 fe 00 00 		mov	WORD PTR [bp-2],0	;wMidiOutEntered
+;|***                 }
+;|*** 
+;|***                 else
+; Line 738
+	*** 0009ee	eb 58 			jmp	SHORT $I2823
+					$I2834:
+;|***                     dwReturn = modSendLongData( (LPMIDIHDR)dwParam1 );
+; Line 739
+	*** 0009f0	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 0009f3	ff 76 0a 		push	WORD PTR [bp+10]	;dwParam1
+	*** 0009f6	e8 c3 fb 		call	MODSENDLONGDATA
+	*** 0009f9	89 46 fc 		mov	WORD PTR [bp-4],ax	;dwReturn
+	*** 0009fc	89 56 fe 		mov	WORD PTR [bp-2],dx	;wMidiOutEntered
+	*** 0009ff	eb 47 			jmp	SHORT $I2823
+;|***         case MODM_RESET:
+; Line 688
+					$SC2817:
+;|***             D1("MODM_RESET");
+; Line 689
+	*** 000a01	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000a06	72 14 			jb	$I2818
+	*** 000a08	68 00 00 		push	SEG _STR_CRLF
+	*** 000a0b	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000a0e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000a13	1e 			push	ds
+	*** 000a14	68 00 00 		push	OFFSET DGROUP:$SG2819
+	*** 000a17	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+; Line 692
+					$I2818:
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+; Line 694
+	*** 000a1c	b8 01 00 		mov	ax,1
+	*** 000a1f	89 46 fe 		mov	WORD PTR [bp-2],ax	;wMidiOutEntered
+	*** 000a22	48 			dec	ax
+	*** 000a23	74 18 			je	$I2820
+;|***                     D1("MODM_DATA reentered!");
+; Line 695
+	*** 000a25	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000a2a	72 b8 			jb	$I2835
+	*** 000a2c	68 00 00 		push	SEG _STR_CRLF
+	*** 000a2f	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000a32	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000a37	1e 			push	ds
+	*** 000a38	68 00 00 		push	OFFSET DGROUP:$SG2822
+	*** 000a3b	eb a2 			jmp	SHORT $L2872
+					$I2820:
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     /* turn all notes off */
+;|***                     modReset();
+; Line 701
+	*** 000a3d	e8 52 fc 		call	MODRESET
+;|***                     dwReturn = 0L;
+; Line 702
+					$L2871:
+	*** 000a40	2b c0 			sub	ax,ax
+	*** 000a42	89 46 fe 		mov	WORD PTR [bp-2],ax	;wMidiOutEntered
+	*** 000a45	89 46 fc 		mov	WORD PTR [bp-4],ax	;dwReturn
+;|***                 }
+; Line 703
+					$I2823:
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+; Line 706
+	*** 000a48	8b 46 fc 		mov	ax,WORD PTR [bp-4]	;dwReturn
+	*** 000a4b	8b 56 fe 		mov	dx,WORD PTR [bp-2]	;wMidiOutEntered
+;|*** 
+;|***         case MODM_DATA:             /* message is in dwParam1 */
+;|***             D4("MODM_DATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_DATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else {
+;|***                     modSendShortMsg( dwParam1 );
+;|***                     dwReturn = 0L;
+;|***                 }
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         case MODM_LONGDATA:         /* far pointer to header in dwParam1 */
+;|***             D4("MODM_LONGDATA");
+;|*** 
+;|***             /* make sure we're not being reentered */
+;|***             wMidiOutEntered++;
+;|***             {
+;|***                 if ( wMidiOutEntered != 1 ) {
+;|***                     D1("MODM_LONGDATA reentered!");
+;|***                     dwReturn = MIDIERR_NOTREADY;
+;|***                 }
+;|*** 
+;|***                 else
+;|***                     dwReturn = modSendLongData( (LPMIDIHDR)dwParam1 );
+;|***             }
+;|***             wMidiOutEntered--;
+;|***             return ( dwReturn );
+;|*** 
+;|***         default:
+;|***             return MMSYSERR_NOTSUPPORTED;
+;|***     }
+;|*** 
+;|***     /* should never get here */
+;|***     AssertF(0);
+;|***     return MMSYSERR_NOTSUPPORTED;
+;|*** }
+; Line 751
+					$EX2783:
+	*** 000a4e	1f 			pop	ds
+	*** 000a4f	5e 			pop	si
+	*** 000a50	c9 			leave	
+	*** 000a51	ca 10 00 		ret	16	;00000010H
+	*** 000a54	90 			nop	
+	*** 000a55	90 			nop	
+
+MODMESSAGE	ENDP
+_TEXT	ENDS
+END

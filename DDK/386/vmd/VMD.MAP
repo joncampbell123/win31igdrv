@@ -1,0 +1,103 @@
+
+ VMD
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000C24H _LTEXT                 CODE 32-bit
+ 0001:00000C24 0000002FCH _LDATA                 CODE 32-bit
+ 0002:00000000 0000002ACH _ITEXT                 ICODE 32-bit
+ 0002:000002AC 00000003FH _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000042H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000E68 VMD_DDB                 VMD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000E64       $VMD_Get_Mouse_Owner
+ 0001:00000E5C       $VMD_Get_Version
+ 0001:00000E60       $VMD_Set_Mouse_Type
+ 0001:00000B9C       @VMD_Get_Mouse_Owner
+ 0001:00000A71       @VMD_Get_Version
+ 0001:00000A92       @VMD_Set_Mouse_Type
+ 0002:000001A5       Get_Mouse_Instance
+ 0002:000002D6       I33_Hard_Init_INI
+ 0001:0000082F       I33_Map_Get_Buff_Size
+ 0001:00000731       I33_Map_Ptr_Shape
+ 0001:000008F9       I33_Map_Restore_State
+ 0001:0000085E       I33_Map_Save_State
+ 0001:0000077A       I33_Map_Set_Handler
+ 0001:00000711       I33_Reflect_to_V86
+ 0002:000002C8       I33_Soft_Init_INI
+ 0001:000007BE       I33_V86_Call_Back
+ 0001:00000055       Int33_API
+ 0001:00000496       Int33_Begin_Message_Mode
+ 0001:00000000       Int33_Create_VM
+ 0002:00000000       Int33_Critical_Init
+ 0001:000004B0       Int33_End_Message_Mode
+ 0001:000000D7       Int33_Event_Call_Back
+ 0002:0000004C       Int33_Init
+ 0001:0000068B       Int33_Pmode_Mapper
+ 0001:00000214       Int33_Smart_Int
+ 0001:0000035C       Int33_Soft_Int
+ 0001:000004DB       Int33_Update_Event
+ 0001:00000437       Int33_Update_State
+ 0001:000002A8       Int33_VM_Init
+ 0001:00000BB7       VMD_API_Proc
+ 0001:00000994       VMD_Control
+ 0001:00000E68       VMD_DDB
+ 0002:00000298       VMD_Device_Init
+ 0001:00000C10       VMD_EOI
+ 0001:00000BFC       VMD_Hw_Int
+ 0001:00000EA4       VMD_Owner
+ 0001:000009DF       VMD_Set_Focus
+
+  Address         Publics by Value
+
+ 0001:00000000       Int33_Create_VM
+ 0001:00000055       Int33_API
+ 0001:000000D7       Int33_Event_Call_Back
+ 0001:00000214       Int33_Smart_Int
+ 0001:000002A8       Int33_VM_Init
+ 0001:0000035C       Int33_Soft_Int
+ 0001:00000437       Int33_Update_State
+ 0001:00000496       Int33_Begin_Message_Mode
+ 0001:000004B0       Int33_End_Message_Mode
+ 0001:000004DB       Int33_Update_Event
+ 0001:0000068B       Int33_Pmode_Mapper
+ 0001:00000711       I33_Reflect_to_V86
+ 0001:00000731       I33_Map_Ptr_Shape
+ 0001:0000077A       I33_Map_Set_Handler
+ 0001:000007BE       I33_V86_Call_Back
+ 0001:0000082F       I33_Map_Get_Buff_Size
+ 0001:0000085E       I33_Map_Save_State
+ 0001:000008F9       I33_Map_Restore_State
+ 0001:00000994       VMD_Control
+ 0001:000009DF       VMD_Set_Focus
+ 0001:00000A71       @VMD_Get_Version
+ 0001:00000A92       @VMD_Set_Mouse_Type
+ 0001:00000B9C       @VMD_Get_Mouse_Owner
+ 0001:00000BB7       VMD_API_Proc
+ 0001:00000BFC       VMD_Hw_Int
+ 0001:00000C10       VMD_EOI
+ 0001:00000E5C       $VMD_Get_Version
+ 0001:00000E60       $VMD_Set_Mouse_Type
+ 0001:00000E64       $VMD_Get_Mouse_Owner
+ 0001:00000E68       VMD_DDB
+ 0001:00000EA4       VMD_Owner
+ 0002:00000000       Int33_Critical_Init
+ 0002:0000004C       Int33_Init
+ 0002:000001A5       Get_Mouse_Instance
+ 0002:00000298       VMD_Device_Init
+ 0002:000002C8       I33_Soft_Init_INI
+ 0002:000002D6       I33_Hard_Init_INI
+
+Program entry point at 0003:0000

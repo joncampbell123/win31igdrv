@@ -1,0 +1,840 @@
+;	Static Name Aliases
+;
+	TITLE   drvproc.c
+	.286p
+	.287
+INCLUDELIB      MLIBCE
+INCLUDELIB	OLDNAMES.LIB
+COMMON	SEGMENT  WORD PUBLIC 'CODE'
+COMMON	ENDS
+_DATA	SEGMENT  WORD PUBLIC 'DATA'
+_DATA	ENDS
+CONST	SEGMENT  WORD PUBLIC 'CONST'
+CONST	ENDS
+_BSS	SEGMENT  WORD PUBLIC 'BSS'
+_BSS	ENDS
+$$SYMBOLS	SEGMENT  BYTE PUBLIC 'DEBSYM'
+$$SYMBOLS	ENDS
+$$TYPES	SEGMENT  BYTE PUBLIC 'DEBTYP'
+$$TYPES	ENDS
+DGROUP	GROUP	CONST, _BSS, _DATA
+	ASSUME DS: DGROUP
+	ASSUME  SS: NOTHING
+EXTRN	CONFIG:FAR
+EXTRN	ENABLE:FAR
+EXTRN	CONFIGREMOVE:FAR
+EXTRN	DISABLE:FAR
+EXTRN	OUTPUTDEBUGSTR:FAR
+EXTRN	DEFDRIVERPROC:FAR
+EXTRN	_wDebugLevel:WORD
+EXTRN	_STR_CRLF:BYTE
+EXTRN	_ghModule:WORD
+_DATA      SEGMENT
+$SG2523	DB	'DRV_LOAD',  00H
+$SG2526	DB	'DRV_FREE',  00H
+$SG2529	DB	'DRV_OPEN',  00H
+$SG2532	DB	'DRV_CLOSE',  00H
+$SG2535	DB	'DRV_ENABLE',  00H
+$SG2538	DB	'DRV_DISABLE',  00H
+$SG2541	DB	'DRV_QUERYCONFIGURE',  00H
+$SG2544	DB	'DRV_CONFIGURE',  00H
+$SG2547	DB	'DRV_INSTALL',  00H
+$SG2550	DB	'DRV_REMOVE',  00H
+_DATA      ENDS
+COMMON      SEGMENT
+	ASSUME	CS: COMMON
+	PUBLIC	DRIVERPROC
+DRIVERPROC	PROC FAR
+;|*** /****************************************************************************
+;|***  *
+;|***  *   drvproc.c
+;|***  *
+;|***  *   Copyright (c) 1991-1992 Microsoft Corporation.  All Rights Reserved.
+;|***  *
+;|***  ***************************************************************************/
+;|*** 
+;|*** #include <windows.h>
+;|*** #include <mmsystem.h>
+;|*** #include "sndblst.h"
+;|*** 
+;|*** /***************************************************************************
+;|***  * @doc INTERNAL
+;|***  *
+;|***  * @api LRESULT | DriverProc | The entry point for an installable driver.
+;|***  *                
+;|***  * @parm DWORD | dwDriverId | For most messages, <p dwDriverId> is the DWORD
+;|***  *     value that the driver returns in response to a <m DRV_OPEN> message.
+;|***  *     Each time that the driver is opened, through the <f DrvOpen> API,
+;|***  *     the driver receives a <m DRV_OPEN> message and can return an
+;|***  *     arbitrary, non-zero value. The installable driver interface
+;|***  *     saves this value and returns a unique driver handle to the 
+;|***  *     application. Whenever the application sends a message to the
+;|***  *     driver using the driver handle, the interface routes the message
+;|***  *     to this entry point and passes the corresponding <p dwDriverId>.
+;|***  *     This mechanism allows the driver to use the same or different
+;|***  *     identifiers for multiple opens but ensures that driver handles
+;|***  *     are unique at the application interface layer.
+;|***  *
+;|***  *     The following messages are not related to a particular open
+;|***  *     instance of the driver. For these messages, the dwDriverId
+;|***  *     will always be zero.
+;|***  *
+;|***  *         DRV_LOAD, DRV_FREE, DRV_ENABLE, DRV_DISABLE, DRV_OPEN
+;|***  *
+;|***  * @parm HDRVR | hDriver | This is the handle returned to the
+;|***  *     application by the driver interface.
+;|***  *          
+;|***  * @parm UINT | uiMessage | The requested action to be performed. Message
+;|***  *     values below <m DRV_RESERVED> are used for globally defined messages.
+;|***  *     Message values from <m DRV_RESERVED> to <m DRV_USER> are used for
+;|***  *     defined driver protocols. Messages above <m DRV_USER> are used
+;|***  *     for driver specific messages.
+;|***  *
+;|***  * @parm LPARAM | lParam1 | Data for this message.  Defined separately for
+;|***  *     each message
+;|***  *
+;|***  * @parm LPARAM | lParam2 | Data for this message.  Defined separately for
+;|***  *     each message
+;|***  *
+;|***  * @rdesc Defined separately for each message. 
+;|***  ***************************************************************************/
+;|*** LRESULT FAR PASCAL _loadds DriverProc(DWORD dwDriverID, HDRVR hDriver, UINT uiMessage, LPARAM lParam1, LPARAM lParam2)
+;|*** {
+; Line 55
+	*** 000000	55 			push	bp
+	*** 000001	8b ec 			mov	bp,sp
+	*** 000003	1e 			push	ds
+	*** 000004	b8 00 00 		mov	ax,DGROUP
+	*** 000007	8e d8 			mov	ds,ax
+	ASSUME DS: DGROUP
+;	dwDriverID = 18
+;	hDriver = 16
+;	uiMessage = 14
+;	lParam1 = 10
+;	lParam2 = 6
+	*** 000009	8b 4e 0e 		mov	cx,WORD PTR [bp+14]	;uiMessage
+;|***     switch (uiMessage) {
+; Line 56
+	*** 00000c	8b c1 			mov	ax,cx
+;|***         case DRV_LOAD:
+;|***             D1("DRV_LOAD");
+;|*** 
+;|***             /*
+;|***                Sent to the driver when it is loaded. Always the first
+;|***                message received by a driver.
+;|*** 
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return 0L to fail the load.
+;|*** 
+;|***                DefDriverProc will return NON-ZERO so we don't have to
+;|***                handle DRV_LOAD
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_FREE:
+;|***             D1("DRV_FREE");
+;|*** 
+;|***             /*
+;|***                Sent to the driver when it is about to be discarded. This
+;|***                will always be the last message received by a driver before
+;|***                it is freed. 
+;|*** 
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_OPEN:
+;|***             D1("DRV_OPEN");
+;|***              
+;|***             /*
+;|***                Sent to the driver when it is opened. 
+;|*** 
+;|***                dwDriverID is 0L.
+;|***                
+;|***                lParam1 is a far pointer to a zero-terminated string
+;|***                containing the name used to open the driver.
+;|***                
+;|***                lParam2 is passed through from the drvOpen call.
+;|***                 
+;|***                Return 0L to fail the open.
+;|***  
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_OPEN message.
+;|***              */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_CLOSE:
+;|***             D1("DRV_CLOSE");
+;|***            
+;|***             /*
+;|***                Sent to the driver when it is closed. Drivers are unloaded
+;|***                when the close count reaches zero. 
+;|*** 
+;|***                dwDriverID is the driver identifier returned from the
+;|***                corresponding DRV_OPEN.
+;|***                
+;|***                lParam1 is passed through from the drvClose call.
+;|*** 
+;|***                lParam2 is passed through from the drvClose call.
+;|***                 
+;|***                Return 0L to fail the close.
+;|*** 
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_CLOSE message.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_ENABLE:
+;|***             D1("DRV_ENABLE");
+;|***  
+;|***             /*
+;|***                Sent to the driver when the driver is loaded or reloaded
+;|***                and whenever Windows is enabled. Drivers should only
+;|***                hook interrupts or expect ANY part of the driver to be in
+;|***                memory between enable and disable messages
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)(Enable() ? 1L : 0L);
+;|*** 
+;|***         case DRV_DISABLE:
+;|***             D1("DRV_DISABLE");
+;|*** 
+;|***             /*
+;|***                Sent to the driver before the driver is freed.
+;|***                and whenever Windows is disabled
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             Disable();
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_QUERYCONFIGURE:
+;|***             D1("DRV_QUERYCONFIGURE");
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that applications can
+;|***                 determine whether the driver supports custom
+;|***                 configuration. The driver should return a
+;|***                 non-zero value to indicate that configuration
+;|***                 is supported.
+;|***                 
+;|***                 dwDriverID is the value returned from the DRV_OPEN
+;|***                 call that must have succeeded before this message
+;|***                 was sent.
+;|***  
+;|***                 lParam1 is passed from the app and is undefined.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return 0L to indicate configuration NOT supported.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;        /* we do configuration */
+;|*** 
+;|***         case DRV_CONFIGURE:
+;|***             D1("DRV_CONFIGURE");
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that it can display a custom
+;|***                 configuration dialog box.
+;|*** 
+;|***                 lParam1 is passed from the app. and should contain
+;|***                 the parent window handle in the loword.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return value is undefined.
+;|*** 
+;|***                 Drivers should create their own section in system.ini.
+;|***                 The section name should be the driver name.
+;|***             */
+;|*** 
+;|***             return (LRESULT)Config(LOWORD(lParam1), ghModule);
+;|*** 
+;|***         case DRV_INSTALL:
+;|***             D1("DRV_INSTALL");
+;|***             return (LRESULT)DRVCNF_RESTART;
+;|*** 
+;|***         case DRV_REMOVE:
+;|***             D1("DRV_REMOVE");
+;|***             ConfigRemove();
+;|***             return (LRESULT)DRVCNF_RESTART;
+;|*** 
+;|***         default:
+;|***             return DefDriverProc(dwDriverID, hDriver,uiMessage,lParam1,lParam2);
+;|***     }                  
+; Line 223
+	*** 00000e	48 			dec	ax
+	*** 00000f	3d 09 00 		cmp	ax,9
+	*** 000012	77 1c 			ja	$SD2551
+	*** 000014	03 c0 			add	ax,ax
+	*** 000016	93 			xchg	ax,bx
+	*** 000017	2e ff a7 00 00 		jmp	WORD PTR cs:$L2554[bx]
+					$L2554:
+	*** 00001c	00 00 				DW	$SC2521
+	*** 00001e	00 00 				DW	$SC2533
+	*** 000020	00 00 				DW	$SC2527
+	*** 000022	00 00 				DW	$SC2530
+	*** 000024	00 00 				DW	$SC2536
+	*** 000026	00 00 				DW	$SC2524
+	*** 000028	00 00 				DW	$SC2542
+	*** 00002a	00 00 				DW	$SC2539
+	*** 00002c	00 00 				DW	$SC2545
+	*** 00002e	00 00 				DW	$SC2548
+;|***         default:
+; Line 221
+					$SD2551:
+;|***             return DefDriverProc(dwDriverID, hDriver,uiMessage,lParam1,lParam2);
+; Line 222
+	*** 000030	ff 76 14 		push	WORD PTR [bp+20]
+	*** 000033	ff 76 12 		push	WORD PTR [bp+18]	;dwDriverID
+	*** 000036	ff 76 10 		push	WORD PTR [bp+16]	;hDriver
+	*** 000039	51 			push	cx
+	*** 00003a	ff 76 0c 		push	WORD PTR [bp+12]
+	*** 00003d	ff 76 0a 		push	WORD PTR [bp+10]	;lParam1
+	*** 000040	ff 76 08 		push	WORD PTR [bp+8]
+	*** 000043	ff 76 06 		push	WORD PTR [bp+6]	;lParam2
+	*** 000046	9a 00 00 00 00 		call	FAR PTR DEFDRIVERPROC
+	*** 00004b	e9 41 01 		jmp	$EX2516
+;|***         case DRV_LOAD:
+; Line 57
+					$SC2521:
+;|***             D1("DRV_LOAD");
+; Line 58
+	*** 00004e	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000053	73 03 			jae	$JCC83
+	*** 000055	e9 f0 00 		jmp	$I2540
+					$JCC83:
+	*** 000058	68 00 00 		push	SEG _STR_CRLF
+	*** 00005b	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00005e	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000063	1e 			push	ds
+	*** 000064	68 00 00 		push	OFFSET DGROUP:$SG2523
+	*** 000067	e9 d9 00 		jmp	$L2560
+;|*** 
+;|***             /*
+;|***                Sent to the driver when it is loaded. Always the first
+;|***                message received by a driver.
+;|*** 
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return 0L to fail the load.
+;|*** 
+;|***                DefDriverProc will return NON-ZERO so we don't have to
+;|***                handle DRV_LOAD
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_FREE:
+;|***             D1("DRV_FREE");
+;|*** 
+;|***             /*
+;|***                Sent to the driver when it is about to be discarded. This
+;|***                will always be the last message received by a driver before
+;|***                it is freed. 
+;|*** 
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_OPEN:
+;|***             D1("DRV_OPEN");
+;|***              
+;|***             /*
+;|***                Sent to the driver when it is opened. 
+;|*** 
+;|***                dwDriverID is 0L.
+;|***                
+;|***                lParam1 is a far pointer to a zero-terminated string
+;|***                containing the name used to open the driver.
+;|***                
+;|***                lParam2 is passed through from the drvOpen call.
+;|***                 
+;|***                Return 0L to fail the open.
+;|***  
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_OPEN message.
+;|***              */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_CLOSE:
+;|***             D1("DRV_CLOSE");
+;|***            
+;|***             /*
+;|***                Sent to the driver when it is closed. Drivers are unloaded
+;|***                when the close count reaches zero. 
+;|*** 
+;|***                dwDriverID is the driver identifier returned from the
+;|***                corresponding DRV_OPEN.
+;|***                
+;|***                lParam1 is passed through from the drvClose call.
+;|*** 
+;|***                lParam2 is passed through from the drvClose call.
+;|***                 
+;|***                Return 0L to fail the close.
+;|*** 
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_CLOSE message.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_ENABLE:
+; Line 136
+					$SC2533:
+;|***             D1("DRV_ENABLE");
+; Line 137
+	*** 00006a	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00006f	72 14 			jb	$I2534
+	*** 000071	68 00 00 		push	SEG _STR_CRLF
+	*** 000074	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000077	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00007c	1e 			push	ds
+	*** 00007d	68 00 00 		push	OFFSET DGROUP:$SG2535
+	*** 000080	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***  
+;|***             /*
+;|***                Sent to the driver when the driver is loaded or reloaded
+;|***                and whenever Windows is enabled. Drivers should only
+;|***                hook interrupts or expect ANY part of the driver to be in
+;|***                memory between enable and disable messages
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)(Enable() ? 1L : 0L);
+; Line 152
+					$I2534:
+	*** 000085	9a 00 00 00 00 		call	FAR PTR ENABLE
+	*** 00008a	0b c0 			or	ax,ax
+	*** 00008c	74 03 			je	$JCC140
+	*** 00008e	e9 b7 00 		jmp	$I2540
+					$JCC140:
+					$L2558:
+	*** 000091	99 			cwd	
+	*** 000092	e9 fa 00 		jmp	$EX2516
+;|***         case DRV_OPEN:
+; Line 93
+					$SC2527:
+;|***             D1("DRV_OPEN");
+; Line 94
+	*** 000095	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00009a	72 19 			jb	$L2562
+	*** 00009c	68 00 00 		push	SEG _STR_CRLF
+	*** 00009f	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0000a2	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000a7	1e 			push	ds
+	*** 0000a8	68 00 00 		push	OFFSET DGROUP:$SG2529
+	*** 0000ab	e9 95 00 		jmp	$L2560
+;|***              
+;|***             /*
+;|***                Sent to the driver when it is opened. 
+;|*** 
+;|***                dwDriverID is 0L.
+;|***                
+;|***                lParam1 is a far pointer to a zero-terminated string
+;|***                containing the name used to open the driver.
+;|***                
+;|***                lParam2 is passed through from the drvOpen call.
+;|***                 
+;|***                Return 0L to fail the open.
+;|***  
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_OPEN message.
+;|***              */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_CLOSE:
+; Line 114
+					$SC2530:
+;|***             D1("DRV_CLOSE");
+; Line 115
+	*** 0000ae	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000b3	73 03 			jae	$L2561
+					$L2562:
+	*** 0000b5	e9 90 00 		jmp	$I2540
+					$L2561:
+	*** 0000b8	68 00 00 		push	SEG _STR_CRLF
+	*** 0000bb	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0000be	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000c3	1e 			push	ds
+	*** 0000c4	68 00 00 		push	OFFSET DGROUP:$SG2532
+	*** 0000c7	eb 7a 			jmp	SHORT $L2560
+;|***            
+;|***             /*
+;|***                Sent to the driver when it is closed. Drivers are unloaded
+;|***                when the close count reaches zero. 
+;|*** 
+;|***                dwDriverID is the driver identifier returned from the
+;|***                corresponding DRV_OPEN.
+;|***                
+;|***                lParam1 is passed through from the drvClose call.
+;|*** 
+;|***                lParam2 is passed through from the drvClose call.
+;|***                 
+;|***                Return 0L to fail the close.
+;|*** 
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_CLOSE message.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_ENABLE:
+;|***             D1("DRV_ENABLE");
+;|***  
+;|***             /*
+;|***                Sent to the driver when the driver is loaded or reloaded
+;|***                and whenever Windows is enabled. Drivers should only
+;|***                hook interrupts or expect ANY part of the driver to be in
+;|***                memory between enable and disable messages
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)(Enable() ? 1L : 0L);
+;|*** 
+;|***         case DRV_DISABLE:
+; Line 154
+					$SC2536:
+;|***             D1("DRV_DISABLE");
+; Line 155
+	*** 0000c9	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000ce	72 14 			jb	$I2537
+	*** 0000d0	68 00 00 		push	SEG _STR_CRLF
+	*** 0000d3	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0000d6	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000db	1e 			push	ds
+	*** 0000dc	68 00 00 		push	OFFSET DGROUP:$SG2538
+	*** 0000df	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /*
+;|***                Sent to the driver before the driver is freed.
+;|***                and whenever Windows is disabled
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             Disable();
+; Line 168
+					$I2537:
+	*** 0000e4	9a 00 00 00 00 		call	FAR PTR DISABLE
+;|***             return (LRESULT)1L;
+; Line 169
+	*** 0000e9	eb 5d 			jmp	SHORT $I2540
+;|***         case DRV_FREE:
+; Line 76
+					$SC2524:
+;|***             D1("DRV_FREE");
+; Line 77
+	*** 0000eb	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 0000f0	72 56 			jb	$I2540
+	*** 0000f2	68 00 00 		push	SEG _STR_CRLF
+	*** 0000f5	68 00 00 		push	OFFSET _STR_CRLF
+	*** 0000f8	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 0000fd	1e 			push	ds
+	*** 0000fe	68 00 00 		push	OFFSET DGROUP:$SG2526
+	*** 000101	eb 40 			jmp	SHORT $L2560
+;|*** 
+;|***             /*
+;|***                Sent to the driver when it is about to be discarded. This
+;|***                will always be the last message received by a driver before
+;|***                it is freed. 
+;|*** 
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_OPEN:
+;|***             D1("DRV_OPEN");
+;|***              
+;|***             /*
+;|***                Sent to the driver when it is opened. 
+;|*** 
+;|***                dwDriverID is 0L.
+;|***                
+;|***                lParam1 is a far pointer to a zero-terminated string
+;|***                containing the name used to open the driver.
+;|***                
+;|***                lParam2 is passed through from the drvOpen call.
+;|***                 
+;|***                Return 0L to fail the open.
+;|***  
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_OPEN message.
+;|***              */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_CLOSE:
+;|***             D1("DRV_CLOSE");
+;|***            
+;|***             /*
+;|***                Sent to the driver when it is closed. Drivers are unloaded
+;|***                when the close count reaches zero. 
+;|*** 
+;|***                dwDriverID is the driver identifier returned from the
+;|***                corresponding DRV_OPEN.
+;|***                
+;|***                lParam1 is passed through from the drvClose call.
+;|*** 
+;|***                lParam2 is passed through from the drvClose call.
+;|***                 
+;|***                Return 0L to fail the close.
+;|*** 
+;|***                DefDriverProc will return ZERO so we do have to
+;|***                handle the DRV_CLOSE message.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_ENABLE:
+;|***             D1("DRV_ENABLE");
+;|***  
+;|***             /*
+;|***                Sent to the driver when the driver is loaded or reloaded
+;|***                and whenever Windows is enabled. Drivers should only
+;|***                hook interrupts or expect ANY part of the driver to be in
+;|***                memory between enable and disable messages
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             return (LRESULT)(Enable() ? 1L : 0L);
+;|*** 
+;|***         case DRV_DISABLE:
+;|***             D1("DRV_DISABLE");
+;|*** 
+;|***             /*
+;|***                Sent to the driver before the driver is freed.
+;|***                and whenever Windows is disabled
+;|***  
+;|***                dwDriverID is 0L. 
+;|***                lParam1 is 0L.
+;|***                lParam2 is 0L.
+;|***                 
+;|***                Return value is ignored.
+;|***             */
+;|*** 
+;|***             Disable();
+;|***             return (LRESULT)1L;
+;|*** 
+;|***         case DRV_QUERYCONFIGURE:
+;|***             D1("DRV_QUERYCONFIGURE");
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that applications can
+;|***                 determine whether the driver supports custom
+;|***                 configuration. The driver should return a
+;|***                 non-zero value to indicate that configuration
+;|***                 is supported.
+;|***                 
+;|***                 dwDriverID is the value returned from the DRV_OPEN
+;|***                 call that must have succeeded before this message
+;|***                 was sent.
+;|***  
+;|***                 lParam1 is passed from the app and is undefined.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return 0L to indicate configuration NOT supported.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;        /* we do configuration */
+;|*** 
+;|***         case DRV_CONFIGURE:
+; Line 193
+					$SC2542:
+;|***             D1("DRV_CONFIGURE");
+; Line 194
+	*** 000103	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000108	72 14 			jb	$I2543
+	*** 00010a	68 00 00 		push	SEG _STR_CRLF
+	*** 00010d	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000110	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 000115	1e 			push	ds
+	*** 000116	68 00 00 		push	OFFSET DGROUP:$SG2544
+	*** 000119	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that it can display a custom
+;|***                 configuration dialog box.
+;|*** 
+;|***                 lParam1 is passed from the app. and should contain
+;|***                 the parent window handle in the loword.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return value is undefined.
+;|*** 
+;|***                 Drivers should create their own section in system.ini.
+;|***                 The section name should be the driver name.
+;|***             */
+;|*** 
+;|***             return (LRESULT)Config(LOWORD(lParam1), ghModule);
+; Line 210
+					$I2543:
+	*** 00011e	ff 76 0a 		push	WORD PTR [bp+10]	;lParam1
+	*** 000121	ff 36 00 00 		push	WORD PTR _ghModule
+	*** 000125	9a 00 00 00 00 		call	FAR PTR CONFIG
+	*** 00012a	e9 64 ff 		jmp	$L2558
+;|***         case DRV_QUERYCONFIGURE:
+; Line 171
+					$SC2539:
+;|***             D1("DRV_QUERYCONFIGURE");
+; Line 172
+	*** 00012d	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000132	72 14 			jb	$I2540
+	*** 000134	68 00 00 		push	SEG _STR_CRLF
+	*** 000137	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00013a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00013f	1e 			push	ds
+	*** 000140	68 00 00 		push	OFFSET DGROUP:$SG2541
+					$L2560:
+	*** 000143	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that applications can
+;|***                 determine whether the driver supports custom
+;|***                 configuration. The driver should return a
+;|***                 non-zero value to indicate that configuration
+;|***                 is supported.
+;|***                 
+;|***                 dwDriverID is the value returned from the DRV_OPEN
+;|***                 call that must have succeeded before this message
+;|***                 was sent.
+;|***  
+;|***                 lParam1 is passed from the app and is undefined.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return 0L to indicate configuration NOT supported.
+;|***             */
+;|*** 
+;|***             return (LRESULT)1L;        /* we do configuration */
+; Line 191
+					$I2540:
+	*** 000148	b8 01 00 		mov	ax,1
+	*** 00014b	eb 40 			jmp	SHORT $L2555
+;|*** 
+;|***         case DRV_CONFIGURE:
+;|***             D1("DRV_CONFIGURE");
+;|*** 
+;|***             /*
+;|***                 Sent to the driver so that it can display a custom
+;|***                 configuration dialog box.
+;|*** 
+;|***                 lParam1 is passed from the app. and should contain
+;|***                 the parent window handle in the loword.
+;|***                 lParam2 is passed from the app and is undefined.
+;|*** 
+;|***                 Return value is undefined.
+;|*** 
+;|***                 Drivers should create their own section in system.ini.
+;|***                 The section name should be the driver name.
+;|***             */
+;|*** 
+;|***             return (LRESULT)Config(LOWORD(lParam1), ghModule);
+;|*** 
+;|***         case DRV_INSTALL:
+; Line 212
+					$SC2545:
+;|***             D1("DRV_INSTALL");
+; Line 213
+	*** 00014d	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 000152	72 36 			jb	$L2559
+	*** 000154	68 00 00 		push	SEG _STR_CRLF
+	*** 000157	68 00 00 		push	OFFSET _STR_CRLF
+	*** 00015a	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00015f	1e 			push	ds
+	*** 000160	68 00 00 		push	OFFSET DGROUP:$SG2547
+	*** 000163	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             return (LRESULT)DRVCNF_RESTART;
+; Line 214
+	*** 000168	eb 20 			jmp	SHORT $L2559
+;|*** 
+;|***         case DRV_REMOVE:
+; Line 216
+					$SC2548:
+;|***             D1("DRV_REMOVE");
+; Line 217
+	*** 00016a	83 3e 00 00 01 		cmp	WORD PTR _wDebugLevel,1
+	*** 00016f	72 14 			jb	$I2549
+	*** 000171	68 00 00 		push	SEG _STR_CRLF
+	*** 000174	68 00 00 		push	OFFSET _STR_CRLF
+	*** 000177	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+	*** 00017c	1e 			push	ds
+	*** 00017d	68 00 00 		push	OFFSET DGROUP:$SG2550
+	*** 000180	9a 00 00 00 00 		call	FAR PTR OUTPUTDEBUGSTR
+;|***             ConfigRemove();
+; Line 218
+					$I2549:
+	*** 000185	9a 00 00 00 00 		call	FAR PTR CONFIGREMOVE
+;|***             return (LRESULT)DRVCNF_RESTART;
+; Line 219
+					$L2559:
+	*** 00018a	b8 02 00 		mov	ax,2
+					$L2555:
+	*** 00018d	33 d2 			xor	dx,dx
+;|*** 
+;|***         default:
+;|***             return DefDriverProc(dwDriverID, hDriver,uiMessage,lParam1,lParam2);
+;|***     }                  
+;|*** }
+; Line 224
+					$EX2516:
+	*** 00018f	1f 			pop	ds
+	*** 000190	c9 			leave	
+	*** 000191	ca 10 00 		ret	16	;00000010H
+
+DRIVERPROC	ENDP
+COMMON	ENDS
+END

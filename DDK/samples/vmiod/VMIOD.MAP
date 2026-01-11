@@ -1,0 +1,39 @@
+
+ VMIOD
+
+ Start         Length     Name                   Class
+ 0001:00000000 0000000ACH _LTEXT                 CODE 32-bit
+ 0001:000000AC 00000018FH _LDATA                 CODE 32-bit
+ 0002:00000000 0000000BCH _ITEXT                 ICODE 32-bit
+ 0002:000000BC 00000000BH _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:000000AC VMIOD_DDB               VMIOD_DDB
+
+  Address         Publics by Name
+
+ 0002:00000071       Mon_Init
+ 0001:00000042       Mon_Out_String
+ 0001:00000000       VMIOD_Control
+ 0001:000000AC       VMIOD_DDB
+ 0002:00000000       VMIOD_Device_Init
+ 0001:00000012       VMIOD_Trap
+
+  Address         Publics by Value
+
+ 0001:00000000       VMIOD_Control
+ 0001:00000012       VMIOD_Trap
+ 0001:00000042       Mon_Out_String
+ 0001:000000AC       VMIOD_DDB
+ 0002:00000000       VMIOD_Device_Init
+ 0002:00000071       Mon_Init

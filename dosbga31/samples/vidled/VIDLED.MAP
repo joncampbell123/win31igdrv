@@ -1,0 +1,35 @@
+
+ VIdleD
+
+ Start         Length     Name                   Class
+ 0001:00000000 00000002DH _LTEXT                 CODE 32-bit
+ 0001:00000030 00000006BH _LDATA                 CODE 32-bit
+ 0002:00000000 000000022H _ITEXT                 ICODE 32-bit
+ 0002:00000024 000000000H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000030 VIdleD_DDB              VIdleD_DDB
+
+  Address         Publics by Name
+
+ 0001:00000000       VIdleD_Control
+ 0001:00000030       VIdleD_DDB
+ 0001:00000012       VIdleD_Idle_Handler
+ 0002:00000000       VIdleD_Sys_Critical_Init
+
+  Address         Publics by Value
+
+ 0001:00000000       VIdleD_Control
+ 0001:00000012       VIdleD_Idle_Handler
+ 0001:00000030       VIdleD_DDB
+ 0002:00000000       VIdleD_Sys_Critical_Init

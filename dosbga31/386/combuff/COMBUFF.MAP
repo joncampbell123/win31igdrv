@@ -1,0 +1,99 @@
+
+ COMBUFF
+
+ Start         Length     Name                   Class
+ 0001:00000000 000000488H _LTEXT                 CODE 32-bit
+ 0001:00000488 000000172H _LDATA                 CODE 32-bit
+ 0002:00000000 00000010AH _ITEXT                 ICODE 32-bit
+ 0002:0000010C 000000020H _IDATA                 ICODE 32-bit
+ 0003:00000000 000000000H _TEXT                  PCODE 32-bit
+ 0003:00000000 000000000H _DATA                  PCODE 32-bit
+ 0003:00000000 000000000H _RCODE                 RCODE 16-bit
+
+ Origin   Group
+ 0002:0   _IGROUP
+ 0001:0   _LGROUP
+ 0003:0   _PGROUP
+ 0000:0   FLAT
+
+ Address       Export                  Alias
+
+ 0001:00000488 COMBUFF_DDB             COMBUFF_DDB
+
+  Address         Publics by Name
+
+ 0001:00000419       COMBuff_Clear_Queue
+ 0001:00000000       COMBuff_Control
+ 0001:00000488       COMBUFF_DDB
+ 0001:0000043E       COMBuff_Debug_Query
+ 0001:00000298       COMBuff_Disable_Trapping
+ 0001:000002B2       COMBuff_Enable_Trapping
+ 0001:00000274       COMBuff_EOI
+ 0001:000003B8       COMBuff_Extract_Queue
+ 0001:00000372       COMBuff_Insert_Queue
+ 0001:000001EC       COMBuff_Int
+ 0001:000000E0       COMBuff_In_IER
+ 0001:0000010D       COMBuff_In_IIR
+ 0001:00000139       COMBuff_In_LCR
+ 0001:0000017C       COMBuff_In_LSR
+ 0001:00000152       COMBuff_In_MCR
+ 0001:000001C6       COMBuff_In_MSR
+ 0001:0000007C       COMBuff_In_RxTxB
+ 0001:00000281       COMBuff_Mask
+ 0001:000000F2       COMBuff_Out_IER
+ 0001:0000012F       COMBuff_Out_IIR
+ 0001:00000145       COMBuff_Out_LCR
+ 0001:000001A4       COMBuff_Out_LSR
+ 0001:0000015E       COMBuff_Out_MCR
+ 0001:000001DB       COMBuff_Out_MSR
+ 0001:000000A0       COMBuff_Out_RxTxB
+ 0001:0000032D       COMBuff_Poll_Status
+ 0002:0000011A       COMBuff_Prot_Ini_Number
+ 0002:00000117       COMBuff_Prot_Ini_String
+ 0002:0000010F       COMBuff_Size_Ini_Number
+ 0002:0000010C       COMBuff_Size_Ini_String
+ 0002:00000000       COMBuff_Sys_Crit_Init
+ 0001:000002E4       COMBuff_Test_Int_Req
+ 0001:0000001C       COMBuff_VCD_Control
+ 0002:00000124       COMBuff_XOFF_String
+ 0002:000000CE       Compare_Strings
+ 0002:000000F9       Force_Upper_Case
+
+  Address         Publics by Value
+
+ 0001:00000000       COMBuff_Control
+ 0001:0000001C       COMBuff_VCD_Control
+ 0001:0000007C       COMBuff_In_RxTxB
+ 0001:000000A0       COMBuff_Out_RxTxB
+ 0001:000000E0       COMBuff_In_IER
+ 0001:000000F2       COMBuff_Out_IER
+ 0001:0000010D       COMBuff_In_IIR
+ 0001:0000012F       COMBuff_Out_IIR
+ 0001:00000139       COMBuff_In_LCR
+ 0001:00000145       COMBuff_Out_LCR
+ 0001:00000152       COMBuff_In_MCR
+ 0001:0000015E       COMBuff_Out_MCR
+ 0001:0000017C       COMBuff_In_LSR
+ 0001:000001A4       COMBuff_Out_LSR
+ 0001:000001C6       COMBuff_In_MSR
+ 0001:000001DB       COMBuff_Out_MSR
+ 0001:000001EC       COMBuff_Int
+ 0001:00000274       COMBuff_EOI
+ 0001:00000281       COMBuff_Mask
+ 0001:00000298       COMBuff_Disable_Trapping
+ 0001:000002B2       COMBuff_Enable_Trapping
+ 0001:000002E4       COMBuff_Test_Int_Req
+ 0001:0000032D       COMBuff_Poll_Status
+ 0001:00000372       COMBuff_Insert_Queue
+ 0001:000003B8       COMBuff_Extract_Queue
+ 0001:00000419       COMBuff_Clear_Queue
+ 0001:0000043E       COMBuff_Debug_Query
+ 0001:00000488       COMBUFF_DDB
+ 0002:00000000       COMBuff_Sys_Crit_Init
+ 0002:000000CE       Compare_Strings
+ 0002:000000F9       Force_Upper_Case
+ 0002:0000010C       COMBuff_Size_Ini_String
+ 0002:0000010F       COMBuff_Size_Ini_Number
+ 0002:00000117       COMBuff_Prot_Ini_String
+ 0002:0000011A       COMBuff_Prot_Ini_Number
+ 0002:00000124       COMBuff_XOFF_String
