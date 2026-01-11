@@ -29,6 +29,7 @@ incDevice = 1				;allow assembly of needed constants
 	.list
 
 	??_out	egainit
+	externW		info_table_base	; type GDIINFO
 	externA		ScreenSelector	; the selector for display memory
 	externFP      	AllocCSToDSAlias; get a data seg alias for CS
 	externFP	FreeSelector	; free a selector
@@ -49,6 +50,9 @@ page
 
 	externW	physical_device
 	externNP dosbox_ig_detect
+	externW info_table_base_dpHorzVertRes
+	externW info_table_base_dpMLoWinMetricRes
+	externW info_table_base_dpMHiWinMetricRes
 
 ;--------------------------Public-Routine-------------------------------;
 ; dev_initialization - device specific initialization
@@ -89,6 +93,11 @@ cBegin
 
 .igok:
 
+	push	es			; save
+	mov	ax,InitSegBASE		; get the CS selector
+	cCall	AllocCSToDSAlias,<ax>	; get a data segment alias
+	mov	es,ax
+
 	; init initial cursor position.
 	; NTS: Not sure about older Windows, but Windows 3.1 appears to call MoveCursor at startup to center the cursor anyway.
 	mov	ax,SCREEN_WIDTH/2
@@ -97,8 +106,23 @@ cBegin
 	mov	ax,SCREEN_HEIGHT/2
 	mov	real_y,ax
 
+	mov	ax,SCREEN_WIDTH
+	mov	es:[physical_device.bmWidth],ax
+	mov	es:WORD PTR [info_table_base_dpHorzVertRes],ax
+	mov	es:[info_table_base_dpMLoWinMetricRes],ax
+	mov	es:WORD PTR [info_table_base_dpMHiWinMetricRes],ax
+
 	mov	ax,SCREEN_HEIGHT
-	mov	physical_device.bmHeight,ax
+	mov	es:[physical_device.bmHeight],ax
+	mov	es:WORD PTR [info_table_base_dpHorzVertRes+2],ax
+
+	neg	ax
+	mov	es:[info_table_base_dpMLoWinMetricRes+2],ax
+	mov	es:WORD PTR [info_table_base_dpMHiWinMetricRes+2],ax
+
+	mov	bx,es
+	cCall	FreeSelector,<bx>	;free the alias
+	pop	es			; restore
 
 	mov	ax,1			;no way to have error
 

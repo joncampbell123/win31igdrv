@@ -365,7 +365,7 @@ SCRSEL		equ	ScreenSelector
 P		equ	 COLOR_FORMAT AND 000FFh	;# color planes
 B		equ	(COLOR_FORMAT AND 0FF00h) SHR 8	;# bits per pixel
 H		equ	0				;new display height
-W		equ	SCREEN_WIDTH			;display width, pels
+W		equ	0				;display width, pels
 WB		equ	SCREEN_W_BYTES			;display width, bytes
 
 physical_device BITMAP <SCRSEL,W,H,WB,P,B,0A0000000H,0,0,0,0,0,0,0>
@@ -377,6 +377,9 @@ physical_device BITMAP <SCRSEL,W,H,WB,P,B,0A0000000H,0,0,0,0,0,0,0>
 ;	mode are passed to GDI via this structure.
 ;-----------------------------------------------------------------------;
 
+public info_table_base_dpHorzVertRes
+public info_table_base_dpMLoWinMetricRes
+public info_table_base_dpMHiWinMetricRes
 
 info_table_base label byte
 
@@ -386,16 +389,17 @@ info_table_base label byte
 	dw	DT_RASDISPLAY		;Device classification
 	errnz	dpTechnology-dpVersion-2
 
-	dw	208 		;Horizontal size in millimeters
+	dw	208 			;Horizontal size in millimeters
 	errnz	dpHorzSize-dpTechnology-2
 
-	dw	156 		;Vertical size in millimeters
+	dw	156 			;Vertical size in millimeters
 	errnz	dpVertSize-dpHorzSize-2
 
-	dw	SCREEN_WIDTH		;Horizontal width in pixels
+info_table_base_dpHorzVertRes:
+	dw	0			;Horizontal width in pixels
 	errnz	dpHorzRes-dpVertSize-2
 
-	dw	SCREEN_HEIGHT		;Vertical width in pixels
+	dw	0			;Vertical width in pixels
 	errnz	dpVertRes-dpHorzRes-2
 
 	dw	1			;Number of bits per pixel
@@ -456,15 +460,17 @@ info_table_base label byte
 	errnz	dpMLoWin-dpStyleLen-2	;Metric  Lo res WinX,WinY,VptX,VptY
 	dw	2080 			;  HorzSize * 10
 	dw	1560 			;  VertSize * 10
-	dw	640			;  HorizRes
-	dw	-480 			;  -VertRes
+info_table_base_dpMLoWinMetricRes:
+	dw	0			;  HorizRes
+	dw	0 			;  -VertRes
 
 
 	errnz	dpMHiWin-dpMLoWin-8	;Metric  Hi res WinX,WinY,VptX,VptY
 	dw	20800			;  HorzSize * 100
 	dw	15600			;  VertSize * 100
-	dw	640			;  HorizRes
-	dw	-480 			;  -VertRes
+info_table_base_dpMHiWinMetricRes:
+	dw	0			;  HorizRes
+	dw	0 			;  -VertRes
 
 
 	errnz	dpELoWin-dpMHiWin-8	;English Lo res WinX,WinY,VptX,VptY
