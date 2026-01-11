@@ -43,7 +43,6 @@ incDevice	= 1
 	.list
 
 
-	externNP dosbox_ig_detect
 	externNP hook_int_2Fh		;Hook into multiplexed interrupt
 	externA  PHYS_DEVICE_SIZE	;Size of physical device
 	externA  ScreenSelector		;selector for video buffer
@@ -54,9 +53,6 @@ InitFlag_OK				equ	1 SHL 0
 InitFlag_Checked			equ	1 SHL 1
 
 sBegin	Data
-
-	public InitFlags
-	InitFlags			db	0
 
 	externW ssb_mask		;Mask for save save screen bitmap bit
 
@@ -169,24 +165,6 @@ cBegin
 
 ;----------------------------------------------------------------------------;
 	push	ds
-	mov	ax,seg InitFlags
-	mov	ds,ax
-	mov	al,InitFlags
-	test	al,InitFlag_OK
-	jnz	.init_pass
-	test	al,InitFlag_Checked
-	jnz	.init_fail
-	or	InitFlags,InitFlag_Checked
-	call	dosbox_ig_detect
-	jc	.init_fail
-	or	InitFlags,InitFlag_OK
-	jmp	.init_pass
-.init_fail:
-	pop	ds
-	xor	ax,ax
-	ret
-.init_pass:
-
 	mov	ax,cs			;Set up ds=cs
 	mov	ds,ax
 	assumes ds,InitSeg

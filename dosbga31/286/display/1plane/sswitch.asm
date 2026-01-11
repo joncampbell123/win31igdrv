@@ -881,6 +881,8 @@ page
 ; }
 ;-----------------------------------------------------------------------;
 
+; NTS: This is the DRV (DLL) entry point. This is the first code to execute
+;      when this DRV is loaded. See the END directive at the bottom.
 	assumes ds,Data
 	assumes es,nothing
 

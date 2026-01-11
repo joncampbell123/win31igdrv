@@ -43,6 +43,7 @@ assumes cs,InitSeg
 page
 
 	externW	physical_device
+	externNP dosbox_ig_detect
 
 ;--------------------------Public-Routine-------------------------------;
 ; dev_initialization - device specific initialization
@@ -75,6 +76,13 @@ cProc	dev_initialization,<NEAR,PUBLIC>
 
 cBegin
 
+	call	dosbox_ig_detect
+	jnc	.igok
+
+	xor	ax,ax
+	ret
+
+.igok:
 	mov	ax,1			;no way to have error
 
 cEnd
