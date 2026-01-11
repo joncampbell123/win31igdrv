@@ -18,55 +18,37 @@
 ;   This file is to be included by the cursor code only.
 ;
 ;-----------------------------------------------------------------------;
-
-
-;	The cursor save area and screen buffer will be allocated in
-;	unused screen RAM.  This will allow the EGA's special hardware
-;	to be used for moving all planes of a byte with a single movsb
-;	instruction.  It will also allow the EGA's drawing modes to
-;	be used for writing to all planes with a single mov instruction.
-;	Besides, it also saves a lot of space!
-;
-;	Special EGA locations will be made public by this routine since
-;	it knows exactly what must be where better than anybody else.
-
-
-	public	current_brush
-	public	tonys_bar_n_grill
-	public	shadow_mem_status
-	public	known_word
-	public	shadowed_mode
-	public	saved_latches
-	public	plane_index
-	public	enable_test
-
-
+; DOSBox IG: No, we're not EGA and we don't pretend to be EGA.          ;
+;            If Win386 is stupid enough to mistake us as one, then we   ;
+;            will have to figure out how to correct it.                 ;
+;                                                                       ;
+;            Just put it at the very end of the 64KB video memory       ;
+;            for now. Someday when bank switching is added to support   ;
+;            video modes >800x600 the screen buf will have to move to   ;
+;            system memory.                                             ;
+;-----------------------------------------------------------------------;
 
 EGAMem		segment at 0
 
-screen_area	db	(SCAN_BYTES*SCREEN_HEIGHT) dup (?)
+		; the original code here did elaborate "EGA" segment definitions
+		; that defined a screen_area for the visible screen, a save area
+		; just beyond it, and then a screen buf for more cursor work.
+		;
+		; it would be much simpler and reduce dependence on constants that
+		; will eventually become variables, to just define only the save_area
+		; and screen_buf and position them correctly using the ORG directive.
+		;
+		; as much as I would like to just say 10000h - x - y, MASM 4.0
+		; will throw a hissy fit about the fact that the number was 32-bit
+		; large at any point during the expression, so, we have to work around
+		; that to keep all points of the expression evaluation to a value that
+		; fits in 16 bits. good lord, how did Microsoft, OEMs, and software
+		; developers suffer through these older versions of MASM from the 1980s
+		; and early 1990s?
+
+		org	(0FFF0h - MASK_LENGTH - (((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH)) + 10h ; put it right up against the end of the 64KB segment
+
 save_area	db	MASK_LENGTH dup (?)
 screen_buf	db	(((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH) dup (?)
-
-
-;	The following locations must reside in the last 16 bytes of
-;	a 16K block of EGA memory (16K-16 or 32K-16).  Win386 expects
-;	to find these locations there, and will save and restore
-;	them when sharing the EGA with us.
-;
-;	The saved latches must be at 3FFF or 7FFF
-
-		  org	(($-screen_area) or 3FFFh - 15)
-
-current_brush	  db	8 dup (?)	;8 bytes for a brush
-tonys_bar_n_grill db	?		;1 byte for a solid color
-shadow_mem_status db	?		;Staus flags for upper 16/32K of mem
-known_word	  dw	?		;Required locations for state
-shadowed_mode	  db	?		;  detection code
-plane_index	  db	?
-enable_test	  db	?
-saved_latches	  db	?
-		  errnz <(($-screen_area) and 3FFFh)>
-
 
 EGAMem	      ends
