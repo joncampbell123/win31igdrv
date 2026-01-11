@@ -64,11 +64,6 @@ incDevice = 1				;Include control for gdidefs.inc
 	include	cursor.inc
 	.list
 
-
-cdw	macro	v1,v2
-	dw	v2
-	endm
-
 	externA	ScreenSelector
 	externA	WinFlags
 
@@ -391,10 +386,10 @@ info_table_base label byte
 	dw	DT_RASDISPLAY		;Device classification
 	errnz	dpTechnology-dpVersion-2
 
-	cdw	240,208 		;Horizontal size in millimeters
+	dw	208 		;Horizontal size in millimeters
 	errnz	dpHorzSize-dpTechnology-2
 
-	cdw	180,156 		;Vertical size in millimeters
+	dw	156 		;Vertical size in millimeters
 	errnz	dpVertSize-dpHorzSize-2
 
 	dw	SCREEN_WIDTH		;Horizontal width in pixels
@@ -459,38 +454,38 @@ info_table_base label byte
 
 
 	errnz	dpMLoWin-dpStyleLen-2	;Metric  Lo res WinX,WinY,VptX,VptY
-	cdw	15,2080 		;  HorzSize * 10
-	cdw	15,1560 		;  VertSize * 10
-	cdw	4,640			;  HorizRes
-	cdw	-4,-480 		;  -VertRes
+	dw	2080 			;  HorzSize * 10
+	dw	1560 			;  VertSize * 10
+	dw	640			;  HorizRes
+	dw	-480 			;  -VertRes
 
 
 	errnz	dpMHiWin-dpMLoWin-8	;Metric  Hi res WinX,WinY,VptX,VptY
-	cdw	150,20800		;  HorzSize * 100
-	cdw	150,15600		;  VertSize * 100
-	cdw	4,640			;  HorizRes
-	cdw	-4,-480 		;  -VertRes
+	dw	20800			;  HorzSize * 100
+	dw	15600			;  VertSize * 100
+	dw	640			;  HorizRes
+	dw	-480 			;  -VertRes
 
 
 	errnz	dpELoWin-dpMHiWin-8	;English Lo res WinX,WinY,VptX,VptY
-	cdw	375,325 		;  HorzSize * 1000
-	cdw	375,325 		;  VertSize * 1000
-	cdw	254,254 		;  HorizRes * 254
-	cdw	-254,-254		;  -VertRes * 254
+	dw	325 			;  HorzSize * 1000
+	dw	325 			;  VertSize * 1000
+	dw	254 			;  HorizRes * 254
+	dw	-254			;  -VertRes * 254
 
 
 	errnz	dpEHiWin-dpELoWin-8	;English Hi res WinX,WinY,VptX,VptY
-	cdw	3750,1625		;  HorzSize * 10000
-	cdw	3750,1625		;  VertSize * 10000
-	cdw	254,127 		;  HorizRes * 254
-	cdw	-254,-127		;  -VertRes * 254
+	dw	1625			;  HorzSize * 10000
+	dw	1625			;  VertSize * 10000
+	dw	127 			;  HorizRes * 254
+	dw	-127			;  -VertRes * 254
 
 
 	errnz	dpTwpWin-dpEHiWin-8	;Twips		WinX,WinY,VptX,VptY
-	cdw	5400,2340		;  HorzSize * 14400
-	cdw	5400,2340		;  VertSize * 14400
-	cdw	254,127 		;  HorizRes * 254
-	cdw	-254,-127		;  -VertRes * 254
+	dw	2340			;  HorzSize * 14400
+	dw	2340			;  VertSize * 14400
+	dw	127 			;  HorizRes * 254
+	dw	-127			;  -VertRes * 254
 
 
 	dw	96			;Logical Pixels/inch in X
