@@ -54,6 +54,7 @@ EXPORTS
 IMPORTS
     ScreenSwitchEnable	= KEYBOARD.100		;For DOS 3.x Box
     __NEXTSEG		= KERNEL.114		;offset to next seg
+    GetProfileInt       = KERNEL.57
     AllocCSToDSAlias    	= KERNEL.170
     AllocDSToCSAlias	      	= KERNEL.171
     ScreenSelector		= KERNEL.174

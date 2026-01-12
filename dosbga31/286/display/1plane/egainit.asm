@@ -33,6 +33,7 @@ incDevice = 1				;allow assembly of needed constants
 	externA		ScreenSelector	; the selector for display memory
 	externFP      	AllocCSToDSAlias; get a data seg alias for CS
 	externFP	FreeSelector	; free a selector
+	externFP	GetProfileInt	; read a value from WIN.INI
 	externW		SCREEN_HEIGHT
 	externW		SCREEN_WIDTH
 	externW		SCREEN_W_BYTES
@@ -65,6 +66,10 @@ page
 	externW info_table_base_dpHorzVertRes
 	externW info_table_base_dpMLoWinMetricRes
 	externW info_table_base_dpMHiWinMetricRes
+
+iniSectionName	db	'dosboxig.drv',0
+iniHeight	db	'height',0
+iniWidth	db	'width',0
 
 ;--------------------------Public-Routine-------------------------------;
 ; dev_initialization - device specific initialization
@@ -104,6 +109,34 @@ cBegin
 	ret
 
 .igok:
+
+	push	seg iniSectionName
+	push	offset iniSectionName
+	push	seg iniWidth
+	push	offset iniWidth
+	push	0FFFFh ; -1
+	cCall	GetProfileInt
+	cmp	ax,320
+	jb	.iniwok
+	cmp	ax,4096
+	ja	.iniwok
+	mov	SCREEN_WIDTH,ax
+	add	ax,7
+	shr	ax,3
+	mov	SCREEN_W_BYTES,ax
+.iniwok:
+	push	seg iniSectionName
+	push	offset iniSectionName
+	push	seg iniHeight
+	push	offset iniHeight
+	push	0FFFFh ; -1
+	cCall	GetProfileInt
+	cmp	ax,240
+	jb	.inihok
+	cmp	ax,4096
+	ja	.inihok
+	mov	SCREEN_HEIGHT,ax
+.inihok:
 
 	push	es			; save
 	mov	ax,InitSegBASE		; get the CS selector
