@@ -39,8 +39,8 @@ incDevice = 1				;allow assembly of needed constants
 	externW		real_y
 	externW		save_area
 	externW		screen_buf
-	externW		X_SCAN_INC
-	externW		X_SCAN_BYTES
+	externW		SCAN_INC
+	externW		SCAN_BYTES
 
 sBegin	Code
 
@@ -160,11 +160,11 @@ cBegin
 
 	mov	ax,SCREEN_W_BYTES
 	mov	es:CODE_SCREEN_W_BYTES,ax
-	mov	X_SCAN_BYTES,ax
+	mov	SCAN_BYTES,ax
 
 	mov	bx,SCREEN_W_BYTES
 	sub	bx,BUF_WIDTH
-	mov	X_SCAN_INC,bx
+	mov	SCAN_INC,bx
 
 	; done with CODE seg
 	mov	bx,es
