@@ -216,6 +216,9 @@ include dosboxid.inc
 sBegin	Code
 assumes cs,Code
 
+; some parts of the code cannot use the Data segment (smartpro.asm)
+globalW X_CODE_SCREEN_W_BYTES,SCREEN_W_BYTES;Screen width in bytes
+
 dosbox_id_reset proc far
 	push	ax
 	push	dx

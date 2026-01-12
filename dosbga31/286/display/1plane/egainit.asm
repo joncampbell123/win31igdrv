@@ -40,10 +40,15 @@ incDevice = 1				;allow assembly of needed constants
 	externW		save_area
 	externW		screen_buf
 
+sBegin	Code
+
+	externW X_CODE_SCREEN_W_BYTES;Screen width in bytes
+
+sEnd	Code
+
 sBegin	Data
 
 	externW ssb_mask	;Mask for save screen bitmap bit
-
 
 sEnd	Data
 
@@ -139,7 +144,22 @@ cBegin
 	sub	ax,bx
 	mov	save_area,ax
 
-	; done
+	; done with INIT seg
+	mov	bx,es
+	cCall	FreeSelector,<bx>	;free the alias
+	pop	es			; restore
+
+	; now the CODE seg
+
+	push	es			; save
+	mov	ax,CodeBASE		; get the CS selector
+	cCall	AllocCSToDSAlias,<ax>	; get a data segment alias
+	mov	es,ax
+
+	mov	ax,X_SCREEN_W_BYTES
+	mov	es:X_CODE_SCREEN_W_BYTES,ax
+
+	; done with CODE seg
 	mov	bx,es
 	cCall	FreeSelector,<bx>	;free the alias
 	pop	es			; restore
