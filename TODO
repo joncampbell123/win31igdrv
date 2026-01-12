@@ -1,9 +1,11 @@
 DOSBOX Graphics driver:
+[DONE]
 - Most programs including VIDEDIT, XINGMPEG, and the DOSLIB display test programs,
   are crashing when attempting to show an image. This is worse than when I was
   initiailly developing the driver when they all worked, and the only crash was
   DIBVIEW with an odd-width bitmap. Use GIT to bisect when programs using
   SetDIBits or DIB related functions started crashing so badly.
+[TODO]
 - Initially the only crash was in DIBVIEW when opening the "odd width" test samples.
 - Bank switching. Video modes about 800x600 are not usable because the driver
   stays within a 64KB video memory region. To go above that resolution, all code
