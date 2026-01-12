@@ -452,9 +452,20 @@ cProc	do_polylines,<FAR,PUBLIC,WIN,PASCAL>,<si,di>
 	localW	Y1			; bottom margin
 	localW	Y2			; top margin
 
+; SCREEN_WIDTH and SCREEN_HEIGHT are needed at a point when DS != Data
+
+	localW	locSCREEN_WIDTH
+	localW	locSCREEN_HEIGHT
+
 cBegin
 
 	jc	jump_error_exit		; exit with error on stack overflow
+
+	mov	ax,SCREEN_WIDTH
+	mov	locSCREEN_WIDTH,ax
+	mov	ax,SCREEN_HEIGHT
+	mov	locSCREEN_HEIGHT,ax
+
 	cld
 	mov	NeedExclusion,0
 	mov	cl,enabled_flag		; whether screen is enabled or not
@@ -488,11 +499,12 @@ do_no_clipping:
 ; pointer, so we will not wory about this when we have a memory bitmap
 
 ifdef	EXCLUSION
+	int	3
 	xor	cx,cx			; assume entire screen
 	mov	dx,cx
-	mov	di,SCREEN_HEIGHT	; SCREEN_HEIGHT-1
+	mov	di,locSCREEN_HEIGHT	; SCREEN_HEIGHT-1
 	dec	di
-	mov	si,SCREEN_WIDTH
+	mov	si,locSCREEN_WIDTH
 	dec	si
 
 	test	ClipFlag,CLIP_TOBE_DONE ; non zero clipping rectangle ?
