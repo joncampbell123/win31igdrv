@@ -59,7 +59,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 ;	be running in.
 
 	externA ScreenSelector		;Selector to the screen
-	externA SCREEN_W_BYTES		;Screen width in bytes
+	externW X_SCREEN_W_BYTES	;Screen width in bytes
 	externA SCREEN_WIDTH		;Screen width in pixels
 
 
@@ -2447,7 +2447,7 @@ gdd_exclude_have_rect:
 	endif
 
 
-	mov	ax,SCREEN_W_BYTES	;Compute adjustment from bottom
+	mov	ax,X_SCREEN_W_BYTES	;Compute adjustment from bottom
 	mov	next_scan,ax		;  of character to top of
 	mul	clipped_font_height	;  next character
 	dec	ax

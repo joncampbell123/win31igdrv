@@ -39,7 +39,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 
 
 	externA ScreenSelector		;Selector to the screen
-	externA SCREEN_W_BYTES		;Screen width in bytes
+	externA X_SCREEN_W_BYTES	;Screen width in bytes
 
 
 ifdef	EXCLUSION
@@ -173,7 +173,7 @@ ifdef	EXCLUSION			;If exclusion required
 	call	exclude_far 		;Exclude the area
 endif
 
-	mov	ax,SCREEN_W_BYTES	;Compute starting address of scan
+	mov	ax,X_SCREEN_W_BYTES	;Compute starting address of scan
 	mul	y			;Better on 286 than explicit shifts
 	xchg	ax,si			;SI is offset of the scan
 

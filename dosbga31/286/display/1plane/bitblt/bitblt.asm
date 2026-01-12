@@ -120,7 +120,6 @@ endif
 	.list
 
 
-	externA SCREEN_W_BYTES		;Screen width in bytes
 	externW SCREEN_HEIGHT
 
 ifdef	THIS_IS_DOS_3_STUFF

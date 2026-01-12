@@ -70,6 +70,7 @@ incDevice = 1				;Include control for gdidefs.inc
 	public	PHYS_DEVICE_SIZE	;Number of bytes in physical device
 	public	BW_THRESHOLD		;Black/white threshold
 	public	COLOR_FORMAT		;Color format
+	public	X_SCREEN_W_BYTES	;Screen width in bytes
 	public	SCREEN_W_BYTES		;Screen width in bytes
 	public	SCREEN_WIDTH		;Screen width in pixels
 	public	SCREEN_HEIGHT		;Screen height in scans
@@ -164,7 +165,7 @@ DC_HATCH_BR_5	equ	00100100b
 DC_HATCH_BR_6	equ	01000010b
 DC_HATCH_BR_7	equ	10000001b
 
-
+SCREEN_W_BYTES	equ	SCAN_BYTES*1	;"*1" to get in public symbol table
 
 ;-----------------------------------------------------------------------;
 ;	Line style definitions for the EGA Card
@@ -203,6 +204,7 @@ globalW ssb_mask,0FFFFh 		;Mask for save screen bitmap bit
 globalB enabled_flag,0			;Display is enabled if non-zero
 globalW	is_protected,WinFlags		;LSB set in protected mode
 globalW SCREEN_HEIGHT,480		;Screen height in pixels
+globalW X_SCREEN_W_BYTES,SCREEN_W_BYTES	;Screen width in bytes
 
 sEnd	Data
 page
@@ -302,9 +304,9 @@ dosbox_ig_detect	proc near
 ; compute how much is needed.
 ; NTS: I KNOW these are constants. They won't be in the future, they will be variables, because
 ;      we'll allow the user to control the video mode and set it to any arbitrary mode they want.
-			mov	ax,SCREEN_W_BYTES
+			mov	ax,X_SCREEN_W_BYTES
 			mov	bx,SCREEN_HEIGHT
-			mul	bx			; SCREEN_W_BYTES (AX) * SCREEN_HEIGHT (BX) = bytes required (DX:AX)
+			mul	bx			; X_SCREEN_W_BYTES (AX) * SCREEN_HEIGHT (BX) = bytes required (DX:AX)
 			mov	cx,dx
 			mov	bx,ax			; CX:BX = bytes required
 
@@ -326,7 +328,6 @@ dosbox_ig_detect	proc near
 			ret
 dosbox_ig_detect	endp
 
-SCREEN_W_BYTES	equ	SCAN_BYTES*1	;"*1" to get in public symbol table
 COLOR_FORMAT	equ	0101h
 
 
@@ -598,7 +599,7 @@ physical_enable proc near
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
 	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_FMT_BPSL_HI,DBID_REG_VGAIG_FMT_BPSL_LO
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	mov	ax,SCREEN_W_BYTES
+	mov	ax,X_SCREEN_W_BYTES
 	mov	dx,DBID_REG_VGAIG_FMTHI_1BPP
 	dosbox_id_write_data_m ; DX:AX
 

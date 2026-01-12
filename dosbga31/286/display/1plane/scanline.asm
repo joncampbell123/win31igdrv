@@ -65,7 +65,7 @@ incOutput	= 1			;Include control for gdidefs.inc
 ;	Link time constants describing the size of the display
 
 	externA ScreenSelector		;Selector to the screen
-	externA SCREEN_W_BYTES		;Screen width in bytes
+	externW X_SCREEN_W_BYTES	;Screen width in bytes
 
 
 ifdef	EXCLUSION
@@ -520,7 +520,7 @@ comp_scan	proc near
 
 
 	xchg	ax,cx			;Don't destroy Y coordinate
-	mov	ax,SCREEN_W_BYTES	;Faster to multiply on a 286
+	mov	ax,X_SCREEN_W_BYTES	;Faster to multiply on a 286
 	mul	cx			;  than doing explicit shifts
 	mov	off_scan_start,ax	;Save address of scan
 	mov	seg_scan_start,ScreenSelector

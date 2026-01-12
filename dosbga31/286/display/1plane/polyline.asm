@@ -235,7 +235,6 @@ incOutput	= 1			;Include GDI Output definitions
 
 ??_out polyline
 
-	externA SCREEN_W_BYTES
 	externA ScreenSelector
 	externA	SCREEN_WIDTH
 	externW	SCREEN_HEIGHT

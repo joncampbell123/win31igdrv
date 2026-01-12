@@ -36,7 +36,6 @@ endif
 ifdef	THIS_IS_DOS_3_STUFF
 	externA ScreenSelector		; Segment of Regen RAM
 endif
-	externA SCREEN_W_BYTES		; Screen width in bytes
 ifdef	GEN_COLOR_BLT
 	externA COLOR_DONT_CARE		; for use with GRAF_CDC register
 endif

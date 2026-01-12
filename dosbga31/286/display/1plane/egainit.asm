@@ -34,7 +34,7 @@ incDevice = 1				;allow assembly of needed constants
 	externFP      	AllocCSToDSAlias; get a data seg alias for CS
 	externFP	FreeSelector	; free a selector
 	externW		SCREEN_HEIGHT
-	externA		SCREEN_W_BYTES
+	externW		X_SCREEN_W_BYTES
 	externW		real_x
 	externW		real_y
 	externW		save_area
@@ -125,7 +125,7 @@ cBegin
 	mov	es:[info_table_base_dpMLoWinMetricRes+2],ax
 	mov	es:WORD PTR [info_table_base_dpMHiWinMetricRes+2],ax
 
-	mov	ax,SCREEN_W_BYTES
+	mov	ax,X_SCREEN_W_BYTES
 	mov	es:[physical_device.bmWidthBytes],ax
 
 	; decide where to put cursor buffer
