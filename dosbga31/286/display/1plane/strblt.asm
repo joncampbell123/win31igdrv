@@ -59,7 +59,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 ;	be running in.
 
 	externA ScreenSelector		;Selector to the screen
-	externW SCREEN_W_BYTES	;Screen width in bytes
+	externW SCREEN_W_BYTES		;Screen width in bytes
 	externW SCREEN_WIDTH		;Screen width in pixels
 
 

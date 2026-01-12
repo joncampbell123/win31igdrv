@@ -499,7 +499,6 @@ do_no_clipping:
 ; pointer, so we will not wory about this when we have a memory bitmap
 
 ifdef	EXCLUSION
-	int	3
 	xor	cx,cx			; assume entire screen
 	mov	dx,cx
 	mov	di,locSCREEN_HEIGHT	; SCREEN_HEIGHT-1

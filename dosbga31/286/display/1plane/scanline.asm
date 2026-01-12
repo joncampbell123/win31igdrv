@@ -519,9 +519,13 @@ comp_scan	proc near
 ;	is destroyed by any cursor exclusion code.
 
 
+	push	ds
+	mov	dx,DataBASE
+	mov	ds,dx
 	xchg	ax,cx			;Don't destroy Y coordinate
 	mov	ax,SCREEN_W_BYTES	;Faster to multiply on a 286
 	mul	cx			;  than doing explicit shifts
+	pop	ds
 	mov	off_scan_start,ax	;Save address of scan
 	mov	seg_scan_start,ScreenSelector
 

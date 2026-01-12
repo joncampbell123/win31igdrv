@@ -143,8 +143,18 @@ cProc	ScanLR,<FAR,PUBLIC,WIN,PASCAL>,<si,di>
 
 	localW	width_bits		;actual width of scan in bits
 	localB	is_device		;set non-zero if the device
+	localW	locSCREEN_HEIGHT	;Within the surface of the device?
+	localW	locSCREEN_W_BYTES	;Need screen width in bytes
+	localW	locSCREEN_WIDTH
 
 cBegin
+	mov	ax,SCREEN_WIDTH
+	mov	locSCREEN_WIDTH,ax
+	mov	ax,SCREEN_HEIGHT
+	mov	locSCREEN_HEIGHT,ax
+	mov	ax,SCREEN_W_BYTES
+	mov	locSCREEN_W_BYTES,ax
+
 	mov	al,enabled_flag 	;Load this before trashing DS
 	lds	si,lp_device		;--> physical device
 	assumes ds,nothing
@@ -174,8 +184,6 @@ scan_10:
 	endif
 
 
-	push	ds			;We need our data segment
-	pop	es
 	mov	ax,ScreenSelector	;Set DS to VRAM
 	mov	ds,ax
 	assumes ds,nothing
@@ -186,13 +194,13 @@ scan_10:
 ;
 
 	mov	ax,y			;Get starting Y coordinate
-	cmp	ax,es:SCREEN_HEIGHT	;Within the surface of the device?
+	cmp	ax,locSCREEN_HEIGHT	;Within the surface of the device?
 	jae	scan_20 		;  No, return error
-	mov	di,es:SCREEN_W_BYTES	;Need screen width in bytes
+	mov	di,locSCREEN_W_BYTES	;Need screen width in bytes
 	mul	di			;Compute Y starting address
 	mov	si,ax
 	mov	bx,x			;Will need X later
-	mov	dx,es:SCREEN_WIDTH
+	mov	dx,locSCREEN_WIDTH
 	mov	width_bits,dx		;Save width for final bounds test
 	cmp	bx,dx			;Within the surface of the device?
 	jb	scan_80 		;  Yes
