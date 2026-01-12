@@ -141,7 +141,10 @@ endif
 ;-----------------------------------------------------------------------;
 
 upd_dev	macro	ll
-	add	di,SCREEN_W_BYTES-DRAW_ADJUST
+if DRAW_ADJUST				;;If last logic operation defined
+	dec	di			;;  did a stosb, adjust for it
+endif
+	add	di,SCREEN_W_BYTES
 	ll
 	endm
 
