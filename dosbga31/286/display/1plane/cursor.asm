@@ -135,6 +135,7 @@
 
 
 	externA ScreenSelector		;Segment of screen
+	externW SCREEN_W_BYTES
 	externW SCREEN_HEIGHT
 
 	public	move_cursors
@@ -1103,9 +1104,11 @@ buf_to_screen_10:
 ;	clipped.  If it won't, then clip as needed.
 
 
+; NTS: The code used to compare against (SCREEN_WIDTH+7)/8 which is redundant because
+;      that comes out to the same value as SCREEN_W_BYTES anyway.
 buf_to_screen_20:
 	add	cx,vc_buf_1		;Add in width of the cursor/icon
-	sub	cx,(SCREEN_WIDTH+7)/8	;Clip the right side of the image?
+	sub	cx,SCREEN_W_BYTES	;Clip the right side of the image?
 	jle	buf_to_screen_40	;  No, it fits
 
 buf_to_screen_30:

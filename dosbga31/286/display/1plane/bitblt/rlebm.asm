@@ -194,7 +194,7 @@ FARPOINTER      ends
 
 	externA	__NEXTSEG		;segment offset to next segment
 	externA	ScreenSelector		;display memory selector
-	externA SCREEN_W_BYTES		;width of a screen scan
+	externW SCREEN_W_BYTES		;width of a screen scan
 
 IFDEF	CGAHERC
 	externA	Y_SHIFT_COUNT		; level of interleaving factor
@@ -540,8 +540,9 @@ rle_cliped:
 	mov	al,NUMBER_PLANES	;get number of planes for surface
 	mov	num_planes,al
 	xor	ah,ah
-	mov	width_scan,SCREEN_W_BYTES;width of screem in bytes
-	mov	next_scan,SCREEN_W_BYTES;total width including all planes
+	mov	dx,SCREEN_W_BYTES
+	mov	width_scan,dx		;width of screem in bytes
+	mov	next_scan,dx		;total width including all planes
 	dec	al			;will be 0 for monochrome driver
 	cmp	al,1			;carry will be set for monochrome
 	sbb	al,al			;al 0 for color
