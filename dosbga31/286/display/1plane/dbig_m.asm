@@ -367,7 +367,7 @@ P		equ	 COLOR_FORMAT AND 000FFh	;# color planes
 B		equ	(COLOR_FORMAT AND 0FF00h) SHR 8	;# bits per pixel
 H		equ	0				;new display height
 W		equ	0				;display width, pels
-WB		equ	SCREEN_W_BYTES			;display width, bytes
+WB		equ	0				;display width, bytes
 
 physical_device BITMAP <SCRSEL,W,H,WB,P,B,0A0000000H,0,0,0,0,0,0,0>
 
