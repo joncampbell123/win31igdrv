@@ -70,7 +70,7 @@ incDevice = 1				;Include control for gdidefs.inc
 	public	PHYS_DEVICE_SIZE	;Number of bytes in physical device
 	public	BW_THRESHOLD		;Black/white threshold
 	public	COLOR_FORMAT		;Color format
-	public	X_SCREEN_W_BYTES	;Screen width in bytes
+	public	SCREEN_W_BYTES		;Screen width in bytes
 	public	SCREEN_WIDTH		;Screen width in pixels
 	public	SCREEN_HEIGHT		;Screen height in scans
 	public	COLOR_TBL_SIZE		;Number of entries in color table
@@ -201,7 +201,7 @@ globalW ssb_mask,0FFFFh 		;Mask for save screen bitmap bit
 globalB enabled_flag,0			;Display is enabled if non-zero
 globalW	is_protected,WinFlags		;LSB set in protected mode
 globalW SCREEN_HEIGHT,480		;Screen height in pixels
-globalW X_SCREEN_W_BYTES,SCAN_BYTES	;Screen width in bytes
+globalW SCREEN_W_BYTES,SCAN_BYTES	;Screen width in bytes
 
 sEnd	Data
 page
@@ -214,7 +214,7 @@ sBegin	Code
 assumes cs,Code
 
 ; some parts of the code cannot use the Data segment (smartpro.asm)
-globalW X_CODE_SCREEN_W_BYTES,SCAN_BYTES;Screen width in bytes
+globalW CODE_SCREEN_W_BYTES,SCAN_BYTES;Screen width in bytes
 
 dosbox_id_reset proc far
 	push	ax
@@ -304,9 +304,9 @@ dosbox_ig_detect	proc near
 ; compute how much is needed.
 ; NTS: I KNOW these are constants. They won't be in the future, they will be variables, because
 ;      we'll allow the user to control the video mode and set it to any arbitrary mode they want.
-			mov	ax,X_SCREEN_W_BYTES
+			mov	ax,SCREEN_W_BYTES
 			mov	bx,SCREEN_HEIGHT
-			mul	bx			; X_SCREEN_W_BYTES (AX) * SCREEN_HEIGHT (BX) = bytes required (DX:AX)
+			mul	bx			; SCREEN_W_BYTES (AX) * SCREEN_HEIGHT (BX) = bytes required (DX:AX)
 			mov	cx,dx
 			mov	bx,ax			; CX:BX = bytes required
 
@@ -599,7 +599,7 @@ physical_enable proc near
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
 	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_FMT_BPSL_HI,DBID_REG_VGAIG_FMT_BPSL_LO
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	mov	ax,X_SCREEN_W_BYTES
+	mov	ax,SCREEN_W_BYTES
 	mov	dx,DBID_REG_VGAIG_FMTHI_1BPP
 	dosbox_id_write_data_m ; DX:AX
 

@@ -141,7 +141,7 @@ upd_dev	macro	ll
 if DRAW_ADJUST				;;If last logic operation defined
 	dec	di			;;  did a stosb, adjust for it
 endif
-	add	di,cs:X_CODE_SCREEN_W_BYTES
+	add	di,cs:CODE_SCREEN_W_BYTES
 	ll
 	endm
 
@@ -1000,7 +1000,7 @@ page
 sBegin	Code
 assumes cs,Code
 
-externW X_CODE_SCREEN_W_BYTES;Screen width in bytes
+externW CODE_SCREEN_W_BYTES;Screen width in bytes
 
 ;-----------------------------------------------------------------------;
 ;

@@ -41,7 +41,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 
 	externA ScreenSelector		;Selector to the screen
 	externA SCREEN_WIDTH		;Screen width in pixels
-	externW X_SCREEN_W_BYTES	;Screen width in bytes
+	externW SCREEN_W_BYTES	;Screen width in bytes
 	externW SCREEN_HEIGHT		;Screen height in scans
 
 
@@ -186,7 +186,7 @@ scan_10:
 	mov	ax,y			;Get starting Y coordinate
 	cmp	ax,SCREEN_HEIGHT	;Within the surface of the device?
 	jae	scan_20 		;  No, return error
-	mov	di,X_SCREEN_W_BYTES	;Need screen width in bytes
+	mov	di,SCREEN_W_BYTES	;Need screen width in bytes
 	mul	di			;Compute Y starting address
 	mov	si,ax
 	mov	bx,x			;Will need X later
