@@ -40,8 +40,8 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 ;	will be running in.
 
 	externA ScreenSelector		;Selector to the screen
-	externA SCREEN_WIDTH		;Screen width in pixels
-	externW SCREEN_W_BYTES	;Screen width in bytes
+	externW SCREEN_WIDTH		;Screen width in pixels
+	externW SCREEN_W_BYTES		;Screen width in bytes
 	externW SCREEN_HEIGHT		;Screen height in scans
 
 
@@ -174,6 +174,8 @@ scan_10:
 	endif
 
 
+	push	ds			;We need our data segment
+	pop	es
 	mov	ax,ScreenSelector	;Set DS to VRAM
 	mov	ds,ax
 	assumes ds,nothing
@@ -184,13 +186,13 @@ scan_10:
 ;
 
 	mov	ax,y			;Get starting Y coordinate
-	cmp	ax,SCREEN_HEIGHT	;Within the surface of the device?
+	cmp	ax,es:SCREEN_HEIGHT	;Within the surface of the device?
 	jae	scan_20 		;  No, return error
-	mov	di,SCREEN_W_BYTES	;Need screen width in bytes
+	mov	di,es:SCREEN_W_BYTES	;Need screen width in bytes
 	mul	di			;Compute Y starting address
 	mov	si,ax
 	mov	bx,x			;Will need X later
-	mov	dx,SCREEN_WIDTH
+	mov	dx,es:SCREEN_WIDTH
 	mov	width_bits,dx		;Save width for final bounds test
 	cmp	bx,dx			;Within the surface of the device?
 	jb	scan_80 		;  Yes

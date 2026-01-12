@@ -25,7 +25,6 @@
 
 CUR_HEIGHT	equ	32			;Height of cursor/icon
 MAX_BUF_HEIGHT	equ	64			;Number of scans in work buffer
-SCREEN_WIDTH	equ	640			;Screen width in pixels
 CUR_ICON_WIDTH	equ	4			;Width in bytes of cursor/icon
 SAVE_WIDTH	equ	CUR_ICON_WIDTH+1	;Width of save area
 BUF_WIDTH	equ	SAVE_WIDTH+CUR_ICON_WIDTH  ;Width of work buffer

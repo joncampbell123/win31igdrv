@@ -59,7 +59,6 @@ COLOR_BLT	equ	01000000b	; the screen is a color device
 
 ;----------------------------------------------------------------------------;
 
-	externA	SCREEN_WIDTH		; width of screen in pels
 	externA	ScreenSelector		; video segment address
         externA COLOR_FORMAT            ; own color format
 

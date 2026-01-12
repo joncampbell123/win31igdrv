@@ -60,7 +60,7 @@ incDrawMode	= 1			;Include control for gdidefs.inc
 
 	externA ScreenSelector		;Selector to the screen
 	externW SCREEN_W_BYTES	;Screen width in bytes
-	externA SCREEN_WIDTH		;Screen width in pixels
+	externW SCREEN_WIDTH		;Screen width in pixels
 
 
 ;	Other functions required for strblt.

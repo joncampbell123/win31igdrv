@@ -305,7 +305,7 @@ abs_ax	macro
 ;	returns min of AX and REG
 ; Entry:
 ;	AX	= integer
-;	REG	= general purpose register containing an integer
+;	REG	= general purpose register containing an integer (2026/01/11 or memory location, whatever)
 ; Returns:
 ;	AX	= min(AX,REG)
 ; Error Returns:
@@ -336,7 +336,7 @@ min_ax	macro	REG
 ;	returns max of AX and REG
 ; Entry:
 ;	AX	= integer
-;	REG	= general purpose register containing an integer
+;	REG	= general purpose register containing an integer (2026/01/11 or memory location, whatever)
 ; Returns:
 ;	AX	= max(AX, REG)
 ; Error Returns:

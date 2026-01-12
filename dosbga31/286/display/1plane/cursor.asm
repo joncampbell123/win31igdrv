@@ -1522,17 +1522,15 @@ compute_buffer_xy endp
 ;-----------------------------------------------------------------------;
 
 
-	assumes ds,nothing
+	assumes ds,Data
 	assumes es,nothing
 
 compute_screen_pointer proc near
 
 	xchg	ax,si			;Save X coordinate, get Y
 	ashiftr si,3			;Compute X offset
-	shiftl	ax,4
-	add	si,ax			;Add in * 16
-	shiftl	ax,2
-	add	si,ax			;Add in * 64 for a total of 80
+	mul	SCREEN_W_BYTES
+	add	si,ax
 	ret
 
 compute_screen_pointer endp

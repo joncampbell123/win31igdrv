@@ -34,6 +34,7 @@ incDevice = 1				;allow assembly of needed constants
 	externFP      	AllocCSToDSAlias; get a data seg alias for CS
 	externFP	FreeSelector	; free a selector
 	externW		SCREEN_HEIGHT
+	externW		SCREEN_WIDTH
 	externW		SCREEN_W_BYTES
 	externW		real_x
 	externW		real_y
@@ -111,7 +112,8 @@ cBegin
 
 	; init initial cursor position.
 	; NTS: Not sure about older Windows, but Windows 3.1 appears to call MoveCursor at startup to center the cursor anyway.
-	mov	ax,SCREEN_WIDTH/2
+	mov	ax,SCREEN_WIDTH
+	shr	ax,1
 	mov	real_x,ax
 
 	mov	ax,SCREEN_HEIGHT
