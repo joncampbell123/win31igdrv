@@ -509,8 +509,9 @@ copy_save_to_screen proc near
 
 	call	compute_screen_pointer	;Compute address on screen
 	xchg	si,di
-	mov	ax,SCAN_BYTES-SAVE_WIDTH;Get axis update values
 	mov	cx,SAVE_WIDTH		;Get width of save area
+	mov	ax,SCAN_BYTES		;Get axis update values
+	sub	ax,cx			;SCAN_BYTES-SAVE_WIDTH (ax -= cx)
 	mov	bp,CUR_HEIGHT		;Set maximum to move (entire save buf)
 	jmp	buf_to_screen_10
 
