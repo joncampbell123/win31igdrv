@@ -175,8 +175,8 @@ sBegin	Data
 	public	CUR_HEIGHT
 	public	CUR_ROUND_LEFT
 	public	CUR_ROUND_RIGHT
-
-
+	public	save_area
+	public	screen_buf
 
 ;	cur_cursor contains the cursor data structure (less the
 ;	actual bits) for the current cursor shape.
@@ -257,7 +257,10 @@ vc_buf_2	dw	0		;Buffer height
 
 real_width	dw	CUR_ICON_WIDTH*8
 
+;
 
+save_area	dw	0
+screen_buf	dw	0
 
 ;	The following are the masks which make up the cursor image.
 
@@ -498,7 +501,7 @@ cursor_off	endp
 
 copy_save_to_screen proc near
 
-	mov	di,offset save_area	;--> bits to restore to screen
+	mov	di,save_area		;--> bits to restore to screen
 	mov	ax,old_x_cell		;Get screen coordinates of upper
 	mov	si,old_y_cell		;  left bit
 	push	si
@@ -849,7 +852,7 @@ rotate_masks	endp
 
 copy_buffer_to_save proc near
 
-	mov	di,offset save_area	;--> where the old bits are to go
+	mov	di,save_area		;--> where the old bits are to go
 	mov	ax,x_cell		;Save the screen (x,y) of the
 	mov	si,y_cell		;  upper left bit of the bits
 	mov	old_x_cell,ax
@@ -923,7 +926,7 @@ copy_buffer_to_save endp
 
 copy_save_to_buf proc near
 
-	mov	di,offset save_area
+	mov	di,save_area
 	mov	ax,old_x_cell		;Get starting coordinate of the
 	mov	si,old_y_cell		;  saved bits
 	call	map_xy
@@ -1013,7 +1016,7 @@ map_xy	proc	near
 	errnz	BUF_WIDTH-9		;Must be 9 bytes wide
 
 	add	si,ax			;Add byte offset
-	add	si,offset screen_buf	;Point to screen buffer
+	add	si,screen_buf		;Point to screen buffer
 	mov	cx,CUR_HEIGHT		;Set cursor height
 	ret
 
@@ -1058,7 +1061,7 @@ map_xy	endp
 copy_buffer_to_screen proc near
 
 	mov	ax,SCAN_INC		;Prepare for the copy
-	mov	si,offset screen_buf	;--> source
+	mov	si,screen_buf		;--> source
 	mov	di,screen_pointer	;--> destination
 	mov	cx,BUF_WIDTH		;Get width of the buffer
 	mov	bp,buf_height		;Set height of valid data in buffer
@@ -1328,12 +1331,13 @@ copy_screen_to_buffer proc near
 	inc	cx
 	sar	cx,1
 	mov	si,screen_pointer	;Set up source pointer
+	mov	di,screen_buf
+	push	di
 	mov	dx,ds			;Save data segment
 	mov	di,ScreenSelector	;Set up destination and source segs
 	mov	ds,di
 	mov	es,di
-
-	mov	di,offset screen_buf
+	pop	di
 
 copy_screen_to_buffer_10:
 	movsb				;Use bytes to prevent an exception

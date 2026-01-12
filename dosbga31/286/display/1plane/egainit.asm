@@ -36,6 +36,8 @@ incDevice = 1				;allow assembly of needed constants
 	externW		SCREEN_HEIGHT
 	externW		real_x
 	externW		real_y
+	externW		save_area
+	externW		screen_buf
 
 sBegin	Data
 
@@ -122,6 +124,18 @@ cBegin
 	mov	es:[info_table_base_dpMLoWinMetricRes+2],ax
 	mov	es:WORD PTR [info_table_base_dpMHiWinMetricRes+2],ax
 
+	; decide where to put cursor buffer
+	xor	ax,ax ; allocate from the end of the 64KB video memory region
+
+	mov	bx,((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH
+	sub	ax,bx
+	mov	screen_buf,ax
+
+	mov	bx,MASK_LENGTH
+	sub	ax,bx
+	mov	save_area,ax
+
+	; done
 	mov	bx,es
 	cCall	FreeSelector,<bx>	;free the alias
 	pop	es			; restore
