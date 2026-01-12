@@ -64,8 +64,8 @@ endif
 	localW	gl_end_fls		;End   of fetch/logic/store operation
 	localD	gl_blt_addr 		;BLT offset address
 	localW	WorkSelector		; selector to use
+	localW	locSCREEN_HEIGHT	;Screen height
 
 	localV	gl_src,%(SIZE DEV) 	;Source device data
 	localV	gl_dest,%(SIZE DEV)	;Destination device data
-
 

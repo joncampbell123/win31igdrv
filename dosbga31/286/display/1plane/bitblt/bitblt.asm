@@ -194,6 +194,9 @@ endif
 
 
 bitblt_stack_ok:
+	mov	ax,SCREEN_HEIGHT	;SCREEN_HEIGHT is needed at a time when DS != Data
+	mov	locSCREEN_HEIGHT,ax
+
 	mov	al,enabled_flag 	;Save enabled_flag while we still
 	mov	local_enable_flag,al	;  have DS pointing to Data
 	mov	ax,ScratchSel		; get the free selector
@@ -437,10 +440,11 @@ ifdef	EXCLUSION
 ;	If the source/destination starting Y is greater than SCREEN_HEIGHT,
 ;	then the blt is supporting a save_screen_bitmap call.  In this case,
 ;	we only want to exclude whichever rectangle is visible.
+;	locSCREEN_HEIGHT is a local copy because DS != Data here.
 
-	cmp	bx,SCREEN_HEIGHT	  ;If destination is off the screen
+	cmp	bx,locSCREEN_HEIGHT	  ;If destination is off the screen
 	jge	cursor_exclusion_no_union ;  then only use source rectangle
-	cmp	dx,SCREEN_HEIGHT	  ;If source is off the screen
+	cmp	dx,locSCREEN_HEIGHT	  ;If source is off the screen
 	jl	cursor_exclusion_not_ssb  ;  then only use dest rectangle
 	xchg	ax,cx
 	mov	dx,bx
