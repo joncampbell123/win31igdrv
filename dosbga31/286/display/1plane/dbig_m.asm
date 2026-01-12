@@ -71,7 +71,6 @@ incDevice = 1				;Include control for gdidefs.inc
 	public	BW_THRESHOLD		;Black/white threshold
 	public	COLOR_FORMAT		;Color format
 	public	X_SCREEN_W_BYTES	;Screen width in bytes
-	public	SCREEN_W_BYTES		;Screen width in bytes
 	public	SCREEN_WIDTH		;Screen width in pixels
 	public	SCREEN_HEIGHT		;Screen height in scans
 	public	COLOR_TBL_SIZE		;Number of entries in color table
@@ -165,8 +164,6 @@ DC_HATCH_BR_5	equ	00100100b
 DC_HATCH_BR_6	equ	01000010b
 DC_HATCH_BR_7	equ	10000001b
 
-SCREEN_W_BYTES	equ	SCAN_BYTES*1	;"*1" to get in public symbol table
-
 ;-----------------------------------------------------------------------;
 ;	Line style definitions for the EGA Card
 ;
@@ -204,7 +201,7 @@ globalW ssb_mask,0FFFFh 		;Mask for save screen bitmap bit
 globalB enabled_flag,0			;Display is enabled if non-zero
 globalW	is_protected,WinFlags		;LSB set in protected mode
 globalW SCREEN_HEIGHT,480		;Screen height in pixels
-globalW X_SCREEN_W_BYTES,SCREEN_W_BYTES	;Screen width in bytes
+globalW X_SCREEN_W_BYTES,SCAN_BYTES	;Screen width in bytes
 
 sEnd	Data
 page
@@ -217,7 +214,7 @@ sBegin	Code
 assumes cs,Code
 
 ; some parts of the code cannot use the Data segment (smartpro.asm)
-globalW X_CODE_SCREEN_W_BYTES,SCREEN_W_BYTES;Screen width in bytes
+globalW X_CODE_SCREEN_W_BYTES,SCAN_BYTES;Screen width in bytes
 
 dosbox_id_reset proc far
 	push	ax
