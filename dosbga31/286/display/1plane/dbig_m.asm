@@ -201,7 +201,7 @@ globalW ssb_mask,0FFFFh 		;Mask for save screen bitmap bit
 globalB enabled_flag,0			;Display is enabled if non-zero
 globalW	is_protected,WinFlags		;LSB set in protected mode
 globalW SCREEN_HEIGHT,480		;Screen height in pixels
-globalW SCREEN_W_BYTES,SCAN_BYTES	;Screen width in bytes
+globalW SCREEN_W_BYTES,80		;Screen width in bytes
 
 sEnd	Data
 page
@@ -214,7 +214,7 @@ sBegin	Code
 assumes cs,Code
 
 ; some parts of the code cannot use the Data segment (smartpro.asm)
-globalW CODE_SCREEN_W_BYTES,SCAN_BYTES;Screen width in bytes
+globalW CODE_SCREEN_W_BYTES,80		;Screen width in bytes
 
 dosbox_id_reset proc far
 	push	ax

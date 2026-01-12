@@ -177,6 +177,8 @@ sBegin	Data
 	public	CUR_ROUND_RIGHT
 	public	save_area
 	public	screen_buf
+	public	X_SCAN_INC
+	public	X_SCAN_BYTES
 
 ;	cur_cursor contains the cursor data structure (less the
 ;	actual bits) for the current cursor shape.
@@ -261,6 +263,11 @@ real_width	dw	CUR_ICON_WIDTH*8
 
 save_area	dw	0
 screen_buf	dw	0
+
+;
+
+X_SCAN_INC	dw	0
+X_SCAN_BYTES	dw	0
 
 ;	The following are the masks which make up the cursor image.
 
@@ -510,7 +517,7 @@ copy_save_to_screen proc near
 	call	compute_screen_pointer	;Compute address on screen
 	xchg	si,di
 	mov	cx,SAVE_WIDTH		;Get width of save area
-	mov	ax,SCAN_BYTES		;Get axis update values
+	mov	ax,X_SCAN_BYTES		;Get axis update values
 	sub	ax,cx			;SCAN_BYTES-SAVE_WIDTH (ax -= cx)
 	mov	bp,CUR_HEIGHT		;Set maximum to move (entire save buf)
 	jmp	buf_to_screen_10
@@ -1061,7 +1068,7 @@ map_xy	endp
 
 copy_buffer_to_screen proc near
 
-	mov	ax,SCAN_INC		;Prepare for the copy
+	mov	ax,X_SCAN_INC		;Prepare for the copy
 	mov	si,screen_buf		;--> source
 	mov	di,screen_pointer	;--> destination
 	mov	cx,BUF_WIDTH		;Get width of the buffer
@@ -1327,7 +1334,7 @@ erase_old_cursor endp
 
 copy_screen_to_buffer proc near
 
-	mov	ax,SCAN_INC		;Prepare for the copy
+	mov	ax,X_SCAN_INC		;Prepare for the copy
 	mov	cx,buf_height		;Set # scans to copy (round up)
 	inc	cx
 	sar	cx,1
@@ -1523,7 +1530,6 @@ compute_screen_pointer proc near
 	add	si,ax			;Add in * 16
 	shiftl	ax,2
 	add	si,ax			;Add in * 64 for a total of 80
-	errnz	SCAN_BYTES-80		;Must be 80 bytes wide
 	ret
 
 compute_screen_pointer endp

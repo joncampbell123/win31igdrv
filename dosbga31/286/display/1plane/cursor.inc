@@ -26,11 +26,9 @@
 CUR_HEIGHT	equ	32			;Height of cursor/icon
 MAX_BUF_HEIGHT	equ	64			;Number of scans in work buffer
 SCREEN_WIDTH	equ	640			;Screen width in pixels
-SCAN_BYTES	equ	80			;# bytes in one scanline
 CUR_ICON_WIDTH	equ	4			;Width in bytes of cursor/icon
 SAVE_WIDTH	equ	CUR_ICON_WIDTH+1	;Width of save area
 BUF_WIDTH	equ	SAVE_WIDTH+CUR_ICON_WIDTH  ;Width of work buffer
-SCAN_INC	equ	SCAN_BYTES-BUF_WIDTH	;Index to next scan line
 MASK_LENGTH	equ	SAVE_WIDTH*CUR_HEIGHT	;#bytes in AND/XOR mask
 FARTHEST	equ	(CUR_ICON_WIDTH+1)*8	;How far apart in X old and
 						;  new cursor may be for
