@@ -53,6 +53,7 @@ sEnd	Code
 sBegin	Data
 
 	externW ssb_mask	;Mask for save screen bitmap bit
+	externD vmemsize
 
 sEnd	Data
 
@@ -171,14 +172,20 @@ cBegin
 	mov	es:[physical_device.bmWidthBytes],ax
 
 	; decide where to put cursor buffer
-	xor	ax,ax ; allocate from the end of the 64KB video memory region
+	; BX:AX = video memory size
+	mov	ax,WORD PTR vmemsize ; allocate from the end of the video memory
+	mov	bx,WORD PTR vmemsize+2
 
-	mov	bx,((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH
-	sub	ax,bx
+	; BX:AX -= ((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH
+	mov	cx,((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH
+	sub	ax,cx
+	sbb	bx,0
 	mov	screen_buf,ax
 
+	; BX:AX -= MASK_LENGTH
 	mov	bx,MASK_LENGTH
-	sub	ax,bx
+	sub	ax,cx
+	sbb	bx,0
 	mov	save_area,ax
 
 	; done with INIT seg
