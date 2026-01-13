@@ -183,7 +183,7 @@ cBegin
 	mov	screen_buf,ax
 
 	; BX:AX -= MASK_LENGTH
-	mov	bx,MASK_LENGTH
+	mov	cx,MASK_LENGTH
 	sub	ax,cx
 	sbb	bx,0
 	mov	save_area,ax
