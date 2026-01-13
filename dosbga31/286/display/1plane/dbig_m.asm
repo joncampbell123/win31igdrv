@@ -203,6 +203,7 @@ globalW	is_protected,WinFlags		;LSB set in protected mode
 globalW SCREEN_WIDTH,640		;Screen height in pixels
 globalW SCREEN_HEIGHT,480		;Screen height in pixels
 globalW SCREEN_W_BYTES,80		;Screen width in bytes
+globalD vmemsize,0
 
 sEnd	Data
 page
@@ -311,10 +312,20 @@ dosbox_ig_detect	proc near
 			mov	cx,dx
 			mov	bx,ax			; CX:BX = bytes required
 
+; include the memory required for the cursor
+			add	bx,((MAX_BUF_HEIGHT+1) and 0FFFEh) * BUF_WIDTH
+			adc	cx,0
+			add	bx,MASK_LENGTH
+			adc	cx,0
+
 			dosbox_id_command_write DBID_CMD_RESET_LATCH
 			dosbox_id_write_regsel_mchl DBID_REG_GET_VGA_MEMSIZE_HI,DBID_REG_GET_VGA_MEMSIZE_LO
 			dosbox_id_command_write DBID_CMD_RESET_LATCH
 			dosbox_id_read_data_m ; into DX:AX
+
+; save the total video memory size
+			mov	WORD PTR vmemsize,ax
+			mov	WORD PTR vmemsize+2,dx
 
 ; is DX:AX >= CX:BX? (available video memory >= bytes required). compute DX:AX -= CX:BX
 			sub	ax,bx
