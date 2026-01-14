@@ -400,6 +400,8 @@ draw_cursor	proc	near
 	mov	es,ax
 	assumes es,Data
 
+	dosbox_id_command_write DBID_CMD_PUSH_STATE
+
 	cld				;This is interrupt code, do this!
 	push	bp			;Must save this
 	call	erase_old_cursor	;Erase old cursor and setup for new
@@ -417,6 +419,8 @@ draw_cursor	proc	near
 	xor	ax,ax
 	xor	dx,dx
 	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_POP_STATE
 
 exit_draw_cursor:
 	ret
@@ -476,6 +480,8 @@ cursor_off	proc	near
 	mov	es,ax
 	assumes es,Data
 
+	dosbox_id_command_write DBID_CMD_PUSH_STATE
+
 	cld
 	push	bp
 	call	copy_save_to_screen
@@ -489,6 +495,8 @@ cursor_off	proc	near
 	xor	ax,ax
 	xor	dx,dx
 	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_POP_STATE
 
 cursor_off_end:
 	ret
