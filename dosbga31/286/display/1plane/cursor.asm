@@ -391,6 +391,58 @@ move_cursors	endp
 	assumes ds,Data
 	assumes es,nothing
 
+rsdbig_parmofs	equ	2
+rsdbig_parmsz	equ	8
+
+; input: SS:BP 8 bytes of storage
+save_dosboxig	proc	near
+
+	mov	bp,sp
+
+	dosbox_id_command_write DBID_CMD_PUSH_STATE
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_read_data_m
+	mov	[bp+rsdbig_parmofs+0],ax
+	mov	[bp+rsdbig_parmofs+2],dx
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_read_data_m
+	mov	[bp+rsdbig_parmofs+4],ax
+	mov	[bp+rsdbig_parmofs+6],dx
+
+	ret
+
+save_dosboxig	endp
+
+restore_dosboxig	proc	near
+
+	mov	bp,sp
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	mov	ax,[bp+rsdbig_parmofs+0]
+	mov	dx,[bp+rsdbig_parmofs+2]
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	mov	ax,[bp+rsdbig_parmofs+4]
+	mov	dx,[bp+rsdbig_parmofs+6]
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_POP_STATE
+
+	ret
+
+restore_dosboxig	endp
+
 draw_cursor	proc	near
 
 	test	enabled_flag,0FFh	;Cannot output if display has
@@ -400,27 +452,22 @@ draw_cursor	proc	near
 	mov	es,ax
 	assumes es,Data
 
-	dosbox_id_command_write DBID_CMD_PUSH_STATE
-
 	cld				;This is interrupt code, do this!
 	push	bp			;Must save this
+
+	sub	sp,rsdbig_parmsz
+	call	save_dosboxig
+
 	call	erase_old_cursor	;Erase old cursor and setup for new
 	call	copy_buffer_to_save	;Save area under new cursor
 	call	rotate_masks		;Rotate cursor masks into place
 	call	put_cursor_in_buffer	;Generate new cursor in local buffer
 	call	copy_buffer_to_screen	;Copy new cursor to screen (and
+
+	call	restore_dosboxig
+	add	sp,rsdbig_parmsz
+
 	pop	bp			;  possibly restore old cursor area)
-
-	; read bank: 0
-	; write bank: 0
-	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_BW_HI,DBID_REG_VGAIG_BW_LO
-	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	xor	ax,ax
-	xor	dx,dx
-	dosbox_id_write_data_m ; DX:AX (70.000Hz)
-
-	dosbox_id_command_write DBID_CMD_POP_STATE
 
 exit_draw_cursor:
 	ret
@@ -480,23 +527,18 @@ cursor_off	proc	near
 	mov	es,ax
 	assumes es,Data
 
-	dosbox_id_command_write DBID_CMD_PUSH_STATE
-
 	cld
 	push	bp
+
+	sub	sp,rsdbig_parmsz
+	call	save_dosboxig
+
 	call	copy_save_to_screen
+
+	call	restore_dosboxig
+	add	sp,rsdbig_parmsz
+
 	pop	bp
-
-	; read bank: 0
-	; write bank: 0
-	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_BW_HI,DBID_REG_VGAIG_BW_LO
-	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	xor	ax,ax
-	xor	dx,dx
-	dosbox_id_write_data_m ; DX:AX (70.000Hz)
-
-	dosbox_id_command_write DBID_CMD_POP_STATE
 
 cursor_off_end:
 	ret
