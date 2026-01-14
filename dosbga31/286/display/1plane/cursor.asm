@@ -232,6 +232,7 @@ old_y_cell	dw	0
 x_buffer	dw	0
 y_buffer	dw	0
 screen_pointer	dw	0
+screen_ptrbank	dd	0
 
 
 
@@ -539,6 +540,8 @@ copy_save_to_screen proc near
 	call	compute_screen_pointer	;Compute address on screen
 	xchg	si,di
 
+	push	dx			;save DX:AX bank offset
+	push	ax
 	; read bank: 
 	; write bank: 
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
@@ -551,8 +554,8 @@ copy_save_to_screen proc near
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
 	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	xor	ax,ax
-	xor	dx,dx
+	pop	ax			;restore DX:AX bank offset
+	pop	dx
 	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 	mov	cx,SAVE_WIDTH		;Get width of save area
@@ -1169,8 +1172,8 @@ copy_buffer_to_screen proc near
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
 	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	xor	ax,ax
-	xor	dx,dx
+	mov	ax,WORD PTR screen_ptrbank
+	mov	dx,WORD PTR screen_ptrbank+2
 	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 	mov	ax,SCAN_INC		;Prepare for the copy
@@ -1376,7 +1379,6 @@ erase_old_cursor proc near
 ;	area under the cursor, and refill the local buffer based on the
 ;	new cursor (x,y)
 
-
 	call	copy_save_to_screen	;Restore what was under the cursor
 
 erase_old_cursor_10:
@@ -1446,8 +1448,8 @@ copy_screen_to_buffer proc near
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
 	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
-	xor	ax,ax
-	xor	dx,dx
+	mov	ax,WORD PTR screen_ptrbank
+	mov	dx,WORD PTR screen_ptrbank+2
 	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 	dosbox_id_command_write DBID_CMD_RESET_LATCH
@@ -1608,6 +1610,8 @@ comp_buf_xy_40:
 	mov	si,bx			;  left corner of the buffer
 	call	compute_screen_pointer
 	mov	screen_pointer,si
+	mov	WORD PTR screen_ptrbank,ax ; put it in the bank offset var, low 16 bits
+	mov	WORD PTR screen_ptrbank+2,dx ; DX into high 16 bits
 	ret
 
 compute_buffer_xy endp
@@ -1622,6 +1626,7 @@ compute_buffer_xy endp
 ;	SI = screen y coordinate
 ; Returns:
 ;	SI = screen pointer
+;	DX:AX = bank offset
 ; Error Returns:
 ;	No error return.
 ; Registers Preserved:
@@ -1650,7 +1655,12 @@ compute_screen_pointer proc near
 	xchg	ax,si			;Save X coordinate, get Y
 	ashiftr si,3			;Compute X offset
 	mul	SCREEN_W_BYTES
-	add	si,ax
+	add	si,ax			;DX:AX += SI
+	adc	dx,0			;carry into upper 16 bits
+
+	mov	ax,si
+	and	ax,NOT 0FFFh		;mask off low 12 bits in AX
+	xor	si,ax			;use the masked AX to clear all but the 12 low bits in SI
 	ret
 
 compute_screen_pointer endp
