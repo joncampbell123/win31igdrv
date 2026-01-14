@@ -41,6 +41,7 @@ incDevice = 1				;allow assembly of needed constants
 	externW		real_y
 	externW		save_area
 	externW		screen_buf
+	externW		cursor_bank
 	externW		SCAN_INC
 	externW		SCAN_BYTES
 
@@ -187,6 +188,11 @@ cBegin
 	sub	ax,cx
 	sbb	bx,0
 	mov	save_area,ax
+
+	; the upper 16 bits (BX) is the bank to store the cursor in.
+	; DOSBox-X (currently) always returns a power of 2 vmem size,
+	; and is unlikely to ever report anything not a multiple of 64KB.
+	mov	cursor_bank,bx
 
 	; done with INIT seg
 	mov	bx,es

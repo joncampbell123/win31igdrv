@@ -127,6 +127,7 @@
 	include windefs.inc
 	include cursor.inc		;Device specific constants
 	include	macros.mac
+	include dosboxid.inc
 	.list
 	include egamemd.inc
 
@@ -180,6 +181,7 @@ sBegin	Data
 	public	screen_buf
 	public	SCAN_INC
 	public	SCAN_BYTES
+	public	cursor_bank
 
 ;	cur_cursor contains the cursor data structure (less the
 ;	actual bits) for the current cursor shape.
@@ -264,6 +266,7 @@ real_width	dw	CUR_ICON_WIDTH*8
 
 save_area	dw	0
 screen_buf	dw	0
+cursor_bank	dw	0
 
 ;
 
@@ -405,6 +408,15 @@ draw_cursor	proc	near
 	call	copy_buffer_to_screen	;Copy new cursor to screen (and
 	pop	bp			;  possibly restore old cursor area)
 
+	; read bank: 0
+	; write bank: 0
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_BW_HI,DBID_REG_VGAIG_BW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	xor	dx,dx
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
 exit_draw_cursor:
 	ret
 
@@ -468,6 +480,15 @@ cursor_off	proc	near
 	call	copy_save_to_screen
 	pop	bp
 
+	; read bank: 0
+	; write bank: 0
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_BW_HI,DBID_REG_VGAIG_BW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	xor	dx,dx
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
 cursor_off_end:
 	ret
 
@@ -517,6 +538,23 @@ copy_save_to_screen proc near
 
 	call	compute_screen_pointer	;Compute address on screen
 	xchg	si,di
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	xor	dx,dx
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
 	mov	cx,SAVE_WIDTH		;Get width of save area
 	mov	ax,SCAN_BYTES		;Get axis update values
 	sub	ax,cx			;SCAN_BYTES-SAVE_WIDTH (ax -= cx)
@@ -570,6 +608,22 @@ put_cursor_in_buffer proc near
 	mov	bx,DataOFFSET cur_xor_mask
 	mov	ax,ScreenSelector
 	mov	es,ax
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 put_cursor_in_buffer_10:
 	mov	dx,SAVE_WIDTH
@@ -868,6 +922,23 @@ copy_buffer_to_save proc near
 	mov	old_y_cell,si
 	mov	old_valid,OLD_IS_VALID
 	call	map_xy
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
 ;	mov	cx,CUR_HEIGHT		;map_xy set cx = CUR_HEIGHT
 	shr	cx,1
 	errnz	<CUR_HEIGHT and 1>
@@ -939,6 +1010,23 @@ copy_save_to_buf proc near
 	mov	ax,old_x_cell		;Get starting coordinate of the
 	mov	si,old_y_cell		;  saved bits
 	call	map_xy
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
 ;	mov	cx,CUR_HEIGHT		;map_xy set cx = CUR_HEIGHT
 	shr	cx,1
 	errnz	<CUR_HEIGHT and 1>
@@ -1068,6 +1156,22 @@ map_xy	endp
 
 
 copy_buffer_to_screen proc near
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	xor	dx,dx
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 	mov	ax,SCAN_INC		;Prepare for the copy
 	mov	si,screen_buf		;--> source
@@ -1336,6 +1440,22 @@ erase_old_cursor endp
 
 
 copy_screen_to_buffer proc near
+
+	; read bank: 
+	; write bank: 
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_RBW_HI,DBID_REG_VGAIG_RBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	xor	dx,dx
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
+
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	dosbox_id_write_regsel_mchl DBID_REG_VGAIG_WBW_HI,DBID_REG_VGAIG_WBW_LO
+	dosbox_id_command_write DBID_CMD_RESET_LATCH
+	xor	ax,ax
+	mov	dx,cursor_bank
+	dosbox_id_write_data_m ; DX:AX (70.000Hz)
 
 	mov	ax,SCAN_INC		;Prepare for the copy
 	mov	cx,buf_height		;Set # scans to copy (round up)
