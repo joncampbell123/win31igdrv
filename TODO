@@ -7,6 +7,17 @@ DOSBOX Graphics driver:
   SetDIBits or DIB related functions started crashing so badly.
 [TODO]
 - Initially the only crash was in DIBVIEW when opening the "odd width" test samples.
+- Hm... The DOSLIB programs to display a bitmap crash for anything higher than about
+  800x600 if you scroll. If I had to guess, the fancy optimization in the code about
+  how most bitmaps lie within the first 3 segments and something about avoiding the
+  divide instruction through iteration might be at fault here.
+- Very rarely, especially during Windows 3.1 startup, it is still possible for the
+  cursor movement to leave behind "mouse droppings" probably due to DOSBox IG bank
+  switching. I noticed in the debugger that when Windows calls the driver to draw
+  the mouse, interrupts are enabled, so perhaps the ISR comes around again before
+  the cursor drawing is finished to operate. Does the cursor routine need a bank
+  switching guard against itself? Maybe DrawCursor interrupted another part of the
+  cursor code and setting the bank to zero screws up drawing?
 - Bank switching. Video modes about 800x600 are not usable because the driver
   stays within a 64KB video memory region. To go above that resolution, all code
   will need to use bank switching. That includes cursor drawing code. Which by the
