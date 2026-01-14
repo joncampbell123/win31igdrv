@@ -1702,15 +1702,22 @@ compute_buffer_xy endp
 
 compute_screen_pointer proc near
 
+	push	bx
+
+	cwd				;sign extend AX -> DX:AX
+	mov	bx,dx			;save upper sign extend in BX
 	xchg	ax,si			;Save X coordinate, get Y
 	ashiftr si,3			;Compute X offset
-	mul	SCREEN_W_BYTES
+	imul	SCREEN_W_BYTES		;NTS: X and Y are SIGNED integers, not unsigned, and they can be negative!
 	add	si,ax			;DX:AX += SI
-	adc	dx,0			;carry into upper 16 bits
+	adc	dx,bx			;DX += sign extended X + carry
 
 	mov	ax,si
 	and	ax,NOT 0FFFh		;mask off low 12 bits in AX
 	xor	si,ax			;use the masked AX to clear all but the 12 low bits in SI
+
+	pop	bx
+
 	ret
 
 compute_screen_pointer endp
