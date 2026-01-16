@@ -12,12 +12,18 @@ DOSBOX Graphics driver:
   the cursor drawing is finished to operate. Does the cursor routine need a bank
   switching guard against itself? Maybe DrawCursor interrupted another part of the
   cursor code and setting the bank to zero screws up drawing?
-[TODO]
 - Initially the only crash was in DIBVIEW when opening the "odd width" test samples.
+  EDIT: That seems to be a bug in DIBVIEW, not our driver.
 - Hm... The DOSLIB programs to display a bitmap crash for anything higher than about
   800x600 if you scroll. If I had to guess, the fancy optimization in the code about
   how most bitmaps lie within the first 3 segments and something about avoiding the
   divide instruction through iteration might be at fault here.
+
+  EDIT: A-ha, the generated BitBlt code causes a crash with large bitmaps whenever
+        it copies scanlines in reverse byte order (right to left). The fix is to
+        always use left to right and to only use right to left in very specific
+        cases where the overlap requires it.
+[TODO]
 - Bank switching. Video modes about 800x600 are not usable because the driver
   stays within a 64KB video memory region. To go above that resolution, all code
   will need to use bank switching. That includes cursor drawing code. Which by the

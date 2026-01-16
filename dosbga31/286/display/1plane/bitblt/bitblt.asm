@@ -544,6 +544,20 @@ phase_proc_10:
 	pop	cx
 	jnz	phase_proc_15		;continue to X >= case if Y coordinates do not match
 
+	test	gl_the_flags,F0_SRC_PRESENT 	;Is there a source?
+	jz	.skip_ptr_comp			;skip ptr test if not
+	push	cx
+	push	dx
+	mov	cx,wptr gl_dest.lp_bits[0]
+	sub	cx,wptr gl_src.lp_bits[0]	;CX = difference of offset
+	mov	dx,wptr gl_dest.lp_bits[2]
+	sub	dx,wptr gl_src.lp_bits[2]	;DX = difference of segment
+	or	cx,dx				;CX |= DX and set ZF if equal (zero)
+	pop	dx
+	pop	cx
+	jnz	phase_proc_15		;continue to X >= case if the pointers do not match
+.skip_ptr_comp:
+
 	push	cx
 	lea	cx,[di-1]
 	sub	cx,si
