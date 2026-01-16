@@ -524,12 +524,34 @@ phase_proc_10:
 	mov	si,ax
 	and	ax,00000111b		;Get offset of source within byte
 
-	cmp	si,di			;Which direction will we be moving?
-	jl	phase_proc_30		;Move from right to left
+; NTS: Copying backwards ALL the time is causing CRASHES with large bitmaps!
+;      Copying forwards seems to solve all the crashes.
+;      However a BitBlt to move about 8 to the left misrenders for obvious reasons.
+;      This driver code copies byte by byte so to avoid the crash limit the
+;      right-to-left backwards copy to cases where the Y coordinate is the same
+;      and the X coordinates are less than 16 pixels apart.
+;
+;      This check fixes crashes with Windows 3.1 and large bitmaps in memory DCs.
+;      Prior to this change, opening a large bitmap in the DOSLIB Windows BMP viewer,
+;      the one that uses CreateCompatibleDC/CreateCompatibleBitmap, would cause a
+;      page fault and crash to DOS if you scrolled down too far.
+;
+; TODO: Add check to do right to left copy ONLY if the lpBits pointers match (i.e. both are
+;       pointing to the screen or the same memory DC)
+	push	cx
+	mov	cx,DestyOrg
+	sub	cx,SrcyOrg
+	pop	cx
+	jnz	phase_proc_15		;continue to X >= case if Y coordinates do not match
 
+	push	cx
+	lea	cx,[di-1]
+	sub	cx,si
+	cmp	cx,15
+	pop	cx
+	jb	phase_proc_30		;Move from right to left IF (dX-sX) < 16 to avoid overlap bugs
 
-
-
+phase_proc_15:
 ;	The starting X of the source rectangle is >= the starting X of
 ;	the destination rectangle, therefore we will be moving bytes
 ;	starting from the left and stepping right.
